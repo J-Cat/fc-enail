@@ -19,7 +19,7 @@ import { Gpio } from 'onoff';
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { getSP, setReady, getState, moveSP } from '../reducers/enailReducer';
+import { getSP, setReady, getState, moveSP, stepMoveTempStart, stepMoveTempComplete, nextStep } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import { Direction } from '../models/IEnailState';
 
@@ -39,8 +39,20 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             break;
         }
 
-        case Constants.E5CC_UPDATE_SETPOINT: {
-//            store.dispatch<any>(getState());
+        case Constants.E5CC_STEP_MOVE_TEMP: {
+            store.dispatch<any>(stepMoveTempStart());
+            break;
+        }
+
+        case Constants.E5CC_STEP_MOVE_TEMP_START: {
+            e5cc.setSP(state.setPoint).then(() => {
+                store.dispatch<any>(stepMoveTempComplete())
+            });
+            break;
+        }
+
+        case Constants.E5CC_STEP_MOVE_TEMP_COMPLETE: {
+            store.dispatch<any>(nextStep())
             break;
         }
 
@@ -60,13 +72,15 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
         }
 
         case Constants.E5CC_MOVE_SETPOINT: {
-            if ((state.lastDirection === action.payload) && !state.changingDirection) {
+            if (action.payload === Direction.None || ((state.lastDirection === action.payload) && !state.changingDirection)) {
                 e5cc.setSP(state.setPoint).then(() => {
                     store.dispatch(setReady());
                 });
             }
             break;
         }
+
+//        case Constants.
         // case Constants.E5CC_INCREASE_SETPOINT:  {
         //     if (state.lastDirection !== Direction.Down) {
         //         e5cc.setSP(state.setPoint + state.stepSize).then(() => {

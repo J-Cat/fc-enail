@@ -20,16 +20,15 @@ export interface APlayOptions {
     basePath?: string;
 }
 
-export default class APlay extends EventEmitter {
-    private options: APlayOptions;
+export class APlay extends EventEmitter {
+    private options?: APlayOptions;
     private stopped: boolean = false;
     private process?: ChildProcess;
     private ch?: string;
     private fileName?: string;
     private basePath?: string;
 
-    constructor(options?: APlayOptions) {
-        super();
+    init(options?: APlayOptions) {
         this.options = options || {};
         if (!!this.options.channel) {
             this.ch = this.options.channel;
@@ -47,6 +46,9 @@ export default class APlay extends EventEmitter {
     }
 
     public play = (fileName: string) => {
+        if (this.options === undefined) {
+            return;
+        }
         this.fileName = fileName;
         if (!this.fileName.toLowerCase().endsWith('.wav')) {
             this.fileName += '.wav';
@@ -109,3 +111,6 @@ export default class APlay extends EventEmitter {
         this.ch = ch;
     }
 }
+
+const aplay = new APlay()
+export default aplay;

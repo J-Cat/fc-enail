@@ -13,7 +13,10 @@
  * -----
  * Copyright (c) 2018
  */
-export interface IEnailState {
+import { IEnailScript } from './IEnailScript';
+import { IStep } from './IStep';
+
+ export interface IEnailState {
     readonly setPoint: number;
     readonly presentValue: number;
     readonly running: boolean;
@@ -24,6 +27,10 @@ export interface IEnailState {
     readonly lastDirection: Direction;
     readonly lastUpdate: number;
     readonly changingDirection: boolean;
+    readonly scripts: IEnailScript[];
+    readonly currentScript?: IEnailScript;
+    readonly currentStep?: IStep;
+    readonly currentStepPos: number;
 }
 
 export enum Direction {

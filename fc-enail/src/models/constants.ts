@@ -22,3 +22,18 @@ export const E5CC_DECREASE_SETPOINT = 'ENAIL/E5CC/DECREASE_SETPOINT';
 export const E5CC_UPDATE_STATE = 'ENAIL/E5CC/UPDATE_STATE';
 export const GET_RUNNING = 'ENAIL/RUNNING';
 export const E5CC_READY = 'ENAIL/E5CC/READY';
+
+export const RUN_SCRIPT = 'ENAIL/SCRIPT/RUN';
+export const RUN_STEP = 'ENAIL/STEP/RUN';
+export const NEXT_STEP = 'ENAIL/STEP/NEXT';
+export const STEP_PARALLEL = 'parallel';
+export const STEP_LOOP = 'loop';
+export const STEP_FEEDBACK = 'feedback';
+export const STEP_MOVETEMP = 'movetemp';
+export const STEP_WAITTEMP = 'waittemp';
+export const STEP_TIMER = 'timer';
+export const STEP_SEQUENTIAL = 'sequential';
+
+export const E5CC_STEP_MOVE_TEMP = 'ENAIL/E5CC/STEP_MOVE_TEMP';
+export const E5CC_STEP_MOVE_TEMP_START = 'ENAIL/E5CC/STEP_MOVE_TEMP_START';
+export const E5CC_STEP_MOVE_TEMP_COMPLETE = 'ENAIL/E5CC/STEP_MOVE_TEMP_COMPLETE';

@@ -168,7 +168,7 @@ class E5CC {
     }
 
     readPV = async (): Promise<number> => {
-        return await this.read(0x2100);        
+        return await this.read(0x2000);        
     }
 
     toggleUnit = async (): Promise<boolean> => {

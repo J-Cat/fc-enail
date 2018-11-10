@@ -17,11 +17,12 @@ import * as readline from 'readline';
 import { Gpio } from 'onoff';
 
 import { RotaryDial } from './ui/rotaryDial';
-import APlay from './aplay';
+import aplay from './aplay';
 import e5cc from './e5cc/e5cc';
 import store from './store/createStore';
-import { connect, increaseSP, decreaseSP, toggleState } from './reducers/enailReducer';
+import { connect, increaseSP, decreaseSP, toggleState, runScript } from './reducers/enailReducer';
 import oledUi from './ui/oledUi';
+import button from './ui/button';
 
 const OLED_ADDRESS = 0x3C;
 
@@ -47,20 +48,13 @@ const initDial = () => {
 }
 
 const initButton = async () => {
-    const button = new Gpio(25, 'in', 'rising', {debounceTimeout: 10, activeLow: true});
-
-    // const running = store.getState().enail.running;
-    // led.write(running ? 1 : 0, () => {});
-
-    button.watch(async (err: Error, value: number) => {
-        if (err) {
-            return;
-        }
-        if (value === 1) {
-            store.dispatch<any>(toggleState());
-//            led.write((await e5cc.toggleState()) ? 1 : 0, () => {});
-        }
+    button.init(25);
+    button.onClick.subscribe(() => {
+        store.dispatch<any>(toggleState());
     });
+    button.onDoubleClick.subscribe(() => {
+        store.dispatch<any>(runScript(0));
+    })
 }
 
 const initClient = () => {
@@ -189,10 +183,12 @@ store.dispatch<any>(connect());
 initClient();
 initDial();
 initButton();
+
 oledUi.start(OLED_ADDRESS);
 oledUi.render();
 
-const aplay = new APlay({
+aplay.init({
     basePath: `${__dirname}/assets/sounds/`
 });
+
 aplay.play('appear');

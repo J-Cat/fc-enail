@@ -14,14 +14,14 @@
  * Copyright (c) 2018
  */
 import { display, Font, Color, Layer } from 'ssd1306-i2c-js';
-import Icons from './icons';
+import { home } from './icons';
 import { format } from 'date-fns';
 
 export class OledUi {
     private lastUpdate: number = 0;
     private flashStatus: boolean = true;
     private flashRate: number = 0;
-    private _icon: Uint8Array = Icons.home;
+    private _icon: Uint8Array = home;
     private line1: string = "FC E-Nail"
     private line2: string = format(Date.now(), "h:mm");
 
