@@ -10,6 +10,8 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * ability to save/load custom settings (PID) for different nails (profiles)
 * mobile app to control advanced features more easily, etc.
 
+![Hardware](https://raw.githubusercontent.com/J-Cat/fc-enail/master/hardware.jpg)
+
 ## Getting Started
 
 ### Prerequisites
@@ -43,7 +45,7 @@ J-Cat
 
 ## License
 
-[http://creativecommons.org/licenses/by-nc/4.0/]This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/)
  
 ## Acknowledgments
 
