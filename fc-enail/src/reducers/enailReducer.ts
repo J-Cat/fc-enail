@@ -14,7 +14,7 @@
  * Copyright (c) 2018
  */
 import { IEnailState, Direction, EnailMode } from '../models/IEnailState';
-import { EnailAction, IBasicAction, IRunScriptAction } from '../models/Actions';
+import { EnailAction, IBasicAction, IE5CCUpdateStateAction } from '../models/Actions';
 import { Dispatch, Action } from 'redux';
 import * as Constants from '../models/constants';
 import e5cc from '../e5cc/e5cc';
@@ -29,6 +29,9 @@ import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
 import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/stepHelper';
 import { calculateStepSizeForIncrease, calculateStepSizeForDecrease } from '../helpers/rotaryHelper';
+
+import Debug from 'debug';
+const debug = Debug('fc-enail:reducer');
 
 const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
 
@@ -104,6 +107,17 @@ export const setSP = (value: number) => {
         });
     }
     
+}
+
+export const updateAllState = (pv: number, sp: number, isRunning: boolean) => {
+    return {
+        type: Constants.E5CC_UPDATE_ALL_STATE,
+        payload: {
+            pv,
+            sp,
+            isRunning
+        }
+    }
 }
 
 export const increaseSP = () => {
@@ -182,6 +196,13 @@ export const endScript = () => {
     };
 }
 
+export const setCurrentScript = (index: number) => {
+    return {
+        type: Constants.SET_CURRENT_SCRIPT,
+        payload: index
+    }
+}
+
 export const nextStep = () => {
     return {
         type: Constants.NEXT_STEP
@@ -201,7 +222,8 @@ export const stepFeedback = (step: IFeedbackStep) => {
             oledUi.render();
         }
 
-        if (step.led) {
+        if (step.led !== undefined) {
+            debug('flash');
             led.flash(step.led);
         }
 
@@ -242,9 +264,9 @@ export const stepMoveTempComplete = () => {
     };
 }
 
-export const stepWaitTemp = (step: IWaitTempStep, setPoint: number) => {
+export const stepWaitTemp = (step: IWaitTempStep) => {
     return (dispatch: Dispatch<IBasicAction>) => {
-        monitorTemp(step, setPoint).then(() => {
+        monitorTemp(step).then(() => {
             dispatch(nextStep());
         });
     };
@@ -407,6 +429,21 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.SET_CURRENT_SCRIPT: {
+            if (state.scriptRunning) {
+                return state;
+            }
+
+            const index = action.payload as number;
+
+            return {
+                ...state,
+                currentScript: state.scripts[index],
+                currentStep: state.scripts[index].step,
+                currentStepPos: 0
+            };
+        }
+
         case Constants.NEXT_STEP: {
             if (!state.currentStep) {
                 return state;
@@ -431,6 +468,14 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.E5CC_UPDATE_ALL_STATE: {
+            return {
+                ...state,
+                presentValue: (action as IE5CCUpdateStateAction).payload!.pv,
+                setPoint: (action as IE5CCUpdateStateAction).payload!.sp,
+                running: (action as IE5CCUpdateStateAction).payload!.isRunning
+            };
+        }
 
         default: {
             return state;

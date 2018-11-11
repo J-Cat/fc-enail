@@ -18,6 +18,8 @@ import { SimpleEventDispatcher, ISimpleEvent } from 'ste-simple-events';
 import { SequentialTaskQueue } from 'sequential-task-queue';
 
 import { IE5CCOptions } from './IE5ccOptions';
+import store from '../store/createStore';
+import { updateAllState } from '../reducers/enailReducer';
 
 const CONNECT_DELAY = 250;
 
@@ -49,10 +51,10 @@ class E5CC {
             }
             this._client.connectRTU(this._options.device, this._options.options, () => {
                 this._client.setID(1);
-                setTimeout(() => {
+                setTimeout((() => {
                     //this._onConnect.dispatch(this);
                     resolve();
-                }, CONNECT_DELAY);
+                }).bind(this), CONNECT_DELAY);
             });
         });
     }

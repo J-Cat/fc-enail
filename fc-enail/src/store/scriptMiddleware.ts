@@ -118,7 +118,7 @@ const executeStep = (dispatch: Dispatch<any>, state: IEnailState) => {
         }
 
         case Constants.STEP_WAITTEMP: {
-            dispatch<any>(stepWaitTemp(step as IWaitTempStep, state.setPoint));
+            dispatch<any>(stepWaitTemp(step as IWaitTempStep));
             break;
         }
 

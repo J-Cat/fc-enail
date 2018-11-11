@@ -14,15 +14,17 @@
  * Copyright (c) 2018
  */
 import { Dispatch, Store } from 'redux';
-import { Gpio } from 'onoff';
 
 import { IEnailStore } from '../models/IEnailStore';
-import { EnailAction } from '../models/Actions';
+import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { getSP, setReady, getState, moveSP, stepMoveTempStart, stepMoveTempComplete, nextStep } from '../reducers/enailReducer';
+import { getSP, setReady, getState, moveSP, stepMoveTempStart, stepMoveTempComplete, nextStep, updateAllState } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import { Direction } from '../models/IEnailState';
 import led from '../ui/led';
+import server from '../server/server';
+
+const MONITOR_CYCLE_TIME = 500;
 
 export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
@@ -30,10 +32,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
 
     switch (action.type) {
         case Constants.E5CC_CONNECTED: {
-            store.dispatch<any>(getSP());
-            Promise.resolve().then(() => {
-                store.dispatch<any>(getState());
-            });
+            getE5CCState(store.dispatch, true);
             break;
         }
 
@@ -60,6 +59,17 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             } else {
                 led.off();
             }
+            break;
+        }
+
+        case Constants.E5CC_UPDATE_ALL_STATE: {
+            if ((action as IE5CCUpdateStateAction).payload!.isRunning) {
+                led.on();
+            } else {
+                led.off();
+            }
+            server.emitState();
+            getE5CCState(store.dispatch);
             break;
         }
 
@@ -104,4 +114,13 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
     }
 
     return result;
+}
+
+const getE5CCState = (dispatch: Dispatch<EnailAction>, immediate: boolean = false) => {
+    setTimeout((async () => {
+        const pv = await e5cc.readPV();
+        const isRunning = await e5cc.isRunning();
+        const sp = await e5cc.readSP();
+        dispatch(updateAllState(pv, sp, isRunning));
+    }), immediate ? 0 : MONITOR_CYCLE_TIME);
 }

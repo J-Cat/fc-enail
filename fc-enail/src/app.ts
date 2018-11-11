@@ -22,6 +22,7 @@ import button from './ui/button';
 import led from './ui/led';
 import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
+import server from './server/server';
 
 const OLED_ADDRESS = 0x3C;
 
@@ -131,4 +132,6 @@ oledUi.render();
 aplay.init({
     basePath: `${__dirname}/assets/sounds/`
 });
+server.init();
+
 aplay.play('appear');

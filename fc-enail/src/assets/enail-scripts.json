@@ -8,6 +8,7 @@
             "steps":[{
                 "type": "feedback",
                 "flashRate": 1,
+                "led": 1,
                 "icon": "drop",
                 "sound": "bell"
             }, {
@@ -40,6 +41,7 @@
             "steps":[{
                 "type": "feedback",
                 "flashRate": 1,
+                "led": 1,
                 "icon": "drop",
                 "sound": "bell"
             }, {
@@ -71,6 +73,7 @@
             "count": 2,
             "steps":[{
                 "type": "feedback",
+                "led": 1,
                 "flashRate": 1,
                 "icon": "drop",
                 "sound": "bell"

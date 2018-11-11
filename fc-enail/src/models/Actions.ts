@@ -16,7 +16,7 @@
 import { Action } from 'redux';
 import { Direction } from './IEnailState';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IRunScriptAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
@@ -24,8 +24,8 @@ export interface IErrorAction extends Action<string> {
     error?: boolean;
 }
 
-export interface IRunScriptAction extends Action<string> {
-    payload?: { index: number, value: number }
+export interface IE5CCUpdateStateAction extends Action<string> {
+    payload?: { pv: number, sp: number, isRunning: boolean }
 }
     
 export interface IBasicAction extends Action<string> {

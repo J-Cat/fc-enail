@@ -67,12 +67,12 @@ export const getNextStepPos = (state: IEnailState): number => {
     return state.currentStepPos;
 }
 
-export const monitorTemp = async (step: IWaitTempStep, setPoint: number): Promise<void> => {
+export const monitorTemp = async (step: IWaitTempStep): Promise<void> => {
     return new Promise<void>(async resolve => {
         let tempReached = false;
         const startTime = Date.now();
         while (!tempReached) {
-            tempReached = await checkTemp(step, setPoint);
+            tempReached = await checkTemp(step);
             if (!tempReached && ((Date.now() - startTime) > (step.timeout * 1000))) {
                 tempReached = true;
             }
@@ -132,9 +132,11 @@ const getNextStepKey = (step: IStep, stepIndex: number, parent: IStep, root: ISt
     }
 }
 
-const checkTemp = (step: IWaitTempStep, setPoint: number) => {
+const checkTemp = (step: IWaitTempStep) => {
     return new Promise<boolean>(async resolve => {
-        const pv = await e5cc.readPV();
+        const state = store.getState().enail;
+        const pv = state.presentValue;
+        const setPoint = state.setPoint;
         switch (step.direction) {
             case Direction.UP: {
                 if (Math.floor(pv) >= Math.floor(setPoint + step.offset)) {
