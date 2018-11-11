@@ -215,7 +215,6 @@ export const stepFeedback = (step: IFeedbackStep) => {
         }
     };
 }
-
 export const stepTimer = (step: ITimerStep) => {
     return (dispatch: Dispatch<IBasicAction>) => {
         setTimeout(() => {

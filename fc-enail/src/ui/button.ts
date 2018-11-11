@@ -1,7 +1,7 @@
 import { Gpio } from 'onoff';
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 
-const DOUBLE_CLICK_RATE = 750;
+const DOUBLE_CLICK_RATE = 1000;
 
 
 // const running = store.getState().enail.running;

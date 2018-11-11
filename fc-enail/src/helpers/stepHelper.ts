@@ -5,6 +5,10 @@ import { IEnailState } from '../models/IEnailState';
 import { IWaitTempStep } from '../models/IWatiTempStep';
 import e5cc from '../e5cc/e5cc';
 import { Direction } from '../models/direction';
+import store from '../store/createStore';
+
+import Debug from 'debug';
+const debug = Debug("fc-enail:script");
 
 export const mapStep = (step: IStep, stepIndex: number, parent: IStep, root: IStep): IStep => {
     const key: string = `${parent.key !== '' ? `${parent.key}.` : ''}${stepIndex}`;
@@ -71,7 +75,14 @@ export const monitorTemp = async (step: IWaitTempStep, setPoint: number): Promis
             tempReached = await checkTemp(step, setPoint);
             if (!tempReached && ((Date.now() - startTime) > (step.timeout * 1000))) {
                 tempReached = true;
-            }             
+            }
+
+            if (!tempReached) {
+                if (!store.getState().enail.scriptRunning) {
+                    tempReached = true;
+                    debug('cancelling temp monitor');
+                }
+            }
         }
         resolve();
     });
