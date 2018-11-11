@@ -28,13 +28,9 @@ import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
 import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/stepHelper';
+import { calculateStepSizeForIncrease, calculateStepSizeForDecrease } from '../helpers/rotaryHelper';
 
 const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
-
-const STEP_ACCELERATION_TIMEOUT = 450;
-const STEP_ACCELERATION_PERIOD = 350;
-const MAX_STEP_SIZE = 10;
-const STEP_COUNT_ACCEL = 5;
 
 const scripts = enailScripts.map((script, index) => {
     const rootStep = {
@@ -311,35 +307,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             if (!state.ready) {
                 return state;
             } else {
-                let stepSize: number = state.stepSize;
-                let directionCount: number = state.directionCount;
-                let lastDirection = Direction.Up;
-                let changingDirection = false;
-                if ((Date.now() - state.lastUpdate) < STEP_ACCELERATION_PERIOD && state.lastDirection === Direction.Up) {
-                    if (directionCount < STEP_COUNT_ACCEL) {
-                        directionCount += 1;
-                    } else {
-                        if (stepSize < MAX_STEP_SIZE) {
-                            stepSize += 1;
-                        }
-                    }
-                } else if (state.lastDirection !== Direction.Up) {
-                    if (state.changingDirection || ((Date.now() - state.lastUpdate) > STEP_ACCELERATION_PERIOD)) {
-                        stepSize = 1;
-                        directionCount = 0;        
-                    } else {
-                        changingDirection = true;
-                        lastDirection = Direction.Down;
-                    }
-                } else if ((Date.now() - state.lastUpdate) > STEP_ACCELERATION_TIMEOUT) {
-                    if (stepSize > 1) {
-                        const reduceStepSize = Math.min(stepSize - 1, Math.max(1, (Date.now() - state.lastUpdate) / STEP_ACCELERATION_TIMEOUT));
-                        stepSize -= reduceStepSize;
-                        directionCount = 0;
-                    } else {
-                        directionCount = 0;
-                    }
-                }
+                let { stepSize, directionCount, lastDirection, changingDirection } = calculateStepSizeForIncrease(state);
 
                 return {
                     ...state,
@@ -357,35 +325,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             if (!state.ready) {
                 return state;
             } else {
-                let stepSize: number = state.stepSize;
-                let directionCount: number = state.directionCount;
-                let lastDirection = Direction.Down;
-                let changingDirection = false;
-                if ((Date.now() - state.lastUpdate) < STEP_ACCELERATION_PERIOD && state.lastDirection === Direction.Down) {
-                    if (directionCount < STEP_COUNT_ACCEL) {
-                        directionCount += 1;
-                    } else {
-                        if (stepSize < MAX_STEP_SIZE) {
-                            stepSize += 1;
-                        }
-                    }
-                } else if (state.lastDirection !== Direction.Down) {
-                    if (state.changingDirection || ((Date.now() - state.lastUpdate) > STEP_ACCELERATION_PERIOD)) {
-                        stepSize = 1;
-                        directionCount = 0;
-                    } else {
-                        changingDirection = true;
-                        lastDirection = Direction.Up;
-                    }
-                } else if ((Date.now() - state.lastUpdate) > STEP_ACCELERATION_TIMEOUT) {
-                    if (stepSize > 1) {
-                        const reduceStepSize = Math.min(stepSize - 1, Math.max(1, (Date.now() - state.lastUpdate) / STEP_ACCELERATION_TIMEOUT));
-                        stepSize -= reduceStepSize;
-                        directionCount = 0;
-                    } else {
-                        directionCount = 0;
-                    }
-                }
+                let { stepSize, directionCount, lastDirection, changingDirection } = calculateStepSizeForDecrease(state);
 
                 return {
                     ...state,

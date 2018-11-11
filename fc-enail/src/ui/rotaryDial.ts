@@ -17,7 +17,7 @@ import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { Gpio } from 'onoff';
 import { Button } from './button';
 
-const ROTATION_THROTTLE = 25;
+const ROTATION_THROTTLE = 20;
 
 export class RotaryDial {
     private lastA: number = 0;

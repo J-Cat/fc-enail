@@ -44,7 +44,6 @@ export const render = (state: IEnailState, action: EnailAction) => {
             oledUi.setIcon(home);
             oledUi.setLine1('FC E-Nail');
             oledUi.setLine2('#time');
-            dial.setRotationThrottle(25);
             break;
         }
 
@@ -52,7 +51,6 @@ export const render = (state: IEnailState, action: EnailAction) => {
             led.flash(0);
             oledUi.setIcon(script);
             oledUi.setLine1(!state.currentScript ? '-Select-' : state.currentScript.title);
-            dial.setRotationThrottle(50);
             break;
         }
 
@@ -60,7 +58,6 @@ export const render = (state: IEnailState, action: EnailAction) => {
             led.flash(0);
             oledUi.setIcon(gear);
             oledUi.setLine1('Settings');
-            dial.setRotationThrottle(50);
             break;
         }
     }
