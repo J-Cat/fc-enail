@@ -16,12 +16,16 @@
 import { Action } from 'redux';
 import { Direction } from './IEnailState';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IRunScriptAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
     meta?:any;
     error?: boolean;
+}
+
+export interface IRunScriptAction extends Action<string> {
+    payload?: { index: number, value: number }
 }
     
 export interface IBasicAction extends Action<string> {

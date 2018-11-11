@@ -31,10 +31,19 @@ import { IStep } from './IStep';
     readonly currentScript?: IEnailScript;
     readonly currentStep?: IStep;
     readonly currentStepPos: number;
+    readonly scriptRunning: boolean;
+    readonly scriptStartSP?: number;
+    readonly mode: EnailMode;
 }
 
 export enum Direction {
     'None' = -1,
     'Up' = 1,
     'Down' = 0
+}
+
+export enum EnailMode {
+    'Home' = 0,
+    'Script' = 1,
+    'Settings' = 2
 }

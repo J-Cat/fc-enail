@@ -28,12 +28,14 @@ import { EnailAction } from '../models/Actions';
 import { e5ccMiddleware } from './e5ccMiddleware';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import { scriptMiddleware } from './scriptMiddleware';
+import { displayMiddleware } from './displayMiddleware';
 
 const configureStore = (initialState?: IEnailStore): Store<IEnailStore, EnailAction> => {
     const middlewares: any = [
         thunk,
         e5ccMiddleware,
-        scriptMiddleware
+        scriptMiddleware,
+        displayMiddleware
     ];
 
     const composeEnhancers = composeWithDevTools({ realtime: true });

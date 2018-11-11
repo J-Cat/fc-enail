@@ -24,22 +24,74 @@
             }, {
                 "type": "timer",
                 "timeout":  5
-            }, {
-                "type": "feedback",
-                "icon": "drop",
-                "sound": "bell"
             }]
         }, {
             "type": "timer",
             "timeout": 5
+        }]
+    }
+}, {
+    "title": "Up 35x2",
+    "step": {
+        "type": "sequential",
+        "steps": [{
+            "type": "loop",
+            "count": 2,
+            "steps":[{
+                "type": "feedback",
+                "flashRate": 1,
+                "icon": "drop",
+                "sound": "bell"
+            }, {
+                "type": "movetemp",
+                "value": 35
+            }, {
+                "type": "waittemp",
+                "offset": -1,
+                "direction": "UP",
+                "timeout": 60
+            }, {
+                "type": "feedback",
+                "icon": "cloud"
+            }, {
+                "type": "timer",
+                "timeout":  5
+            }]
         }, {
-            "type": "movetemp",
-            "value": -105
+            "type": "timer",
+            "timeout": 5
+        }]
+    }
+}, {
+    "title": "Up 45x2",
+    "step": {
+        "type": "sequential",
+        "steps": [{
+            "type": "loop",
+            "count": 2,
+            "steps":[{
+                "type": "feedback",
+                "flashRate": 1,
+                "icon": "drop",
+                "sound": "bell"
+            }, {
+                "type": "movetemp",
+                "value": 45
+            }, {
+                "type": "waittemp",
+                "offset": -1,
+                "direction": "UP",
+                "timeout": 60
+            }, {
+                "type": "feedback",
+                "icon": "cloud"
+            }, {
+                "type": "timer",
+                "timeout":  5
+            }]
         }, {
-            "type": "feedback",
-            "flashRate": 0,
-            "icon": "home",
-            "sound": "complete"
+            "type": "timer",
+            "timeout": 5
         }]
     }
 }]

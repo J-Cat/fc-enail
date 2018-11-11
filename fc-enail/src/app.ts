@@ -13,182 +13,122 @@
  * -----
  * Copyright (c) 2018
  */
-import * as readline from 'readline';
-import { Gpio } from 'onoff';
-
-import { RotaryDial } from './ui/rotaryDial';
+import dial from './ui/rotaryDial';
 import aplay from './aplay';
-import e5cc from './e5cc/e5cc';
 import store from './store/createStore';
-import { connect, increaseSP, decreaseSP, toggleState, runScript } from './reducers/enailReducer';
+import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript } from './reducers/enailReducer';
 import oledUi from './ui/oledUi';
 import button from './ui/button';
+import led from './ui/led';
+import consoleUi from './ui/consoleUi';
+import { EnailMode } from './models/IEnailState';
 
 const OLED_ADDRESS = 0x3C;
 
-const rl = readline.createInterface(process.stdin, process.stdout);
-
-const displayHelp = () => {
-    console.log('Commands:\n\n\t- read <address>\n\t- write <address> <value>\n\t- run <command>\n\n');
-    console.log('Examples:\n\n\t- read 0x2103\n\t- write 0x2103 50\n\t- run 0x0101\n\n');
-}
-
 const initDial = () => {
-    const dial = new RotaryDial(22, 23, 24);
-    dial.onButton.subscribe(() => {
+    dial.init(22, 23, 24);
+
+    dial.onClockwise.subscribe(() => {
+        switch (store.getState().enail.mode) {
+            case EnailMode.Home: {
+                store.dispatch(increaseSP());
+                break;
+            }
+            case EnailMode.Script: {
+                store.dispatch(increaseCurrentScript());
+                break;
+            }
+            case EnailMode.Settings: {
+                break;
+            }
+        }
     });
 
-    dial.onClockwise.subscribe((sender: RotaryDial) => {
-        store.dispatch(increaseSP());
+    dial.onCounterClockwise.subscribe(() => {
+        switch (store.getState().enail.mode) {
+            case EnailMode.Home: {
+                store.dispatch(decreaseSP());
+                break;
+            }
+            case EnailMode.Script: {
+                store.dispatch(decreaseCurrentScript());
+                break;
+            }
+            case EnailMode.Settings: {
+                break;
+            }
+        }
     });
 
-    dial.onCounterClockwise.subscribe((sender: RotaryDial) => {
-        store.dispatch(decreaseSP());
+    dial.onClick.subscribe(() => {
+        // change menu
+        switch (store.getState().enail.mode) {
+            case EnailMode.Home: {
+                store.dispatch(setMode(EnailMode.Script));
+                break;
+            }
+            case EnailMode.Script: {
+                store.dispatch(setMode(EnailMode.Settings));
+                break;
+            }
+            case EnailMode.Settings: {
+                store.dispatch(setMode(EnailMode.Home));
+                break;
+            }
+        }
     });
 }
 
 const initButton = async () => {
     button.init(25);
     button.onClick.subscribe(() => {
-        store.dispatch<any>(toggleState());
+        const state = store.getState().enail;
+        switch (state.mode) {
+            case EnailMode.Home: {
+                store.dispatch<any>(toggleState());
+                break;
+            }
+
+            case EnailMode.Script: {
+                if (state.scriptRunning) {
+                    store.dispatch<any>(endScript());
+                } else {
+                    store.dispatch<any>(runScript());
+                }
+                break;
+            }
+        }
     });
     button.onDoubleClick.subscribe(() => {
-        store.dispatch<any>(runScript(0));
+        const state = store.getState().enail;
+        switch (state.mode) {
+            case EnailMode.Script: {
+                store.dispatch<any>(toggleState());
+                break;
+            }
+
+            case EnailMode.Home: {
+                if (state.scriptRunning) {
+                    store.dispatch<any>(endScript());
+                } else {
+                    store.dispatch<any>(runScript());
+                }
+                break;
+            }
+        }
     })
 }
 
-const initClient = () => {
-    rl.setPrompt('command>');
-    rl.prompt();
-    rl.on('line', (line: string) => {
-        const cmd = line.split(' ');
-        switch (cmd[0].toLowerCase()) {
-            case 'read': {
-                if (cmd.length < 2) {
-                    console.log('Invalid # of arguments specified.\n');
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-                
-                const address = parseInt(cmd[1]);
-                if (isNaN(address)) {
-                    console.log(`Invalid address specified: ${cmd[1]}\n`);
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
 
-                e5cc.read(address).then(value => {
-                    console.log(`Value: ${value}`);
-                    rl.prompt();
-                }).catch(e => {
-                    console.log(`Error: ${e}`);
-                    rl.prompt();
-                });
-                break;
-            }
-
-            case 'write': {
-                if (cmd.length < 3) {
-                    console.log('Invalid # of arguments specified.\n');
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-
-                const address = parseInt(cmd[1]);
-                if (isNaN(address)) {
-                    console.log(`Invalid address specified: ${cmd[1]}\n`);
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-
-                const newValue = parseInt(cmd[2]);
-                if (isNaN(newValue)) {
-                    console.log(`Invalid value specified: ${cmd[2]}\n`);
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-
-                e5cc.write(address, newValue).then(result => {
-                    if (result) {
-                        console.log('Updated variable.');
-                    } else {
-                        console.log(`Failed to update variable`);
-                    }
-                    rl.prompt();
-                });
-                break;
-            }
-
-            case 'run': {
-                if (cmd.length < 2) {
-                    console.log('Invalid # of arguments specified.\n');
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-
-                const command = parseInt(cmd[1]);
-                if (isNaN(command)) {
-                    console.log(`Invalid command specified: ${cmd[1]}\n`);
-                    displayHelp();
-                    rl.prompt();
-                    break;
-                }
-
-                e5cc.run(command).then(result => {
-                    if (result) {
-                        console.log('Executed command.');
-                    } else {
-                        console.log(`Failed to execute command.`);
-                    }
-                    rl.prompt();
-                });
-                break;
-            }
-
-            case 'exit': case 'quit': case 'e': case 'q': {
-                console.log('\n');
-                e5cc.close().then(() => {
-                    process.exit();
-                });
-                break;
-            }
-
-            case '?': case 'help': {
-                displayHelp();
-                rl.prompt();
-                break;
-            }
-
-            default: {
-                console.log('Invalid command.  Valid commands: read/write/run\n\n');
-                displayHelp();
-                rl.prompt();
-            }
-        }    
-    }).on('close', () => {
-        e5cc.close().then(() => {
-            process.exit();
-        });
-    });
-}
-
+// initialize stuff
+led.init(5);
+consoleUi.init();
 store.dispatch<any>(connect());
-
-initClient();
 initDial();
 initButton();
-
 oledUi.start(OLED_ADDRESS);
 oledUi.render();
-
 aplay.init({
     basePath: `${__dirname}/assets/sounds/`
 });
-
 aplay.play('appear');

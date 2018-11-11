@@ -9,6 +9,7 @@
   "dependencies": {
     "async": "^2.6.1",
     "date-fns": "^1.29.0",
+    "debug": "^4.1.0",
     "guid-typescript": "^1.0.9",
     "modbus-serial": "^7.3.0",
     "onoff": "^3.2.2",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/async": "^2.0.50",
     "@types/date-fns": "^2.6.0",
+    "@types/debug": "0.0.31",
     "@types/node": "^10.12.3",
     "@types/onoff": "^3.2.1",
     "@types/redux": "^3.6.0",

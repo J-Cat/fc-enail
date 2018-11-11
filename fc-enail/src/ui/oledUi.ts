@@ -44,11 +44,21 @@ export class OledUi {
         display.dispose();
     }
 
-    setIcon(icon: Uint8Array, flashRate: number = 0) {
+    setIcon = (icon: Uint8Array, flashRate: number = 0) => {
         this._icon = icon;
         this.flashRate = flashRate;
         this.flashStatus = true;
         this.drawIcon();
+    }
+
+    setLine1 = (line1: string) => {
+        this.line1 = line1;
+        this.displayLine1();
+    }
+
+    setLine2 = (line2: string) => {
+        this.line2 = line2;
+        this.displayLine2();
     }
 
     drawIcon = () => {
@@ -122,10 +132,10 @@ export class OledUi {
     }
     
     displayLine2 = () => {
-        this.line2 = format(Date.now(), 'h:mm');
+        const s = this.line2.replace('#time', format(Date.now(), 'h:mm'));
         // display.setFont(Font.UbuntuMono_16ptFontInfo);
         display.drawString(4, 45, 
-            `${this.line2}`,
+            `${s}`,
             2, Color.White, Layer.Layer0
         );
         // display.setFont(Font.UbuntuMono_8ptFontInfo);

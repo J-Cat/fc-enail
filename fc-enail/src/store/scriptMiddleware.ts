@@ -18,43 +18,84 @@ import { Store, Dispatch } from 'redux';
 import { EnailAction } from '../models/Actions';
 
 import * as Constants from '../models/constants';
-import { IEnailState } from '../models/IEnailState';
-import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp } from '../reducers/enailReducer';
+import { IEnailState, EnailMode } from '../models/IEnailState';
+import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp, endScript, setSP } from '../reducers/enailReducer';
 import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IFeedbackStep } from '../models/IFeedbackStep';
 import { ITimerStep } from '../models/ITimerStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
+import led from '../ui/led';
+import oledUi from '../ui/oledUi';
+import { home, script, gear } from '../ui/icons';
+import aplay from '../aplay';
+
+import Debug from 'debug';
+const debug = Debug("fc-enail:script");
 
 export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
 
+    const state = store.getState().enail;
+    const running = state.scriptRunning;
+
     switch (action.type) {
-        case Constants.RUN_SCRIPT: {
-            store.dispatch<any>(runStep())
+        case Constants.SCRIPT_RUN: {
+            store.dispatch<any>(runStep());
             break;
         }
 
         case Constants.RUN_STEP: {
-            executeStep(store.dispatch, store.getState().enail);
+            if (running) {
+                executeStep(store.dispatch, store.getState().enail);
+            }
             break;
         }
 
         case Constants.NEXT_STEP: {
-            store.dispatch<any>(runStep());
+            if (running) {
+                store.dispatch<any>(runStep());
+            }
             break;
+        }
+
+        case Constants.SCRIPT_END: {
+            led.flash(0);
+            oledUi.setIcon(getModeIcon(state.mode), 0);
+            aplay.once("complete", () => {
+                store.dispatch<any>(setSP(state.scriptStartSP!));
+            });
+            aplay.play("complete");
         }
     }
 
     return result;
 }
 
+const getModeIcon = (mode: EnailMode): Uint8Array => {
+    switch (mode) {
+        case EnailMode.Script: {
+            return script;
+        }
+
+        case EnailMode.Settings: {
+            return gear;
+        }
+
+        default: {
+            return home;
+        }
+    }
+}
+
 const executeStep = (dispatch: Dispatch<any>, state: IEnailState) => {
     if (state.currentStep === undefined) {
+        // finish script
+        dispatch<any>(endScript());
         return;
     }
 
     const step = state.currentStep;
-    console.log(`${step.type}, ${step.key}`)
+    debug(`${step.type}, ${step.key}`);
     switch (step.type) {
         case Constants.STEP_LOOP: case Constants.STEP_SEQUENTIAL: {
             dispatch<any>(nextStep());

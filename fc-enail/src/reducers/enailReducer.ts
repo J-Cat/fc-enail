@@ -13,15 +13,12 @@
  * -----
  * Copyright (c) 2018
  */
-import { IEnailState, Direction } from '../models/IEnailState';
-import { Direction as WaitDirection } from '../models/direction';
-import { EnailAction, IBasicAction } from '../models/Actions';
+import { IEnailState, Direction, EnailMode } from '../models/IEnailState';
+import { EnailAction, IBasicAction, IRunScriptAction } from '../models/Actions';
 import { Dispatch, Action } from 'redux';
 import * as Constants from '../models/constants';
 import e5cc from '../e5cc/e5cc';
 import { IEnailScript } from '../models/IEnailScript';
-import { IStep } from '../models/IStep';
-import { ILoopStep } from '../models/ILoopStep';
 import oledUi from '../ui/oledUi';
 import { getIconByName } from '../ui/icons';
 import { IFeedbackStep } from '../models/IFeedbackStep';
@@ -29,79 +26,37 @@ import aplay from '../aplay';
 import { ITimerStep } from '../models/ITimerStep';
 import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
+import led from '../ui/led';
+import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/stepHelper';
 
 const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
 
-const STEP_ACCELERATION_TIMEOUT = 350;
-const STEP_ACCELERATION_PERIOD = 250;
+const STEP_ACCELERATION_TIMEOUT = 450;
+const STEP_ACCELERATION_PERIOD = 350;
 const MAX_STEP_SIZE = 10;
 const STEP_COUNT_ACCEL = 5;
 
-const getStepByKey = (root: IStep, key: string): IStep | undefined => {
-    if (key === '') {
-        return root;
-    }
-
-    let step = root;
-    for (const index of key.split('.').map(s => parseInt(s))) {
-        if (step.steps === undefined) {
-            break;
-        }
-
-        if (step.steps.length < index) {
-            break;
-        }
-
-        step = step.steps[index];
-    }
-
-    return step;
-}
-
-const getNextStepKey = (step: IStep, stepIndex: number, parent: IStep, root: IStep) => {
-    if (step.steps !== undefined && step.steps.length > 0) {
-        return `${step.key !== '' ? `${step.key}.0` : '0'}`
-    }
-
-    if (parent.steps === undefined) {
-        return;
-    }
-    
-    if (!step.last! && parent.type !== Constants.STEP_PARALLEL) {
-        return `${parent.key !== '' ? `${parent.key}.` : ''}${stepIndex + 1}`;
-    } else {
-        if (parent === undefined || parent.last!) {
-            return;
-        }
-
-        const parentKey = parent.key!.split('.');
-        const parentIndex = parseInt(parentKey[parentKey.length - 1]);
-
-        return `${parent.parent !== '' ? `${parent.parent}.` : ''}${parentIndex+1}`;
-    }
-}
-
-const mapStep = (step: IStep, stepIndex: number, parent: IStep, root: IStep): IStep => {
-    const key: string = `${parent.key !== '' ? `${parent.key}.` : ''}${stepIndex}`;
-    let newStep = {
-        ...step,
-        key,
-        parent: parent.key,
-        loopCount: parent.type === Constants.STEP_LOOP ? (parent as ILoopStep).count : 0,
-        last: parent.steps === undefined ? true : stepIndex >= parent.steps.length - 1
-    };
-    newStep = {
-        ...newStep,
-        next: getNextStepKey(newStep, stepIndex, parent, root)
+const scripts = enailScripts.map((script, index) => {
+    const rootStep = {
+        ...script.step,
+        key: '',
+        loopCount: 0,
+        next: script.step.steps && script.step.steps.length > 0 ? '0' : undefined,
+        parent: undefined,
+        last: true
     };
 
     return {
-        ...newStep,
-        steps: step.steps === undefined ? [] : step.steps.map((subStep, subStepIndex) => {
-            return mapStep(subStep, subStepIndex, newStep, root);
-        })
+        ...script,
+        index,
+        step: {
+            ...rootStep,
+            steps: rootStep.steps === undefined ? [] : rootStep.steps.map((step, stepIndex) => {
+               return mapStep(step, stepIndex, rootStep, rootStep); 
+            })
+        }
     }
-}
+});
 
 const initialState: IEnailState = {
     setPoint: 0,
@@ -115,63 +70,12 @@ const initialState: IEnailState = {
     directionCount: 0,
     changingDirection: false,
     currentStepPos: 0,
-    scripts: enailScripts.map((script, index) => {
-        const rootStep = {
-            ...script.step,
-            key: '',
-            loopCount: 0,
-            next: script.step.steps && script.step.steps.length > 0 ? '0' : undefined,
-            parent: undefined,
-            last: true
-        };
-
-        return {
-            ...script,
-            index,
-            step: {
-                ...rootStep,
-                steps: rootStep.steps === undefined ? [] : rootStep.steps.map((step, stepIndex) => {
-                   return mapStep(step, stepIndex, rootStep, rootStep); 
-                })
-            }
-        }
-    })
+    scriptRunning: false,
+    mode: EnailMode.Home,
+    scripts,
+    currentScript: scripts.length > 0 ? scripts[0] : undefined,
+    currentStep: scripts.length > 0 ? scripts[0].step : undefined
 };
-
-const getNextStep = (state: IEnailState): IStep | undefined => {
-    if (state.currentStep === undefined || state.currentScript === undefined) {
-        return;
-    }
-
-    if (state.currentStep.loopCount! > 0 && state.currentStep.last && state.currentStep.loopCount! > state.currentStepPos) {
-        const parent = getStepByKey(state.currentScript.step, state.currentStep.parent!);
-        if (parent !== undefined && parent.next !== undefined) {
-            return getStepByKey(state.currentScript.step, parent.next);
-        }
-    }
-
-    if (state.currentStep.next === undefined) {
-        return;
-    }
-
-    return getStepByKey(state.currentScript.step, state.currentStep.next);
-}
-
-const getNextStepPos = (state: IEnailState): number => {
-    if (state.currentStep === undefined || state.currentScript === undefined) {
-        return state.currentStepPos;
-    }
-
-    if (state.currentStep.type === Constants.STEP_LOOP) {
-        return 0;
-    }
-
-    if (state.currentStep.loopCount! > 0 && state.currentStep.last) {
-        return state.currentStepPos + 1;
-    }
-
-    return state.currentStepPos;
-}
 
 export const connect = () => {
     return (dispatch: Dispatch<Action<string>>) => {
@@ -194,6 +98,18 @@ export const getSP = () => {
     }
 }
 
+export const setSP = (value: number) => {
+    return (dispatch: Dispatch<IBasicAction>) => {
+        e5cc.setSP(value).then(() => {
+            dispatch({
+                type: Constants.E5CC_UPDATE_SETPOINT,
+                payload: value
+            });
+        });
+    }
+    
+}
+
 export const increaseSP = () => {
     return {
         type: Constants.E5CC_INCREASE_SETPOINT
@@ -203,6 +119,18 @@ export const increaseSP = () => {
 export const decreaseSP = () => {
     return {
         type: Constants.E5CC_DECREASE_SETPOINT
+    }
+}
+
+export const increaseCurrentScript = () => {
+    return {
+        type: Constants.SCRIPT_INCREASE
+    }
+}
+
+export const decreaseCurrentScript = () => {
+    return {
+        type: Constants.SCRIPT_DECREASE
     }
 }
 
@@ -241,10 +169,20 @@ export const moveSP = (direction: Direction) => {
     };
 }
 
-export const runScript = (index: number) => {
+export const runScript = ()  => {
+    return (dispatch: Dispatch<IBasicAction>) => {
+        e5cc.readSP().then(value => {
+            dispatch({
+                type: Constants.SCRIPT_RUN,
+                payload: value
+            });
+        });
+    };
+}
+
+export const endScript = () => {
     return {
-        type: Constants.RUN_SCRIPT,
-        payload: index
+        type: Constants.SCRIPT_END
     };
 }
 
@@ -267,15 +205,18 @@ export const stepFeedback = (step: IFeedbackStep) => {
             oledUi.render();
         }
 
-        // if (step.led) {
-
-        // }
-
-        if (step.sound) {
-            aplay.play(step.sound);
+        if (step.led) {
+            led.flash(step.led);
         }
 
-        dispatch(nextStep());
+        if (step.sound) {
+            aplay.once("complete", () => {
+                dispatch(nextStep());
+            });
+            aplay.play(step.sound);
+        } else {
+            dispatch(nextStep());
+        }
     };
 }
 
@@ -284,7 +225,7 @@ export const stepTimer = (step: ITimerStep) => {
         setTimeout(() => {
             dispatch(nextStep());
         }, step.timeout * 1000);
-    }
+    };
 }
 
 export const stepMoveTemp = (step: IMoveTempStep) => {
@@ -297,60 +238,35 @@ export const stepMoveTemp = (step: IMoveTempStep) => {
 export const stepMoveTempStart = () => {
     return {
         type: Constants.E5CC_STEP_MOVE_TEMP_START
-    }
+    };
 }
 
 export const stepMoveTempComplete = () => {
     return {
         type: Constants.E5CC_STEP_MOVE_TEMP_COMPLETE
-    }
+    };
 }
 
 export const stepWaitTemp = (step: IWaitTempStep, setPoint: number) => {
     return (dispatch: Dispatch<IBasicAction>) => {
         monitorTemp(step, setPoint).then(() => {
             dispatch(nextStep());
-        })
-    }
+        });
+    };
 }
 
-export const monitorTemp = async (step: IWaitTempStep, setPoint: number): Promise<void> => {
-    return new Promise<void>(async resolve => {
-        let tempReached = false;
-        const startTime = Date.now();
-        while (!tempReached) {
-            tempReached = await checkTemp(step, setPoint);
-            if (!tempReached && ((Date.now() - startTime) > (step.timeout * 1000))) {
-                tempReached = true;
-            }             
-        }
-        resolve();
-    });
+export const setMode = (mode: EnailMode) => {
+    return {
+        type: Constants.SET_MODE,
+        payload: mode
+    };
 }
 
-export const checkTemp = (step: IWaitTempStep, setPoint: number) => {
-    return new Promise<boolean>(async resolve => {
-        const pv = await e5cc.readPV();
-        switch (step.direction) {
-            case WaitDirection.UP: {
-                if (Math.floor(pv) >= Math.floor(setPoint + step.offset)) {
-                    resolve(true);
-                }
-                break;
-            }
-
-            case WaitDirection.DOWN: {
-                if (Math.floor(pv) <= Math.floor(setPoint + step.offset)) {
-                    resolve(true);
-                }
-                break;
-            }
-        }
-
-        setTimeout(() => { resolve(false); }, 500);
-    });
+export const updateDisplay = () => {
+    return {
+        type: Constants.DISPLAY_UPDATE
+    };
 }
-
 
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
@@ -370,10 +286,6 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         }
 
         case Constants.E5CC_STEP_MOVE_TEMP: {
-            if (!state.ready) {
-                return state;
-            }
-
             return {
                 ...state,
                 ready: false,
@@ -509,16 +421,50 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
-        case Constants.RUN_SCRIPT: {
-            const index = action.payload as number;
-            if (index >= state.scripts.length) {
+        case Constants.SCRIPT_RUN: {
+            if (state.scriptRunning) {
                 return state;
             }
 
             return {
                 ...state,
+                scriptStartSP: action.payload as number,
+                scriptRunning: true
+            }
+        }
+
+        case Constants.SCRIPT_INCREASE: {
+            if (state.scriptRunning || (state.currentScript === undefined)) {
+                return state;
+            }
+
+            const index = state.currentScript.index! < state.scripts.length - 1 ? state.currentScript.index! + 1 : 0;
+            return {
+                ...state,
                 currentScript: state.scripts[index],
                 currentStep: state.scripts[index].step
+            };
+        }
+
+        case Constants.SCRIPT_DECREASE: {
+            if (state.scriptRunning || (state.currentScript === undefined)) {
+                return state;
+            }
+
+            const index = state.currentScript.index! > 0 ? state.currentScript.index! - 1 : state.scripts.length - 1;
+
+            return {
+                ...state,
+                currentScript: state.scripts[index],
+                currentStep: state.scripts[index].step
+            };
+        }
+
+        case Constants.SCRIPT_END: {
+            return {
+                ...state,
+                scriptRunning: false,
+                currentStep: state.currentScript ? state.currentScript.step : undefined
             }
         }
 
@@ -532,7 +478,20 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 currentStep: getNextStep(state),
                 currentStepPos: getNextStepPos(state)
             }
+        
         }
+
+        case Constants.SET_MODE: {
+            if (state.scriptRunning) {
+                return state;
+            }
+
+            return {
+                ...state,
+                mode: action.payload as EnailMode
+            }
+        }
+
 
         default: {
             return state;

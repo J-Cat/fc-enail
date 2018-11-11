@@ -22,9 +22,7 @@ import * as Constants from '../models/constants';
 import { getSP, setReady, getState, moveSP, stepMoveTempStart, stepMoveTempComplete, nextStep } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import { Direction } from '../models/IEnailState';
-
-const LED_GPIO = 5;
-const led = new Gpio(LED_GPIO, 'out');
+import led from '../ui/led';
 
 export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
@@ -56,8 +54,12 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             break;
         }
 
-        case Constants.E5CC_UPDATE_STATE: {            
-            led.write((action.payload as boolean) ? 1 : 0, () => {});
+        case Constants.E5CC_UPDATE_STATE: {
+            if ((action.payload as boolean)) {
+                led.on();
+            } else {
+                led.off();
+            }
             break;
         }
 

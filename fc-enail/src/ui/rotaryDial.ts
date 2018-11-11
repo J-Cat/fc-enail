@@ -15,13 +15,18 @@
  */
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { Gpio } from 'onoff';
+import { Button } from './button';
+
+const ROTATION_THROTTLE = 25;
 
 export class RotaryDial {
     private lastA: number = 0;
     private lastB: number = 0;
-    private inputA: Gpio;
-    private inputB: Gpio;
-    private button: Gpio;
+    private inputA?: Gpio;
+    private inputB?: Gpio;
+    private button?: Button;
+    private lastRotation = 0;
+    private rotationThrottle = ROTATION_THROTTLE;
 
     protected _onClockwise: SimpleEventDispatcher<RotaryDial> = new SimpleEventDispatcher<RotaryDial>();
     get onClockwise(): ISimpleEvent<RotaryDial> {
@@ -33,12 +38,21 @@ export class RotaryDial {
         return this._onCounterClockwise.asEvent();
     }
 
-    protected _onButton: SimpleEventDispatcher<RotaryDial> = new SimpleEventDispatcher<RotaryDial>();
-    get onButton(): ISimpleEvent<RotaryDial> {
-        return this._onButton.asEvent();
+    protected _onClick: SimpleEventDispatcher<RotaryDial> = new SimpleEventDispatcher<RotaryDial>();
+    get onClick(): ISimpleEvent<RotaryDial> {
+        return this._onClick.asEvent();
     }
 
-    rotaryInterupt = (isA: boolean) => {
+    protected _onDoubleClick: SimpleEventDispatcher<RotaryDial> = new SimpleEventDispatcher<RotaryDial>();
+    get onDoubleClick(): ISimpleEvent<RotaryDial> {
+        return this._onDoubleClick.asEvent();
+    }
+
+    setRotationThrottle = (value: number) => {
+        this.rotationThrottle = value;
+    }
+
+    private rotaryInterupt = (isA: boolean) => {
         const newA: number = this.inputA!.readSync()
         const newB: number = this.inputB!.readSync();
         if (newA === this.lastA && newB === this.lastB) {
@@ -49,18 +63,23 @@ export class RotaryDial {
         this.lastB = newB;
 
         if (newA === 1 && newB === 1) {
-            if (isA) {
-                this._onCounterClockwise.dispatch(this);
-            } else {
-                this._onClockwise.dispatch(this);
+            const lastRotation = this.lastRotation;
+            this.lastRotation = Date.now();
+            if ((this.lastRotation - lastRotation) > this.rotationThrottle) {
+                if (isA) {
+                    this._onCounterClockwise.dispatch(this);
+                } else {
+                    this._onClockwise.dispatch(this);
+                }
             }
         }
     }
 
-    constructor(gpioA: number, gpioB: number, gpioButton: number) {   
+    init = (gpioA: number, gpioB: number, gpioButton: number) => {   
         this.inputA = new Gpio(gpioA, 'in', 'rising');
         this.inputB = new Gpio(gpioB, 'in', 'rising');
-        this.button = new Gpio(gpioButton, 'in', 'rising', {debounceTimeout: 10});
+        this.button = new Button();
+        this.button.init(gpioButton);
 
         this.inputA.watch((err: Error, value: number) => {
             if (err) {
@@ -76,13 +95,15 @@ export class RotaryDial {
             this.rotaryInterupt(false);
         });
 
-        this.button.watch((err: Error, value: number) => {
-            if (err) {
-                return;
-            }
-            if (value === 1) {
-                this._onButton.dispatch(this);
-            }
+        this.button.onClick.subscribe(() => {
+            this._onClick.dispatch(this);
+        });
+
+        this.button.onDoubleClick.subscribe(() => {
+            this._onDoubleClick.dispatch(this);
         });
     }
 }
+
+const dial = new RotaryDial();
+export default dial;
