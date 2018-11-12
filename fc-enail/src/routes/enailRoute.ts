@@ -12,6 +12,7 @@ export class EnailRoute {
         this.router.get('/', this.controller.get);
         this.router.post('/sp/:value', this.controller.setSP);
         this.router.post('/state', this.controller.toggleState);
+        this.router.get('/scripts', this.controller.getScripts);
         this.router.post('/script/set/:index', this.controller.setScript);
         this.router.post('/script/run', this.controller.runScript);
         this.router.post('/script/end', this.controller.endScript);

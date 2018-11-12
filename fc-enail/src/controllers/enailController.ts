@@ -8,6 +8,10 @@ export class EnailController {
         res.status(HttpStatus.OK).send(store.getState().enail);
     }
 
+    getScripts = (req: Request, res: Response, next: NextFunction): void => {
+        res.status(HttpStatus.OK).send(store.getState().enail.scripts);
+    }
+
     setSP = (req: Request, res: Response, next: NextFunction): void => {
         store.dispatch<any>(setSP(req.params.value));
         res.sendStatus(HttpStatus.OK);

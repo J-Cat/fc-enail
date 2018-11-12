@@ -1,0 +1,22 @@
+@import './styles/variables.less';
+
+.App {
+  text-align: center;
+
+}
+
+.am-tab-bar-bar {
+  background-color: @component-background !important;
+  color: @text-color;
+
+}
+.am-tabs-tab-bar-wrap {
+  @media @kiosk {
+    display:none !important;
+  }
+}
+
+.error {
+  color: red;
+  font-style: italic;
+}

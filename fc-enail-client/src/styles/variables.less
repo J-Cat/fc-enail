@@ -1,0 +1,264 @@
+@import '../../node_modules/antd/lib/style/themes/default.less';
+@import '../../node_modules/antd-mobile/lib/style/themes/default.less';
+ 
+// fonts local
+@icon-url               : "~antd-iconfont/iconfont";
+
+// -------- Colors -----------
+@primary-color          : rgb(17, 100, 17);
+@info-color             : rgb(17, 120, 17);
+@success-color          : rgb(17, 140, 17);
+@processing-color       : yellow;
+@error-color            : red;
+@highlight-color        : #E66000;
+@warning-color          : orange;
+@normal-color           : #565656;
+
+@primary-1: tint(@primary-color, 10%);
+@primary-2: tint(@primary-color, 80%);
+@primary-5: replace tint(@primary-color, 20%);
+@primary-6: @primary-color;                                 // color used to control the text color of active buttons, don't use, use @primary-color
+@primary-7: shade(@primary-color, 5%);
+
+
+// Background color for `<body>`
+@body-background        : #222;
+@fill-body              : #222;
+// Base background color for most components
+@component-background   : #333;
+
+@font-family  : "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif,
+"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+@heading-color          : fade(#FFF, 85%);
+@text-color             : fade(#FFF, 75%);
+@text-color-secondary   : fade(#FFF, 45%);
+// @heading-color-dark     : fade(#fff, 100%);
+// @text-color-dark        : fade(#fff, 85%);
+// @text-color-secondary-dark: fade(#fff, 65%);
+@font-size-base         : 14px;
+@font-size-lg           : @font-size-base + 2px;
+@font-size-sm           : 12px;
+@line-height-base       : 1.5;
+@border-radius-base     : 4px;
+@border-radius-sm       : 2px;
+
+// Border color
+@border-color-base      : @primary-color;  // base border outline a component
+@border-color-split     : @primary-color;  // split border inside a component
+@border-width-base      : 1px;            // width of the border for a component
+@border-style-base      : solid;          // style of a components border
+
+@background-color-light : hsv(0, 0%, 30%);  // background of header and selected item
+@background-color-base  : hsv(0, 0%, 30%);  // Default grey background color
+
+// Disabled states
+@disabled-color         : fade(#FFF, 25%);
+@disabled-bg            : @background-color-base;
+// @disabled-color-dark    : fade(#fff, 35%);
+
+// vertical paddings
+@padding-lg    : 24px; // containers
+@padding-md    : 16px; // small containers and buttons
+@padding-sm    : 12px; // Form controls and items
+@padding-xs    : 8px;  // small items
+
+// Shadow
+@shadow-color           : rgba(0, 0, 0, .15);
+@box-shadow-base        : @shadow-1-down;
+@shadow-1-up            : 0 2px 8px @shadow-color;
+@shadow-1-down          : 0 2px 8px @shadow-color;
+@shadow-1-left          : -2px 0 8px @shadow-color;
+@shadow-1-right         : 2px 0 8px @shadow-color;
+@shadow-2               : 0 4px 12px @shadow-color;
+
+// Buttons
+@btn-font-weight        : 400;
+@btn-border-radius-base : @border-radius-base;
+@btn-border-radius-sm   : @border-radius-base;
+
+@btn-primary-color      : #fff;
+@btn-primary-bg         : @primary-color;
+
+@btn-default-color      : @text-color;
+@btn-default-bg         : #222;
+@btn-default-border     : @border-color-base;
+
+@btn-danger-color       : @error-color;
+@btn-danger-bg          : @background-color-base;
+@btn-danger-border      : @border-color-base;
+
+@btn-disable-color      : @disabled-color;
+@btn-disable-bg         : @disabled-bg;
+@btn-disable-border     : @border-color-base;
+
+@btn-padding-base       : 0 @padding-md - 1px;
+@btn-font-size-lg       : @font-size-lg;
+@btn-font-size-sm       : @font-size-base;
+@btn-padding-lg         : @btn-padding-base;
+@btn-padding-sm         : 0 @padding-xs - 1px;
+
+@btn-height-base        : 32px;
+@btn-height-lg          : 40px;
+@btn-height-sm          : 24px;
+
+@btn-circle-size        : @btn-height-base;
+@btn-circle-size-lg     : @btn-height-lg;
+@btn-circle-size-sm     : @btn-height-sm;
+
+
+// Popover
+// ---
+//** Popover body background color
+@popover-bg: #333;
+//** Popover text color
+@popover-color: @text-color;
+//** Popover maximum width
+@popover-min-width: 177px;
+//** Popover arrow width
+@popover-arrow-width: 6px;
+//** Popover arrow color
+@popover-arrow-color: @popover-bg;
+//** Popover outer arrow width
+//** Popover outer arrow color
+@popover-arrow-outer-color: @popover-bg;
+//** Popover distance with trigger
+@popover-distance: @popover-arrow-width + 4px;
+
+// Media queries breakpoints
+// Extra small screen / phone
+@screen-xs              : 480px;
+@screen-xs-min          : @screen-xs;
+
+// Small screen / tablet
+@screen-sm              : 576px;
+@screen-sm-min          : @screen-sm;
+
+// Medium screen / desktop
+@screen-md              : 768px;
+@screen-md-min          : @screen-md;
+
+// Large screen / wide desktop
+@screen-lg              : 992px;
+@screen-lg-min          : @screen-lg;
+
+// Extra large screen / full hd
+@screen-xl              : 1200px;
+@screen-xl-min          : @screen-xl;
+
+// Extra extra large screen / large descktop
+@screen-xxl              : 1600px;
+@screen-xxl-min          : @screen-xxl;
+
+// Layout
+@layout-body-background         : #f0f2f5;
+@layout-header-background       : #001500;
+@layout-footer-background       : @layout-body-background;
+@layout-header-height           : 64px;
+@layout-header-padding          : 0 50px;
+@layout-footer-padding          : 24px 50px;
+@layout-sider-background        : @layout-header-background;
+@layout-trigger-height          : 48px;
+@layout-trigger-background      : #002100;
+@layout-trigger-color           : #fff;
+@layout-zero-trigger-width      : 36px;
+@layout-zero-trigger-height     : 42px;
+// Layout light theme
+@layout-sider-background-light  : #fff;
+@layout-trigger-background-light: #fff;
+@layout-trigger-color-light     : @text-color;
+
+// Form
+// ---
+@label-required-color        : @highlight-color;
+@label-color                 : @heading-color;
+@form-item-margin-bottom     : 24px;
+@form-item-trailing-colon    : true;
+@form-vertical-label-padding : 0 0 8px;
+@form-vertical-label-margin  : 0;
+
+// Input
+// ---
+@input-height-base           : 32px;
+@input-height-lg             : 40px;
+@input-height-sm             : 24px;
+
+@input-placeholder-color     : hsv(0, 0, 75%);
+@input-color                 : #fff;
+@input-border-color          : @border-color-base;
+@input-bg                    : #333;
+@input-addon-bg              : @background-color-light;
+@input-hover-border-color    : @primary-color;
+@input-disabled-bg           : @disabled-bg;
+@input-outline-offset        : 0 0;
+
+// Menu
+// ---
+@menu-inline-toplevel-item-height: 40px;
+@menu-item-height: 40px;
+@menu-collapsed-width: 80px;
+@menu-bg: @component-background;
+@menu-item-color: @text-color;
+@menu-highlight-color: @primary-color;
+@menu-item-active-bg: #444;
+@menu-item-group-title-color: #FFF;
+
+// The background colors for active and hover states for things like
+// list items or table cells.
+@item-active-bg         : #555;
+@item-hover-bg          : @primary-color;
+
+
+// antd-mobile 
+@color-text-base: #fff;                  // 基本
+@color-text-base-inverse: #000;          // 基本 - 反色
+@color-text-secondary: #f0f0f0;          // 辅助色
+@color-text-placeholder: #333;           // 文本框提示
+@color-text-disabled: #222;              // 失效
+@color-text-caption: #ddd;               // 辅助描述
+@color-text-paragraph: #eee;             // 段落
+@color-link: @brand-primary;             // 链接
+
+@fill-base: #222;                           // 组件默认背景
+@fill-body: #222;                        // 页面背景
+@fill-tap: #333;                            // 组件默认背景 - 按下
+@fill-disabled: #333;                       // 通用失效背景
+@fill-mask: rgba(255, 255, 255, 0.4);              // 遮罩背景
+@color-icon-base: #444;                      // 许多小图标的背景，比如一些小圆点，加减号
+@fill-grey: #444;
+
+// 透明度
+@opacity-disabled: 0.3;   // switch checkbox radio 等组件禁用的透明度
+
+// 全局/品牌色
+@brand-primary: @primary-color;
+@brand-primary-tap: rgb(17, 100, 17);
+@brand-success: rgb(17, 120, 17);
+@brand-warning: rgb(17, 140, 17);
+@brand-error: red;
+@brand-important: rgb(17, 100, 17);  // 用于小红点
+@brand-wait: #007000;
+
+// 边框色
+@border-color-base: #333;
+
+
+// media queries
+@screen-xs-media: ~"only screen and (max-width: 575px)";
+@screen-sm-media: ~"only screen and (min-width: 576px)";
+@screen-md-media: ~"only screen and (min-width: 768px)";
+@screen-lg-media: ~"only screen and (min-width: 992px)";
+@screen-xl-media: ~"only screen and (min-width: 1200px)";
+@screen-xl-media: ~"only screen and (min-width: 1600px)";
+
+@landscape: ~"(orientation: landscape)";
+@portrait: ~"(orientation: portrait)";
+
+@short: ~"only screen and (max-height: 500px)";
+@reallyshort: ~"only screen and (max-height: 400px)";
+@notshort: ~"only screen and (min-height: 500px)";
+@notreallyshort: ~"only screen and (min-height: 400px)";
+
+ 
+@kiosk: ~"only screen and (device-width: 100vw) and (device-height: 100vh) and (min-width: 1680px) and (min-height: 1024px)";
+ 

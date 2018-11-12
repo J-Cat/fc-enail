@@ -1,0 +1,99 @@
+/*
+ * File: c:\enail-magic-client\src\routes\Home\home.less
+ * Project: c:\enail-magic-client
+ * Created Date: Thursday August 23rd 2018
+ * Author: J-Cat
+ * -----
+ * Last Modified:
+ * Modified By:
+ * -----
+ * License: 
+ *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
+ *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
+ * -----
+ * Copyright (c) 2018
+ */
+.home {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .spacer {
+        flex: 1;                    
+    }
+
+    .version-label {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        font-size: .8em;
+        opacity: 0.4;
+    }
+    
+    &-header {
+        flex: 1;
+    }
+
+    &-footer {
+        flex: 1;
+        padding: 20px;
+    }
+
+    &-content {
+        text-align: center;
+        flex: 0;
+        margin: 10px;
+
+        &-body {
+            flex-direction: row;
+            display: flex;
+            vertical-align: middle;
+            &-left {
+                flex: 2;
+                &-pv {
+                    font-size: 4em;
+                    margin: 10px;
+                }
+
+                &-sp {
+                    font-size: 3em;
+                    margin: 10px;
+                }
+            }
+
+            &-right {
+                flex: 1;
+                text-align: center;
+                vertical-align: middle;
+                align-content: center;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+                
+                &-switch {
+                    flex: 1;
+                    padding: 10px;
+                }
+
+                &-button {
+                    padding: 10px;
+                    flex: 1;
+                    width: 44px !important;
+                    height: 44px !important;
+
+                    svg {
+                        height: 28px;
+                        width: 28px;
+                        margin: 0xp;
+                        padding: 0px;
+                    }
+                }
+            }
+        }
+        &-slider {
+            padding: 10px;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "android": {
+        "debug": {
+            "keystore": "../mobile-app.keystore",
+            "storePassword": "jcat-fc",
+            "alias": "fc-community-enail",
+            "password" : "jcat-fc",
+            "keystoreType": ""
+        },
+        "release": {
+            "keystore": "../mobile-app.keystore",
+            "storePassword": "jcat-fc",
+            "alias": "fc-community-enail",
+            "password" : "jcat-fc",
+            "keystoreType": ""
+        }
+    },
+    "ios": {
+        "debug": {
+            "codeSignIdentity": "iPhone Developer",
+            "developmentTeam": "DXWZU47ELN",
+            "packageType": "development",
+            "provisioningProfile": "5f5500c6-9a04-4be5-b323-44768356302c"
+        },
+        "release": {
+            "codeSignIdentity": "iPhone Developer",
+            "developmentTeam": "DXWZU47ELN",
+            "packageType": "enterprise",
+            "provisioningProfile": "e135875c-b98a-4ea1-b8c0-17ef0a886675"
+        }
+    }
+}
+

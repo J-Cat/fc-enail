@@ -1,0 +1,17 @@
+declare module 'bonjour' {
+    function bonjour(opts?: any): IBonjour;
+
+    interface IBonjour {
+        publish(opts?: any): any;
+
+        unpublishAll(cb: (...args: any[]) => any): any;
+
+        find(opts: any, onup: (...args: any[]) => any): any;
+
+        findOne(opts: any, cb: (...args: any[]) => any): any;
+
+        destroy(): void;
+    }
+
+    export = bonjour;
+}

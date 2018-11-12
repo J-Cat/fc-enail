@@ -3,12 +3,15 @@ import { Server as HttpServer } from 'http';
 import * as SocketIO from 'socket.io';
 import * as bodyParser from "body-parser";
 import * as cors from 'cors';
+import { createAdvertisement, ServiceType } from 'mdns';
 
 import { EnailRoute } from '../routes/enailRoute';
 import * as Constants from '../models/constants';
 
-import Debug from 'debug';
 import store from '../store/createStore';
+import { IEnailEmitState } from '../models/IEnailEmitState';
+
+import Debug from 'debug';
 const debug = Debug('fc-enail:server');
 
 const HTTP_PORT = 4000;
@@ -54,6 +57,11 @@ export class Server {
     start = () => {
         debug('starting');
         this.http.listen(HTTP_PORT);
+
+        // advertise an HTTP server on port 3000
+        createAdvertisement(new ServiceType('_fc-enail', '_tcp'), HTTP_PORT, {
+            name: 'FC Community E-Nail'
+        });
     }
 
     emitState = () => {
@@ -61,7 +69,7 @@ export class Server {
             return;
         }
         const state = store.getState().enail;
-        this.io.emit(Constants.EMIT_STATE, {
+        const emitState: IEnailEmitState = {
             pv: state.presentValue,
             sp: state.setPoint,
             running: state.running,
@@ -70,7 +78,9 @@ export class Server {
             currentStep: state.currentStep ? state.currentStep.key : undefined,
             currentStepPos: state.currentStepPos,
             mode: state.mode
-        });
+        };
+
+        this.io.emit(Constants.EMIT_STATE, emitState);
     }
 }
 
