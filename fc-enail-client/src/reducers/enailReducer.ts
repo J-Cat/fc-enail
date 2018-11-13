@@ -1,16 +1,20 @@
 import { Dispatch } from 'redux';
+import { RSAA } from 'redux-api-middleware';
+import { Zeroconf } from '@ionic-native/zeroconf';
+
 import { IEnailState } from '../models/IEnailState';
+import { ISavedState } from '../models/ISavedState';
 import { EnailAction, IErrorAction } from '../models/Actions';
 import * as Constants from '../models/constants';
 import { IEnailEmitState } from 'src/models/IEnailEmitState';
-import { RSAA } from 'redux-api-middleware';
-import config from 'src/config';
-import { Zeroconf } from '@ionic-native/zeroconf';
+import { IEnailScript } from '../models/IEnailScript';
+import config from '../config';
 
 const initialState: IEnailState = {
     serviceFound: false,
     connected: false,
-    requesting: false
+    requesting: false,
+    presets: []
 };
 
 export const connectSocket = () => {
@@ -212,6 +216,49 @@ export const findEnailService = () => {
     }
 }
 
+export const getSavedState = () => {
+    return (dispatch: any) => {
+        getServiceUrl().then((serviceUrl) => {
+            dispatch({
+                [RSAA]: {
+                    endpoint: `${serviceUrl}/savedstate`,
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    types: [
+                        Constants.LOAD_SAVED_STATE_REQUEST,
+                        Constants.LOAD_SAVED_STATE_RESPONSE,
+                        Constants.LOAD_SAVED_STATE_ERROR
+                    ]
+                }
+            });
+        });
+    };
+}
+
+export const persistSavedState = (savedState: ISavedState) => {
+    return (dispatch: any) => {
+        getServiceUrl().then((serviceUrl) => {
+            dispatch({
+                [RSAA]: {
+                    endpoint: `${serviceUrl}/savedstate`,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    types: [
+                        Constants.PERSIST_SAVED_STATE_REQUEST,
+                        { type: Constants.PERSIST_SAVED_STATE_RESPONSE, meta: savedState },
+                        Constants.PERSIST_SAVED_STATE_ERROR
+                    ],
+                    body: JSON.stringify(savedState)
+                }
+            });
+        });
+    };
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.SOCKET_CONNECTED: {
@@ -248,13 +295,14 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 requesting: false,
                 error: false,
-                scripts: action.payload
+                scripts: action.payload as IEnailScript[]
             };
         }
 
         case Constants.SETSP_REQUEST: case Constants.TOGGLE_STATE_REQUEST: 
         case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
-        case Constants.SET_SCRIPT_REQUEST: {
+        case Constants.SET_SCRIPT_REQUEST: case Constants.LOAD_SAVED_STATE_REQUEST: 
+        case Constants.PERSIST_SAVED_STATE_REQUEST: {
             return {
                 ...state,
                 requesting: true,
@@ -274,12 +322,40 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
         case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
         case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
-        case Constants.SET_SCRIPT_ERROR: {
+        case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR: {
             return {
                 ...state,
                 requesting: false,
                 error: true,
                 message: !action.payload ? undefined : (action as IErrorAction).payload!.message
+            };
+        }
+
+        case Constants.PERSIST_SAVED_STATE_RESPONSE: {
+            return {
+                ...state,
+                requesting: false,
+                error: false,
+                presets: (action.meta as ISavedState).presets
+            }
+        }
+
+        case Constants.LOAD_SAVED_STATE_RESPONSE: {
+            return {
+                ...state,
+                requesting: false,
+                error: false,
+                presets: (action.payload as ISavedState).presets
+            };
+        }
+
+        case Constants.LOAD_SAVED_STATE_ERROR: {
+            return {
+                ...state,
+                requesting: false,
+                error: true,
+                message: !action.payload ? undefined : (action as IErrorAction).payload!.message,
+                presets: []
             };
         }
 

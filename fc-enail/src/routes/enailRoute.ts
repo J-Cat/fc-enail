@@ -16,5 +16,7 @@ export class EnailRoute {
         this.router.post('/script/set/:index', this.controller.setScript);
         this.router.post('/script/run', this.controller.runScript);
         this.router.post('/script/end', this.controller.endScript);
+        this.router.get('/savedstate', this.controller.getSavedState);
+        this.router.post('/savedstate', this.controller.persistSavedState);
     }
 }

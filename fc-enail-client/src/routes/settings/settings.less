@@ -1,0 +1,103 @@
+/*
+ * File: c:\fc-enail\fc-enail-client\src\routes\settings\settings.less
+ * Project: c:\fc-enail\fc-enail-client
+ * Created Date: Tuesday November 13th 2018
+ * Author: J-Cat
+ * -----
+ * Last Modified:
+ * Modified By:
+ * -----
+ * License: 
+ *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
+ *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
+ * -----
+ * Copyright (c) 2018
+ */
+.settings {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-content: space-around;
+    width: 100%;
+
+    &-halfspacer {
+        flex: 0;
+        flex-grow: 0.5;
+        flex-shrink: 1;
+    }
+
+    &-spacer {
+        flex: 0;      
+        flex-grow: 1;
+        flex-shrink: 0;
+    }
+
+    .version-label {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        font-size: .8em;
+        opacity: 0.4;
+        @media @landscape {
+            display: none;
+        }
+    }
+    
+    &-header {
+        flex: 0;
+        flex-grow: 0;
+        text-align: center;
+        vertical-align: top;
+        padding: 10px;
+        @media @landscape {
+            display: none;
+        }
+    }
+
+    &-footer {
+        flex: 0;      
+        flex-grow: 1;
+        flex-shrink: 0;
+        min-height: 20px;
+    }
+
+    &-content {
+        flex: 1 0 2;
+        &-container {
+            &-datarow {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                &-spacer {
+                    flex: 1 0 0;
+                }
+                &-content {
+                    flex: 0 1 auto;
+                    .ant-form-item {
+                        white-space: nowrap;
+                        display: inline-block;
+                        margin: 1px 5px 1px 5px;
+
+                        &-label {
+                            margin: 0px 5px 0px 0px;
+                            display: inline-block;
+                            width: auto;
+                        }
+
+                        &-control-wrapper {
+                            margin: 0px 0px 0px 5px;
+                            display: inline-block;
+                            width: auto;
+                        }
+                    }
+                }
+            }
+            &-buttonrow {
+                margin: 20px !important;
+                text-align: center;
+            }
+        }
+    }
+}

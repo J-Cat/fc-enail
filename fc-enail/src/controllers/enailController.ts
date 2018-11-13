@@ -1,7 +1,8 @@
 import * as HttpStatus from 'http-status-codes';
 import store from '../store/createStore';
 import { Request, Response, NextFunction } from 'express';
-import { setSP, toggleState, setCurrentScript, runScript, endScript } from '../reducers/enailReducer';
+import { setSP, toggleState, setCurrentScript, runScript, endScript, persistSavedState } from '../reducers/enailReducer';
+import { ISavedState } from '../models/ISavedState';
 
 export class EnailController {
     get = (req: Request, res: Response, next: NextFunction): void => {
@@ -34,6 +35,15 @@ export class EnailController {
 
     endScript = (req: Request, res: Response, next: NextFunction): void => {
         store.dispatch<any>(endScript());
+        res.sendStatus(HttpStatus.OK);
+    }
+
+    getSavedState = (req: Request, res: Response, next: NextFunction): void => {
+        res.status(HttpStatus.OK).send({presets: store.getState().enail.presets});
+    }
+
+    persistSavedState =  (req: Request, res: Response, next: NextFunction): void => {
+        store.dispatch<any>(persistSavedState(req.body as ISavedState));
         res.sendStatus(HttpStatus.OK);
     }
 }

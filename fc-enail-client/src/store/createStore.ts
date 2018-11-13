@@ -9,7 +9,7 @@ import {
 import { EnailAction } from 'src/models/Actions';
 import { IEnailStore } from 'src/models/IEnailStore';
 import { socketIoMiddleware } from './socketIoMiddleware';
-import { connectSocket, getScripts } from 'src/reducers/enailReducer';
+import { connectSocket, getScripts, getSavedState } from 'src/reducers/enailReducer';
 import { apiMiddleware } from 'redux-api-middleware';
 import thunk from 'redux-thunk';
 
@@ -28,6 +28,7 @@ export function configureStore(initialState?: IEnailStore): Store<IEnailStore, E
     );
 
     store.dispatch<any>(getScripts());
+    store.dispatch<any>(getSavedState());
     store.dispatch<any>(connectSocket());
     
     return store;

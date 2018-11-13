@@ -34,6 +34,7 @@ import { IStep } from './IStep';
     readonly scriptRunning: boolean;
     readonly scriptStartSP?: number;
     readonly mode: EnailMode;
+    readonly presets: number[];
 }
 
 export enum Direction {

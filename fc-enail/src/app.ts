@@ -16,7 +16,7 @@
 import dial from './ui/rotaryDial';
 import aplay from './aplay';
 import store from './store/createStore';
-import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript } from './reducers/enailReducer';
+import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState } from './reducers/enailReducer';
 import oledUi from './ui/oledUi';
 import button from './ui/button';
 import led from './ui/led';
@@ -124,7 +124,10 @@ const initButton = async () => {
 // initialize stuff
 led.init(5);
 consoleUi.init();
+
 store.dispatch<any>(connect());
+store.dispatch<any>(loadSavedState());
+
 initDial();
 initButton();
 oledUi.start(OLED_ADDRESS);

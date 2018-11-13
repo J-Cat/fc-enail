@@ -13,9 +13,11 @@
  * -----
  * Copyright (c) 2018
  */
+import { Dispatch, Action } from 'redux';
+import * as fs from 'fs';
+
 import { IEnailState, Direction, EnailMode } from '../models/IEnailState';
 import { EnailAction, IBasicAction, IE5CCUpdateStateAction } from '../models/Actions';
-import { Dispatch, Action } from 'redux';
 import * as Constants from '../models/constants';
 import e5cc from '../e5cc/e5cc';
 import { IEnailScript } from '../models/IEnailScript';
@@ -31,6 +33,7 @@ import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/st
 import { calculateStepSizeForIncrease, calculateStepSizeForDecrease } from '../helpers/rotaryHelper';
 
 import Debug from 'debug';
+import { ISavedState } from '../models/ISavedState';
 const debug = Debug('fc-enail:reducer');
 
 const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
@@ -73,7 +76,8 @@ const initialState: IEnailState = {
     mode: EnailMode.Home,
     scripts,
     currentScript: scripts.length > 0 ? scripts[0] : undefined,
-    currentStep: scripts.length > 0 ? scripts[0].step : undefined
+    currentStep: scripts.length > 0 ? scripts[0].step : undefined,
+    presets: []
 };
 
 export const connect = () => {
@@ -285,6 +289,40 @@ export const updateDisplay = () => {
     };
 }
 
+export const loadSavedState = () => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        fs.readFile('./saved-state.json', 'utf8', (err: NodeJS.ErrnoException, data: string) => {
+            if (err) {
+                dispatch({
+                    type: Constants.LOAD_SAVED_STATE,
+                    payload: {
+                        presets: [475, 535, 575, 600, 635]
+                    } as ISavedState
+                });
+            } else {
+                const savedState: ISavedState = JSON.parse(data);
+                dispatch({
+                    type: Constants.LOAD_SAVED_STATE,
+                    payload: savedState
+                });
+            }
+        });
+    };
+}
+
+export const persistSavedState = (savedState: ISavedState) => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        fs.writeFile('./saved-state.json', JSON.stringify(savedState), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+            if (!err) {
+                dispatch({
+                    type: Constants.PERSIST_SAVED_STATE,
+                    payload: savedState
+                });
+            }
+        });
+    };
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.E5CC_CONNECTED: {
@@ -475,6 +513,20 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 setPoint: (action as IE5CCUpdateStateAction).payload!.sp,
                 running: (action as IE5CCUpdateStateAction).payload!.isRunning
             };
+        }
+
+        case Constants.LOAD_SAVED_STATE: {
+            return {
+                ...state,
+                presets: (action.payload as ISavedState).presets
+            };
+        }
+
+        case Constants.PERSIST_SAVED_STATE: {
+            return {
+                ...state,
+                presets: (action.payload as ISavedState).presets
+            }
         }
 
         default: {
