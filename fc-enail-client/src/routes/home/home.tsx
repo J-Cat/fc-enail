@@ -111,8 +111,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
         }
     }
 
-    scriptBeforeChange = (from: number, to: number) => {
-        alert(to);
+    scriptAfterChange = (to: number) => {
+        this.props.setScript(to);
         return;
     }
 
@@ -137,9 +137,10 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             isCarousel: true,
             columnNum: 1,
             carouselMaxRow: 1,
-            onBeforeChange: this.scriptBeforeChange,
+            afterChange: this.scriptAfterChange,
             className: 'home-footer-scripts',
-            renderItem: this.renderScriptItem
+            renderItem: this.renderScriptItem,
+            selectedIndex: this.props.state ? this.props.state.currentScript || 0 : 0
         };
 
         return (

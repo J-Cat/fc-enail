@@ -175,6 +175,27 @@ export const endScript = () => {
     }
 }
 
+export const setScript = (index: number) => {
+    return (dispatch: any) => {
+        getServiceUrl().then((serviceUrl) => {
+            dispatch({
+                [RSAA]: {
+                    endpoint: `${serviceUrl}/script/set/${index}`,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    types: [
+                        Constants.SET_SCRIPT_REQUEST,
+                        Constants.SET_SCRIPT_RESPONSE,
+                        Constants.SET_SCRIPT_ERROR
+                    ]
+                }
+            });
+        });
+    }
+}
+
 export const findEnailService = () => {
     return (dispatch: Dispatch<EnailAction>) => {
         const zeroconf = (cordova.plugins as any).zeroconf;
@@ -232,7 +253,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         }
 
         case Constants.SETSP_REQUEST: case Constants.TOGGLE_STATE_REQUEST: 
-        case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: {
+        case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
+        case Constants.SET_SCRIPT_REQUEST: {
             return {
                 ...state,
                 requesting: true,
@@ -241,7 +263,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         }
 
         case Constants.SETSP_RESPONSE: case Constants.TOGGLE_STATE_RESPONSE: 
-        case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: {
+        case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: 
+        case Constants.SET_SCRIPT_RESPONSE: {
             return {
                 ...state,
                 requesting: false,
@@ -250,7 +273,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         }
 
         case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
-        case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: {
+        case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
+        case Constants.SET_SCRIPT_ERROR: {
             return {
                 ...state,
                 requesting: false,

@@ -20,7 +20,7 @@ import { IEnailStore } from '../../models/IEnailStore';
 import { Home } from './home';
 import { IEnailEmitState } from '../../models/IEnailEmitState';
 import { IEnailScript } from '../../models/IEnailScript';
-import { setSP, toggleState, runScript, endScript } from '../../reducers/enailReducer';
+import { setSP, toggleState, runScript, endScript, setScript } from '../../reducers/enailReducer';
 
 export namespace HomeProps {
     export interface IStateProps {
@@ -34,6 +34,7 @@ export namespace HomeProps {
         toggleState: () => void;
         runScript: () => void;
         endScript: () => void;
+        setScript: (index: number) => void;
     }
 
     export interface IOwnProps {
@@ -62,6 +63,7 @@ function mapDispatchToProps(dispatch: (...args: any[]) => void) {
         toggleState: () => dispatch(toggleState()),
         runScript: () => dispatch(runScript()),
         endScript: () => dispatch(endScript()),
+        setScript: (index: number) => dispatch(setScript(index))
     };
 }
 
