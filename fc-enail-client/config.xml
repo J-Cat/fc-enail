@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.jcat.fcenailclient" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>FC Community E-Nail</name>
+<widget id="com.jcat.fcenailclient" version="0.5.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>FC E-Nail</name>
     <description>
         FC Community E-Nail - A better E-Nail!
     </description>
@@ -8,7 +8,6 @@
         JCat (FC)
     </author>
     <content src="index.html" />
-    <plugin name="cordova-plugin-whitelist" spec="1" />
     <access origin="*" />
     <allow-navigation href="http://*/*" />
     <allow-navigation href="https://*/*" />
@@ -25,16 +24,17 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
-    <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
-    <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="StatusBarBackgroundColor" value="#000000" />
     <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="AndroidLaunchMode" value="singleTask" />
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
+    <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
+    <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <plugin name="cordova-plugin-zeroconf" spec="^1.3.3" />
     <plugin name="cordova-plugin-add-swift-support" spec="^1.7.2" />
-    <engine name="ios" spec="^4.5.5" />
     <engine name="android" spec="^7.1.2" />
     <engine name="browser" spec="^5.0.4" />
+    <engine name="ios" spec="^4.5.5" />
 </widget>

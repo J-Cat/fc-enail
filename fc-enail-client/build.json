@@ -26,7 +26,7 @@
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "enterprise",
-            "provisioningProfile": "29fc610f-f7ba-44cb-99e2-3811d50a7d38"
+            "automaticProvisioning": true
         }
     }
 }
