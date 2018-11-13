@@ -42,22 +42,18 @@ export const render = (state: IEnailState, action: EnailAction) => {
         case EnailMode.Home: {
             led.flash(0);
             oledUi.setIcon(home);
-            oledUi.setLine1('FC E-Nail');
-            oledUi.setLine2('#time');
             break;
         }
 
         case EnailMode.Script: {
             led.flash(0);
             oledUi.setIcon(script);
-            oledUi.setLine1(!state.currentScript ? '-Select-' : state.currentScript.title);
             break;
         }
 
         case EnailMode.Settings: {
             led.flash(0);
             oledUi.setIcon(gear);
-            oledUi.setLine1('Settings');
             break;
         }
     }

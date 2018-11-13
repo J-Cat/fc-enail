@@ -1,5 +1,5 @@
 [{
-    "title": "Up 35x3",
+    "title": "Up 35\u00B0F x3",
     "step": {
         "type": "sequential",
         "steps": [{
@@ -32,7 +32,7 @@
         }]
     }
 }, {
-    "title": "Up 35x2",
+    "title": "Up 35\u00B0F x2",
     "step": {
         "type": "sequential",
         "steps": [{
@@ -65,7 +65,7 @@
         }]
     }
 }, {
-    "title": "Up 45x2",
+    "title": "Up 45\u00B0F x2",
     "step": {
         "type": "sequential",
         "steps": [{

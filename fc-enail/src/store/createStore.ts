@@ -19,7 +19,6 @@ import {
     createStore,
     Store
 } from 'redux';
-// import { apiMiddleware } from 'redux-api-middleware';
 import thunk from 'redux-thunk';
 
 import makeRootReducer from '../reducers';
@@ -38,8 +37,8 @@ const configureStore = (initialState?: IEnailStore): Store<IEnailStore, EnailAct
         displayMiddleware
     ];
 
-    const composeEnhancers = composeWithDevTools({ realtime: true });
-    //const composeEnhancers = compose;
+    //const composeEnhancers = composeWithDevTools({ realtime: true });
+    const composeEnhancers = compose;
 
     const newState = initialState || {} as IEnailStore;
     const store: Store<IEnailStore, EnailAction> = createStore<IEnailStore, EnailAction, {}, {}>(makeRootReducer, newState,         
