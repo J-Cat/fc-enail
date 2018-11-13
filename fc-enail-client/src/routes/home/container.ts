@@ -18,13 +18,15 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { IEnailStore } from '../../models/IEnailStore';
 import { Home } from './home';
-import { IEnailEmitState } from 'src/models/IEnailEmitState';
-import { setSP, toggleState, runScript, endScript } from 'src/reducers/enailReducer';
+import { IEnailEmitState } from '../../models/IEnailEmitState';
+import { IEnailScript } from '../../models/IEnailScript';
+import { setSP, toggleState, runScript, endScript } from '../../reducers/enailReducer';
 
 export namespace HomeProps {
     export interface IStateProps {
         readonly version: string;
         readonly state?: IEnailEmitState;
+        readonly scripts: IEnailScript[];
     }
 
     export interface IDispatchProps {
@@ -49,7 +51,8 @@ export namespace HomeProps {
 function mapStateToProps(state: IEnailStore, ownProps: HomeProps.IOwnProps) {
     return {
         version: state.version.version,
-        state: state.enail.emitState
+        state: state.enail.emitState,
+        scripts: state.enail.scripts || []
     };
 }
 

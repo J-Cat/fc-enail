@@ -17,9 +17,13 @@ import * as React from 'react';
 import './home.less';
 
 import { HomeProps } from './container';
-import { Slider, Modal, Toast, Switch } from 'antd-mobile';
+import { Grid, Slider, Modal, Toast, Switch } from 'antd-mobile';
 import { Button } from 'antd';
 import { Action } from 'antd-mobile/lib/modal/PropsType';
+
+import { IEnailScript } from '../../models/IEnailScript';
+
+const fcLogo = require('../../assets/fclogo.png');
 
 const MAX_TEMP = 1000;
 
@@ -107,11 +111,44 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
         }
     }
 
+    scriptBeforeChange = (from: number, to: number) => {
+        alert(to);
+        return;
+    }
+
+    renderScriptItem = (script: IEnailScript) => {
+        return (<div className="home-footer-scripts-item">
+            <div className="home-footer-scripts-item-spacer" />
+            <div className="home-footer-scripts-item-content">
+                <div className="home-footer-scripts-item-content-left">
+                    {script.title}
+                </div>
+                <div className="home-footer-scripts-item-content-right">
+                    <Button className="home-footer-scripts-item-content-right-button" onClick={this.runEndScript} icon={this.props.state!.scriptRunning ? 'pause-circle' : 'play-circle'} style={{color: this.props.state!.scriptRunning ? '#A00000' : 'black' }} />
+                </div>
+            </div>
+            <div className="home-footer-scripts-item-spacer" />
+        </div>);
+    }
+
     render() {
+        const gridProps = {
+            data: this.props.scripts,
+            isCarousel: true,
+            columnNum: 1,
+            carouselMaxRow: 1,
+            onBeforeChange: this.scriptBeforeChange,
+            className: 'home-footer-scripts',
+            renderItem: this.renderScriptItem
+        };
+
         return (
             <div className="home">
                 <div className="version-label">{this.props.version}</div>
-                <div className="home-header" />
+                <div className="home-header">
+                    <img src={fcLogo} alt="FC" className="home-header-logo" />
+                </div>
+                <div className="home-halfspacer" />
                 <div className="home-content">
                     {this.props.state
                     ? <div>
@@ -121,10 +158,9 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                 <div className="home-content-body-left-sp" onDoubleClick={this.getSPDialog}>{this.state.changing ? this.state.sliderValue : this.props.state ? this.props.state.sp : '-'}</div>
                             </div>
                             <div className="home-content-body-right">
-                                <div className='spacer' />
-                                <Switch className="home-content-body-right-switch" onChange={this.toggleState} checked={this.props.state.running} disabled={this.props.state === undefined} color="rgb(17, 100, 17)" />
-                                <Button className="home-content-body-right-button" onClick={this.runEndScript} icon={this.props.state.scriptRunning ? 'border' : 'caret-right'} style={{color: this.props.state.scriptRunning ? 'darkred' : 'unset' }} />
-                                <div className='spacer' />
+                                <div className='home-content-body-right-spacer' />
+                                <Switch className="home-content-body-right-switch" onChange={this.toggleState} checked={this.props.state.running} disabled={this.props.state === undefined} color="#A00000"  />
+                                <div className='home-content-body-right-spacer' />
                             </div>
                         </div>
                         <div className="home-content-slider">
@@ -133,7 +169,11 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                     </div> : "Loading ..."
                     }
                 </div>
-                <div className="home-footer" />
+                {this.props.state ?
+                <div className="home-footer">
+                    <Grid {...gridProps} />                
+                </div> : "" }
+                <div className="home-spacer" />
             </div>
         );
     }
