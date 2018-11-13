@@ -20,13 +20,13 @@
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "development",
-            "provisioningProfile": "5f5500c6-9a04-4be5-b323-44768356302c"
+            "provisioningProfile": "ee7eb916-8c70-4ade-bfa0-dc0c6863bf73"
         },
         "release": {
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "enterprise",
-            "provisioningProfile": "e135875c-b98a-4ea1-b8c0-17ef0a886675"
+            "provisioningProfile": "29fc610f-f7ba-44cb-99e2-3811d50a7d38"
         }
     }
 }

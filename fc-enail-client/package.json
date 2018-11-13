@@ -56,7 +56,8 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-whitelist": {},
-      "cordova-plugin-zeroconf": {}
+      "cordova-plugin-zeroconf": {},
+      "cordova-plugin-add-swift-support": {}
     },
     "platforms": [
       "ios",
