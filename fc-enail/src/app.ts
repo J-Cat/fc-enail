@@ -24,7 +24,7 @@ import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
 import server from './server/server';
 import { settingSelect, settingDown, settingUp, settingBack, connectWiFiNetwork, getNetworkInfo } from './reducers/menuReducer';
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import e5cc from './e5cc/e5cc';
 
 import * as Constants from './models/constants';
@@ -146,15 +146,6 @@ const initButton = async () => {
         }
         
         e5cc.close().then(() => {
-            process.on("exit", function () {
-                setTimeout(() => {
-                    spawn(process.argv.shift() as string, process.argv, {
-                        cwd: process.cwd(),
-                        detached : true,
-                        stdio: "inherit"
-                    });
-                }, 10000);
-            });
             process.exit();
         });
     });
@@ -165,11 +156,8 @@ const initButton = async () => {
         }
 
         e5cc.close().then(() => {
-            process.on("exit", function () {
-                spawn('sudo', ['reboot'], {
-                    detached : true,
-                    stdio: "inherit"
-                });
+            process.on("SIGINT", function () {
+                exec('sudo reboot');
             });
             process.exit();
         });

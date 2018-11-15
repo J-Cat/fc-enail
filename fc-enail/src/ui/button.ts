@@ -53,6 +53,7 @@ export class Button {
                     
                     if (this.timer) {
                         clearTimeout(this.timer);
+                        this.timer = undefined;
                         this.clickCount += 1;
                     }
 
@@ -63,7 +64,7 @@ export class Button {
                             this._onClick.dispatch(this);
                         }
                         this.clickCount = 0;
-                    }).bind(this), 500);
+                    }).bind(this), DOUBLE_CLICK_RATE);
                 }
             }
         });

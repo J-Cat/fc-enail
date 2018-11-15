@@ -158,7 +158,11 @@ export class OledUi {
                 break;
             }
             default: {
-                lines = ['FC E-Nail']
+                if (state.enail.scriptRunning) {
+                    lines = [state.enail.currentScript!.title, state.enail.currentStep!.message || `Step ${state.enail.currentStep!.key}`];
+                } else {
+                    lines = ['FC E-Nail']
+                }
                 break;
             }
         }
@@ -233,7 +237,7 @@ export class OledUi {
 
 
     getLineCoordinates = (index: number): { x: number, y: number } => {
-        if (this.lines.length === 2 && index === 1) {
+        if ((this.lines.length === 2) && (index === 1) && store.getState().enail.scriptRunning) {
             return { x: 4, y: 45 };
         } 
         return { x: 0, y: (index * 16) };
