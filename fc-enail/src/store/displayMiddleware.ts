@@ -22,7 +22,7 @@ export const displayMiddleware = (store: Store<IEnailStore>) => <A extends Enail
     const state = store.getState().enail;
 
     switch (action.type) {
-        case Constants.SET_MODE: case Constants.SCRIPT_INCREASE: case Constants.SCRIPT_DECREASE: {
+        case Constants.SET_MODE: case Constants.SCRIPT_INCREASE: case Constants.SCRIPT_DECREASE: case Constants.NETWORK_INFO: {
             store.dispatch<any>(updateDisplay());
             break;
         }
@@ -57,5 +57,4 @@ export const render = (state: IEnailState, action: EnailAction) => {
             break;
         }
     }
-    oledUi.render();
 }

@@ -5,9 +5,10 @@ export interface IEnailState {
     readonly connected: boolean;
     readonly emitState?: IEnailEmitState;
     readonly requesting: boolean;
-    readonly error?: boolean;
-    readonly message?: string;
+    readonly reconnect: boolean;
+    readonly serviceFound: boolean;
     readonly scripts?: IEnailScript[];
     readonly presets: number[];
-    readonly serviceFound: boolean;
+    readonly error?: boolean;
+    readonly message?: string;
 }

@@ -6,7 +6,8 @@ import { ISavedState } from '../models/ISavedState';
 
 export class EnailController {
     get = (req: Request, res: Response, next: NextFunction): void => {
-        res.status(HttpStatus.OK).send(store.getState().enail);
+        // res.status(HttpStatus.OK).send(store.getState().enail);
+        res.sendStatus(HttpStatus.OK);
     }
 
     getScripts = (req: Request, res: Response, next: NextFunction): void => {

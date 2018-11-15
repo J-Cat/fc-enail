@@ -8,23 +8,19 @@ import { EnailAction, IErrorAction } from '../models/Actions';
 import * as Constants from '../models/constants';
 import { IEnailEmitState } from 'src/models/IEnailEmitState';
 import { IEnailScript } from '../models/IEnailScript';
-import config from '../config';
 
 const initialState: IEnailState = {
     serviceFound: false,
     connected: false,
     requesting: false,
+    reconnect: false,
     presets: []
 };
 
 export const connectSocket = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then(() => {
-            dispatch({
-                type: Constants.SOCKET_CONNECT
-            });
-        });
-    }
+    return {
+        type: Constants.SOCKET_CONNECT
+    };
 }
 
 export const socketConnected = () => {
@@ -47,31 +43,95 @@ export const receiveEnailState = (reading: IEnailEmitState) => {
 }
 
 export const getScripts = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/scripts`,
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.SCRIPTS_REQUEST,
-                        Constants.SCRIPTS_RESPONSE,
-                        Constants.SCRIPTS_ERROR
-                    ]
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/scripts`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.SCRIPTS_REQUEST,
+                Constants.SCRIPTS_RESPONSE,
+                Constants.SCRIPTS_ERROR
+            ]
+        }
+    }
+}
+
+export const reconnect = (retry: boolean, ignoreCache: boolean = false) => {
+    return async (dispatch: Dispatch<EnailAction>) => {
+        if (retry) {
+            try {
+                // dispatch({
+                //     type: Constants.SERVICE_FOUND,
+                //     payload: 'http://172.19.0.21:4000'
+                // });
+                // return;
+                const serviceUrl = await fetchServiceUrl(ignoreCache);
+
+                dispatch({
+                    type: Constants.SERVICE_FOUND,
+                    payload: serviceUrl
+                });
+            } catch {
+                if (!ignoreCache) {
+                    dispatch<any>(reconnect(true, true));
+                } else {
+                    dispatch<any>(reconnect(false, false));
                 }
-            });
+            }
+            // dispatch<any>(getScripts());
+            // dispatch<any>(getSavedState());
+            // dispatch<any>(connectSocket());
+        } else {
+            dispatch({
+                type: Constants.RECONNECT,
+                payload: retry
+            });        
+        }
+    };
+}
+
+export const connectManual = (serviceUrl: string) => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        fetch(serviceUrl)
+        .then((response: Response) => {
+            if (response.status !== 200) {
+                dispatch<any>(reconnect(false, false));
+            } else {
+                dispatch({
+                    type: Constants.SERVICE_FOUND,
+                    payload: serviceUrl
+                })
+            }
         });
     };
 }
 
-const getServiceUrl = (): Promise<string> => {
-    return new Promise<string>(resolve => {
-        const serviceUrl = localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL);
-        if (serviceUrl) {
-            resolve(serviceUrl);
+const getServiceUrl = (): string => {
+    return localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) || '';
+}
+
+const fetchServiceUrl = (ignoreCache: boolean): Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+        const serviceUrl = ignoreCache ? '' : localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) || '';
+        if (serviceUrl !== '') {
+            const timeout = setTimeout(() => {
+                reject();
+            }, 5000);
+
+            fetch(serviceUrl)
+            .then((response: Response) => {
+                clearTimeout(timeout);
+                if (response.status !== 200) {
+                    reject();
+                } else {
+                    resolve(serviceUrl);
+                }
+            }).catch(() => {
+                reject();
+            });
             return;
         }
 
@@ -81,123 +141,119 @@ const getServiceUrl = (): Promise<string> => {
             switch (result.action) {
                 case 'added': case 'resolved': {
                     const url = `http://${result.service.ipv4Addresses[0]}:${result.service.port}`;
-                    localStorage.setItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL, url);
+
+                    const timeout = setTimeout(() => {
+                        reject();
+                    }, 5000);
+                    
+                    fetch(serviceUrl)
+                    .then((response: Response) => {
+                        clearTimeout(timeout);
+                        if (response.status !== 200) {
+                            reject();
+                        } else {
+                            resolve(serviceUrl);
+                        }
+                    }).catch(() => {
+                        reject();
+                    });
+
                     resolve(url);
                     zeroconf.unwatch('_fc-enail._tcp.', 'local.');
                     break;
                 }
             }
         }, () => {
-            localStorage.setItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL, config.serviceUrl);
-            resolve(config.serviceUrl);
+            // localStorage.setItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL, config.serviceUrl);
+            reject();
             return;    
         });
     });
 }
 
 export const setSP = (value: number) => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/sp/${value}`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.SETSP_REQUEST,
-                        Constants.SETSP_RESPONSE,
-                        Constants.SETSP_ERROR
-                    ]
-                }
-            });
-        });
-    }
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/sp/${value}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.SETSP_REQUEST,
+                Constants.SETSP_RESPONSE,
+                Constants.SETSP_ERROR
+            ]
+        }
+    };
 }
 
 export const toggleState = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/state`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.TOGGLE_STATE_REQUEST,
-                        Constants.TOGGLE_STATE_RESPONSE,
-                        Constants.TOGGLE_STATE_ERROR
-                    ]
-                }
-            });
-        });
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/state`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.TOGGLE_STATE_REQUEST,
+                Constants.TOGGLE_STATE_RESPONSE,
+                Constants.TOGGLE_STATE_ERROR
+            ]
+        }
     }
 }
 
 export const runScript = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/script/run`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.RUN_SCRIPT_REQUEST,
-                        Constants.RUN_SCRIPT_RESPONSE,
-                        Constants.RUN_SCRIPT_ERROR
-                    ]
-                }
-            });
-        });
-    }
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/script/run`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.RUN_SCRIPT_REQUEST,
+                Constants.RUN_SCRIPT_RESPONSE,
+                Constants.RUN_SCRIPT_ERROR
+            ]
+        }
+    };
 }
 
 export const endScript = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/script/end`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.END_SCRIPT_REQUEST,
-                        Constants.END_SCRIPT_RESPONSE,
-                        Constants.END_SCRIPT_ERROR
-                    ]
-                }
-            });
-        });
-    }
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/script/end`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.END_SCRIPT_REQUEST,
+                Constants.END_SCRIPT_RESPONSE,
+                Constants.END_SCRIPT_ERROR
+            ]
+        }
+    };
 }
 
 export const setScript = (index: number) => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/script/set/${index}`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.SET_SCRIPT_REQUEST,
-                        Constants.SET_SCRIPT_RESPONSE,
-                        Constants.SET_SCRIPT_ERROR
-                    ]
-                }
-            });
-        });
-    }
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/script/set/${index}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.SET_SCRIPT_REQUEST,
+                Constants.SET_SCRIPT_RESPONSE,
+                Constants.SET_SCRIPT_ERROR
+            ]
+        }
+    };
 }
 
 export const findEnailService = () => {
@@ -207,7 +263,8 @@ export const findEnailService = () => {
             switch (result.action) {
                 case 'added': case 'resolved': {
                     dispatch({
-                        type: Constants.SERVICE_FOUND
+                        type: Constants.SERVICE_FOUND,
+                        payload: `http://${result.service.ipv4Addresses[0]}:${result.service.port}`
                     });
                     break;
                 }
@@ -217,45 +274,37 @@ export const findEnailService = () => {
 }
 
 export const getSavedState = () => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/savedstate`,
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.LOAD_SAVED_STATE_REQUEST,
-                        Constants.LOAD_SAVED_STATE_RESPONSE,
-                        Constants.LOAD_SAVED_STATE_ERROR
-                    ]
-                }
-            });
-        });
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/savedstate`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.LOAD_SAVED_STATE_REQUEST,
+                Constants.LOAD_SAVED_STATE_RESPONSE,
+                Constants.LOAD_SAVED_STATE_ERROR
+            ]
+        }
     };
 }
 
 export const persistSavedState = (savedState: ISavedState) => {
-    return (dispatch: any) => {
-        getServiceUrl().then((serviceUrl) => {
-            dispatch({
-                [RSAA]: {
-                    endpoint: `${serviceUrl}/savedstate`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    types: [
-                        Constants.PERSIST_SAVED_STATE_REQUEST,
-                        { type: Constants.PERSIST_SAVED_STATE_RESPONSE, meta: savedState },
-                        Constants.PERSIST_SAVED_STATE_ERROR
-                    ],
-                    body: JSON.stringify(savedState)
-                }
-            });
-        });
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/savedstate`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.PERSIST_SAVED_STATE_REQUEST,
+                { type: Constants.PERSIST_SAVED_STATE_RESPONSE, meta: savedState },
+                Constants.PERSIST_SAVED_STATE_ERROR
+            ],
+            body: JSON.stringify(savedState)
+        }
     };
 }
 
@@ -362,8 +411,16 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.SERVICE_FOUND: {
             return {
                 ...state,
-                serviceFound: true
+                serviceFound: true,
+                reconnect: false
             }
+        }
+
+        case Constants.RECONNECT: {
+            return {
+                ...state,
+                reconnect: true
+            };
         }
         default: {
             return state;

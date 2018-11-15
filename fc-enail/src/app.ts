@@ -23,6 +23,11 @@ import led from './ui/led';
 import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
 import server from './server/server';
+import { settingSelect, settingDown, settingUp, settingBack, connectWiFiNetwork, getNetworkInfo } from './reducers/menuReducer';
+import { spawn } from 'child_process';
+import e5cc from './e5cc/e5cc';
+
+import * as Constants from './models/constants';
 
 const OLED_ADDRESS = 0x3C;
 
@@ -40,6 +45,7 @@ const initDial = () => {
                 break;
             }
             case EnailMode.Settings: {
+                store.dispatch(settingDown());
                 break;
             }
         }
@@ -56,6 +62,7 @@ const initDial = () => {
                 break;
             }
             case EnailMode.Settings: {
+                store.dispatch(settingUp());
                 break;
             }
         }
@@ -73,7 +80,8 @@ const initDial = () => {
                 break;
             }
             case EnailMode.Settings: {
-                store.dispatch(setMode(EnailMode.Home));
+                store.dispatch(settingBack());
+                //store.dispatch(setMode(EnailMode.Home));
                 break;
             }
         }
@@ -98,26 +106,74 @@ const initButton = async () => {
                 }
                 break;
             }
+
+            case EnailMode.Settings: {
+                store.dispatch<any>(settingSelect());
+                break;
+            }
         }
     });
     button.onDoubleClick.subscribe(() => {
-        const state = store.getState().enail;
-        switch (state.mode) {
+        const state = store.getState();
+        switch (state.enail.mode) {
             case EnailMode.Script: {
                 store.dispatch<any>(toggleState());
                 break;
             }
 
             case EnailMode.Home: {
-                if (state.scriptRunning) {
+                if (state.enail.scriptRunning) {
                     store.dispatch<any>(endScript());
                 } else {
                     store.dispatch<any>(runScript());
                 }
                 break;
             }
+
+            case EnailMode.Settings: {
+                if ((state.menu.currentMenu === Constants.MENU.SETTINGS.NETWORK.CONNECT.KEY)
+                    && (state.menu.actionStep === 1)
+                ) {
+                    store.dispatch<any>(connectWiFiNetwork(state.menu.scan![state.menu.currentIndex].ssid, state.menu.passphrase));
+                }
+            }
         }
-    })
+    });
+
+    button.onLongClick.subscribe(() => {
+        if (store.getState().enail.mode !== EnailMode.Home) {
+            return;
+        }
+        
+        e5cc.close().then(() => {
+            process.on("exit", function () {
+                setTimeout(() => {
+                    spawn(process.argv.shift() as string, process.argv, {
+                        cwd: process.cwd(),
+                        detached : true,
+                        stdio: "inherit"
+                    });
+                }, 10000);
+            });
+            process.exit();
+        });
+    });
+
+    button.onReallyLongLick.subscribe(() => {
+        if (store.getState().enail.mode !== EnailMode.Home) {
+            return;
+        }
+
+        e5cc.close().then(() => {
+            process.on("exit", function () {
+                spawn('sudo', ['reboot'], {
+                    detached : true,
+                    stdio: "inherit"
+                });
+            });
+            process.exit();
+        });
+    });
 }
 
 
@@ -127,11 +183,11 @@ consoleUi.init();
 
 store.dispatch<any>(connect());
 store.dispatch<any>(loadSavedState());
+store.dispatch<any>(getNetworkInfo());
 
 initDial();
 initButton();
 oledUi.start(OLED_ADDRESS);
-oledUi.render();
 aplay.init({
     basePath: `${__dirname}/assets/sounds/`
 });

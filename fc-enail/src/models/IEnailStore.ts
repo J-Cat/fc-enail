@@ -14,7 +14,9 @@
  * Copyright (c) 2018
  */
 import { IEnailState } from './IEnailState';
+import { IMenuState } from './IMenuState';
 
 export interface IEnailStore {
     readonly enail: IEnailState;
+    readonly menu: IMenuState;
 }

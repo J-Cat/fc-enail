@@ -16,8 +16,9 @@
 import { Action } from 'redux';
 import { Direction } from './IEnailState';
 import { ISavedState } from './ISavedState';
+import { IWpaCliStatus, IWpaScanResult } from 'wireless-tools';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
@@ -30,9 +31,16 @@ export interface IE5CCUpdateStateAction extends Action<string> {
 }
 
 export interface IUserStateAction extends Action<string> {
-    payload?: ISavedState
+    payload?: ISavedState;
 }
-    
+
+export interface INetworkInfoAction extends Action<string> {
+    payload?: IWpaCliStatus;
+}
+export interface IWiFiScanAction extends Action<string> {
+    payload?: IWpaScanResult[];
+}
+
 export interface IBasicAction extends Action<string> {
     payload?: string | number | boolean | Direction;
     meta?: string;

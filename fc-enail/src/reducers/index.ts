@@ -16,9 +16,11 @@
 import { combineReducers, Reducer } from 'redux';
 import { IEnailStore } from '../models/IEnailStore';
 import { enailReducer } from './enailReducer';
+import { menuReducer } from './menuReducer';
 
 const makeRootReducer: Reducer<IEnailStore> = combineReducers({
-    enail: enailReducer
+    enail: enailReducer,
+    menu: menuReducer
 });
 
 export default makeRootReducer;

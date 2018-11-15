@@ -53,26 +53,36 @@ export class RotaryDial {
     }
 
     private rotaryInterupt = (isA: boolean) => {
-        const newA: number = this.inputA!.readSync()
-        const newB: number = this.inputB!.readSync();
-        if (newA === this.lastA && newB === this.lastB) {
-            return;
-        }
-    
-        this.lastA = newA;
-        this.lastB = newB;
-
-        if (newA === 1 && newB === 1) {
-            const lastRotation = this.lastRotation;
-            this.lastRotation = Date.now();
-            if ((this.lastRotation - lastRotation) > this.rotationThrottle) {
-                if (isA) {
-                    this._onCounterClockwise.dispatch(this);
-                } else {
-                    this._onClockwise.dispatch(this);
-                }
+        this.inputA!.read((err: Error, newA: number) => {
+            if (err) {
+                return;
             }
-        }
+
+            this.inputB!.read((err1: Error, newB: number) => {
+                if (err1) {
+                    return;
+                }
+
+                if (newA === this.lastA && newB === this.lastB) {
+                    return;
+                }
+            
+                this.lastA = newA;
+                this.lastB = newB;
+        
+                if (newA === 1 && newB === 1) {
+                    const lastRotation = this.lastRotation;
+                    this.lastRotation = Date.now();
+                    if ((this.lastRotation - lastRotation) > this.rotationThrottle) {
+                        if (isA) {
+                            this._onCounterClockwise.dispatch(this);
+                        } else {
+                            this._onClockwise.dispatch(this);
+                        }
+                    }
+                }    
+            });
+        });
     }
 
     init = (gpioA: number, gpioB: number, gpioButton: number) => {   

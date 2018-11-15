@@ -14,7 +14,7 @@ import { IEnailEmitState } from '../models/IEnailEmitState';
 import Debug from 'debug';
 const debug = Debug('fc-enail:server');
 
-const HTTP_PORT = 4000;
+export const HTTP_PORT = 4000;
 
 export class Server {
     app!: express.Application;

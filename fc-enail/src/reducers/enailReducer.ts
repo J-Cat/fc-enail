@@ -223,7 +223,6 @@ export const stepFeedback = (step: IFeedbackStep) => {
     return (dispatch: Dispatch<IBasicAction>) => {
         if (step.icon) {
             oledUi.setIcon(getIconByName(step.icon), step.flashRate || 0);
-            oledUi.render();
         }
 
         if (step.led !== undefined) {

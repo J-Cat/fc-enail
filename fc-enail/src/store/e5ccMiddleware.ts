@@ -24,7 +24,7 @@ import { Direction } from '../models/IEnailState';
 import led from '../ui/led';
 import server from '../server/server';
 
-const MONITOR_CYCLE_TIME = 500;
+const MONITOR_CYCLE_TIME = 1000;
 
 export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
@@ -69,7 +69,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
                 led.off();
             }
             server.emitState();
-            getE5CCState(store.dispatch);
+            //getE5CCState(store.dispatch);
             break;
         }
 
@@ -122,5 +122,6 @@ const getE5CCState = (dispatch: Dispatch<EnailAction>, immediate: boolean = fals
         const isRunning = await e5cc.isRunning();
         const sp = await e5cc.readSP();
         dispatch(updateAllState(pv, sp, isRunning));
+        getE5CCState(dispatch, false);
     }), immediate ? 0 : MONITOR_CYCLE_TIME);
 }

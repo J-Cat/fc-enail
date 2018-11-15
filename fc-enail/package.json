@@ -25,7 +25,8 @@
     "sequential-task-queue": "^1.2.1",
     "socket.io": "^2.1.1",
     "ssd1306-i2c-js": "^1.0.2",
-    "strongly-typed-events": "^1.4.6"
+    "strongly-typed-events": "^1.4.6",
+    "wireless-tools": "^0.19.0"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",

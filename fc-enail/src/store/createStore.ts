@@ -28,17 +28,20 @@ import { e5ccMiddleware } from './e5ccMiddleware';
 import { composeWithDevTools } from 'remote-redux-devtools';
 import { scriptMiddleware } from './scriptMiddleware';
 import { displayMiddleware } from './displayMiddleware';
+import { settingsMiddleware } from './settingsMiddleware';
 
 const configureStore = (initialState?: IEnailStore): Store<IEnailStore, EnailAction> => {
     const middlewares: any = [
         thunk,
         e5ccMiddleware,
         scriptMiddleware,
-        displayMiddleware
+        displayMiddleware,
+        settingsMiddleware
     ];
 
-    //const composeEnhancers = composeWithDevTools({ realtime: true });
-    const composeEnhancers = compose;
+    const composeEnhancers = process.env.NODE_ENV === 'development' 
+        ? composeWithDevTools({ realtime: true }) 
+        : compose;
 
     const newState = initialState || {} as IEnailStore;
     const store: Store<IEnailStore, EnailAction> = createStore<IEnailStore, EnailAction, {}, {}>(makeRootReducer, newState,         
