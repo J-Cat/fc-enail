@@ -136,29 +136,33 @@ const fetchServiceUrl = (ignoreCache: boolean): Promise<string> => {
         }
 
         const zeroconf = new Zeroconf();
+        const timeout2 = setTimeout(() => {
+            reject();
+        }, 5000);
 
         zeroconf.watch('_fc-enail._tcp.', 'local.').subscribe((result: { action: string, service: any }) => {
             switch (result.action) {
-                case 'added': case 'resolved': {
+                case 'resolved': {
+                    clearTimeout(timeout2);
+                    
                     const url = `http://${result.service.ipv4Addresses[0]}:${result.service.port}`;
 
-                    const timeout = setTimeout(() => {
+                    const timeout3 = setTimeout(() => {
                         reject();
                     }, 5000);
                     
-                    fetch(serviceUrl)
+                    fetch(url)
                     .then((response: Response) => {
-                        clearTimeout(timeout);
+                        clearTimeout(timeout3);
                         if (response.status !== 200) {
                             reject();
                         } else {
-                            resolve(serviceUrl);
+                            resolve(url);
                         }
                     }).catch(() => {
                         reject();
                     });
 
-                    resolve(url);
                     zeroconf.unwatch('_fc-enail._tcp.', 'local.');
                     break;
                 }

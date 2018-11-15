@@ -16,7 +16,7 @@ class App extends React.Component<RouteComponentProps<{}>, {}> {
     if (this.props.location.pathname.indexOf('settings')>=0) {
       selectedPath = "settings";
     }
-
+    
     return (
       <TabBar className="App" tintColor="rgb(67, 104, 67)">
         <TabBar.Item title="Home" 
