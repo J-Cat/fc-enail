@@ -237,8 +237,12 @@ export class OledUi {
 
 
     getLineCoordinates = (index: number): { x: number, y: number } => {
-        if ((this.lines.length === 2) && (index === 1) && store.getState().enail.scriptRunning) {
-            return { x: 4, y: 45 };
+        if ((this.lines.length === 2) && (index === 1)) {
+            if (!store.getState().enail.scriptRunning) {
+                return { x: 4, y: 45 };
+            } else {
+                return { x: 0, y: 45 };
+            }
         } 
         return { x: 0, y: (index * 16) };
     }
