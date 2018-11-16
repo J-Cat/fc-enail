@@ -1,7 +1,7 @@
 {
     "default": {
-        "privateKey": "/home/pi/fcenail.key",
-        "publicKey": "/home/pi/fcenail.cer",
+        "privateKey": "/home/pi/fc-enail.key",
+        "publicKey": "/home/pi/fc-enail.cert",
         "jwtOptions": {
             "algorithm": "RS256",
             "audience": "FC E-Nail",

@@ -50,7 +50,7 @@ export const settingsMiddleware = (store: Store<IEnailStore>) => <A extends Enai
                         break;
                     }
                     case Constants.MENU.SETTINGS.NETWORK.SAVE.ACTION: {
-                        exec("sudo cat /home/pi/wpa_supplicant.conf | grep -v -E '\s*#.*' > /etc/wpa_supplicant/wpa_supplicant.conf", () => {
+                        exec("sudo cat /home/pi/wpa_supplicant.conf | grep -v -E '\s*#.*' > /etc/wpa_supplicant/wpa_supplicant.conf && sudo rm /home/pi/wpa_supplicant.conf", () => {
                             setTimeout(() => {
                                 aplay.play('complete');
                                 store.dispatch(navigate(Constants.MENU.SETTINGS.KEY));

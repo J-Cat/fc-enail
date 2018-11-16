@@ -166,7 +166,7 @@ export class OledUi {
                         const elapsed = Date.now() - state.enail.scriptStartTime;
                         const m = Math.floor(elapsed / 60000);
                         const s = Math.floor((elapsed % 60000) / 1000);
-                        const d = `${m}${s.toString().length === 1 ? '0' : ''}${s}`;
+                        const d = `${m}:${s.toString().length === 1 ? '0' : ''}${s}`;
                         lines = [state.enail.currentScript!.title, state.enail.currentStep!.message || d];
                     } else {
                         lines = [Constants.APPLICATION_TITLE];
@@ -223,6 +223,7 @@ export class OledUi {
                 display.drawChar((i - (Math.floor(i / 10) * 10))*12, 4+(Math.floor(i / 10)+1)*20, '*'.charCodeAt(0), 2, Color.White, Layer.Layer0);
             }
         }
+        
         if (passphrase.length > 20) {
             display.drawLine(0, 40, 132, 40, Color.White, Layer.Layer0);
             display.drawLine(0, 62, 132, 62, Color.White, Layer.Layer0)
@@ -230,15 +231,15 @@ export class OledUi {
             display.drawLine(0, 40, 132, 40, Color.White, Layer.Layer0);
             display.drawLine(0, 62, 12*passphrase.length, 62, Color.White, Layer.Layer0);            
             if (this.characterOn === 1) {
-                display.drawLine(12*passphrase.length, 62, 12, 62, Color.White, Layer.Layer0);            
+                display.drawLine(12*(passphrase.length-1), 62, 12*passphrase.length, 62, Color.White, Layer.Layer0);            
             }
-            display.drawLine(12*(passphrase.length+1), 62, 132, 62, Color.White, Layer.Layer0);            
+            display.drawLine(12*passphrase.length, 62, 132, 62, Color.White, Layer.Layer0);            
         } else {
             display.drawLine(0, 40, 12*passphrase.length, 40, Color.White, Layer.Layer0);            
             if (this.characterOn === 1) {
-                display.drawLine(12*passphrase.length, 40, 12, 40, Color.White, Layer.Layer0);            
+                display.drawLine(12*(passphrase.length-1), 40, 12*passphrase.length, 40, Color.White, Layer.Layer0);            
             }
-            display.drawLine(12*(passphrase.length+1), 40, 132, 40, Color.White, Layer.Layer0);            
+            display.drawLine(12*passphrase.length, 40, 132, 40, Color.White, Layer.Layer0);            
             display.drawLine(0, 62, 132, 62, Color.White, Layer.Layer0)
         }
 
@@ -284,7 +285,7 @@ export class OledUi {
                             Constants.MENU.SETTINGS.NETWORK.TITLE, 
                             `${state.networkInfo.ssid}`, 
                             `${state.networkInfo.ip}`,
-                            `http://${state.networkInfo.ip}:${HTTP_PORT}`
+                            `http://${state.networkInfo.ip}${HTTP_PORT !== 80 ? `:${HTTP_PORT}` : ''}`
                         ];
                     }
                     break;

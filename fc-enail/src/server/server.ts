@@ -1,5 +1,7 @@
 import * as express from 'express';
-import { Server as HttpServer } from 'http';
+import * as fs from 'fs';
+import { Server as HttpServer, createServer } from 'http';
+//import { Server as HttpsServer, createServer } from 'https';
 import * as SocketIO from 'socket.io';
 import * as bodyParser from "body-parser";
 import * as cors from 'cors';
@@ -12,15 +14,16 @@ import store from '../store/createStore';
 import { IEnailEmitState } from '../models/IEnailEmitState';
 
 import Debug from 'debug';
-import { start } from 'repl';
 import { verifyToken } from '../helpers/securityHelper';
+import { config } from '../config';
 const debug = Debug('fc-enail:server');
 
-export const HTTP_PORT = 4000;
+export const HTTP_PORT = 80;
 
 export class Server {
     app!: express.Application;
     http!: HttpServer;
+    // https!: HttpsServer;
     io!: SocketIO.Server;
 
     init = () => {
@@ -35,7 +38,16 @@ export class Server {
         this.app.use(cors(corsOptions));
         this.app.use(bodyParser.json());
 
-        this.http = new HttpServer(this.app);
+        this.http = createServer(this.app);
+        
+        // const privateKey  = fs.readFileSync(config.httpsPrivateKey, 'utf8');
+        // const certificate = fs.readFileSync(config.httpsPublicKey, 'utf8');
+
+        // this.https = createServer({
+        //     key: privateKey,
+        //     cert: certificate            
+        // }, this.app);
+
         this.io = SocketIO(this.http);
         this.io.use(this.authorize);
 
@@ -85,7 +97,7 @@ export class Server {
     }
 
     start = () => {
-        debug('starting');
+        debug(`Starting FC Community E-Nail on ${HTTP_PORT}.`)
         this.http.listen(HTTP_PORT);
 
         // advertise an HTTP server on port 3000
