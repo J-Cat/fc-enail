@@ -21,6 +21,7 @@ export const socketIoMiddleware = (store: Store<IEnailStore>) => <A extends Enai
     switch (action.type) {
         case Constants.SOCKET_CONNECT: {
             const socketIo = io(localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) as string, {
+                query: 'token=' + store.getState().enail.token
             });
             socketIo.connect();
             socketIo.on('connect', () => {

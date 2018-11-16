@@ -37,6 +37,7 @@ export class Server {
 
         this.http = new HttpServer(this.app);
         this.io = SocketIO(this.http);
+        this.io.use(this.authorize);
 
         this.configureRoutes();
         this.initSocketIo();
@@ -111,6 +112,20 @@ export class Server {
 
         this.io.emit(Constants.EMIT_STATE, emitState);
     }
+
+    authorize = (socket: SocketIO.Socket, next: (error?: Error) => void) => {
+        if (socket.handshake.query && socket.handshake.query.token){
+            verifyToken(socket.handshake.query.token).then(result => {
+                if (result) {
+                    next();
+                } else {
+                    next(new Error('Authentication failed.  Invalid token'));
+                }
+            });
+        } else {
+            next(new Error('Authentication token missing from request.'));
+        }    
+    };
 }
 
 const server = new Server();
