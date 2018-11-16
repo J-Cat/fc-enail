@@ -20,13 +20,19 @@
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "development",
-            "provisioningProfile": "ee7eb916-8c70-4ade-bfa0-dc0c6863bf73"
+            "provisioningProfile": "ee7eb916-8c70-4ade-bfa0-dc0c6863bf73",
+            "buildFlag": [
+                "-UseModernBuildSystem=0"
+            ]
         },
         "release": {
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "enterprise",
-            "automaticProvisioning": true
+            "automaticProvisioning": true,
+            "buildFlag": [
+                "-UseModernBuildSystem=0"
+            ]
         }
     }
 }
