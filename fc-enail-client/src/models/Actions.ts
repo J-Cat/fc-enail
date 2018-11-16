@@ -2,6 +2,7 @@ import { Action } from 'redux';
 import { IEnailEmitState } from './IEnailEmitState';
 import { IEnailScript } from './IEnailScript';
 import { ISavedState } from './ISavedState';
+import { IVerifyTokenResponse } from './IVerifyTokenResponse';
 
 export type EnailAction = IErrorAction | IBasicAction | IEnailEmitStateAction;
 
@@ -13,7 +14,7 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IBasicAction extends Action<string> {
-    payload?: string | number | boolean | IEnailScript[] | ISavedState;
+    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse;
     meta?: string;
 }
 

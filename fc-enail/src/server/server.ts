@@ -12,6 +12,8 @@ import store from '../store/createStore';
 import { IEnailEmitState } from '../models/IEnailEmitState';
 
 import Debug from 'debug';
+import { start } from 'repl';
+import { verifyToken } from '../helpers/securityHelper';
 const debug = Debug('fc-enail:server');
 
 export const HTTP_PORT = 4000;
@@ -44,11 +46,38 @@ export class Server {
 
     configureRoutes = () => {
         const enailRoute = new EnailRoute();
-        this.app.use('/', enailRoute.router);
+        this.app.use('/', this.validateToken, enailRoute.router);
 
         // const securityRoute = new Security(this.getState, this.dispatch);
         // this.app.use('/auth', securityRoute.router);
         // this.app.use('/', passport.authenticate('jwt', { session: false }), monitorRoute.router);
+    }
+
+    validateToken = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+        if (['/', '/passphrase/generate', '/passphrase/verify'].indexOf(req.path.toLowerCase()) >= 0) {
+            next();
+            return;
+        }
+
+        let token = req.headers.authorization;
+        
+        if (!token) {
+            res.sendStatus(401);
+            return;
+        }
+
+        if (token.startsWith('Bearer ')) {
+          // Remove Bearer from string
+          token = token.slice(7, token.length);
+        }
+      
+        verifyToken(token).then(result => {
+            if (!result) {
+                res.sendStatus(401);
+            } else {
+                next();
+            }
+        });
     }
 
     initSocketIo = () => {

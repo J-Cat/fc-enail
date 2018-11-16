@@ -7,7 +7,7 @@ import * as Constants from '../models/constants';
 import Debug from 'debug';
 import { setMode } from '../reducers/enailReducer';
 import { EnailMode } from '../models/IEnailState';
-import { getNetworkInfo, getMenuItemByKey, internalSelect, getWiFiNetworks } from '../reducers/menuReducer';
+import { getNetworkInfo, getMenuItemByKey, internalSelect, getWiFiNetworks, settingBack, navigate } from '../reducers/menuReducer';
 import { exec } from 'child_process';
 import aplay from '../aplay';
 const TEMP_WPA_SUPPLICANT_CONF = '/home/pi/wpa_supplicant.conf';
@@ -49,8 +49,13 @@ export const settingsMiddleware = (store: Store<IEnailStore>) => <A extends Enai
                         store.dispatch<any>(getNetworkInfo());
                         break;
                     }
-                    case Constants.MENU.SETTINGS.NETWORK.EDIT.ACTION: {
-                        store.dispatch<any>(getNetworkInfo());
+                    case Constants.MENU.SETTINGS.NETWORK.SAVE.ACTION: {
+                        exec("sudo cat /home/pi/wpa_supplicant.conf | grep -v -E '\s*#.*' > /etc/wpa_supplicant/wpa_supplicant.conf", () => {
+                            setTimeout(() => {
+                                aplay.play('complete');
+                                store.dispatch(navigate(Constants.MENU.SETTINGS.KEY));
+                            }, 1000);
+                        });
                         break;
                     }
                 }
@@ -70,6 +75,7 @@ export const settingsMiddleware = (store: Store<IEnailStore>) => <A extends Enai
                 setTimeout(() => {
                     aplay.play('complete');
                     store.dispatch<any>(getNetworkInfo());
+                    store.dispatch(navigate(Constants.MENU.SETTINGS.NETWORK.VIEW.KEY));
                 }, 5000);
             });                       
         }

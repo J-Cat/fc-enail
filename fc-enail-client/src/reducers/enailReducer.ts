@@ -8,13 +8,15 @@ import { EnailAction, IErrorAction } from '../models/Actions';
 import * as Constants from '../models/constants';
 import { IEnailEmitState } from 'src/models/IEnailEmitState';
 import { IEnailScript } from '../models/IEnailScript';
+import { IVerifyTokenResponse } from '../models/IVerifyTokenResponse';
 
 const initialState: IEnailState = {
     serviceFound: false,
     connected: false,
     requesting: false,
     reconnect: false,
-    presets: []
+    presets: [],
+    token: ''
 };
 
 export const connectSocket = () => {
@@ -260,6 +262,41 @@ export const setScript = (index: number) => {
     };
 }
 
+export const generatePassphrase = () => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/passphrase/generate`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.PASSPHRASE_GENERATE_REQUEST,
+                Constants.PASSPHRASE_GENERATE_RESPONSE,
+                Constants.PASSPHRASE_GENERATE_ERROR
+            ]
+        }
+    };
+}
+
+export const verifyPassphrase = (passphrase: string) => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/passphrase/verify`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ passphrase } as { passphrase: string }),
+            types: [
+                Constants.PASSPHRASE_VERIFY_REQUEST,
+                Constants.PASSPHRASE_VERIFY_RESPONSE,
+                Constants.PASSPHRASE_VERIFY_ERROR
+            ]
+        }
+    };
+}
+
 export const findEnailService = () => {
     return (dispatch: Dispatch<EnailAction>) => {
         const zeroconf = (cordova.plugins as any).zeroconf;
@@ -312,6 +349,19 @@ export const persistSavedState = (savedState: ISavedState) => {
     };
 }
 
+export const loadToken = (token: string) => {
+    return {
+        type: Constants.LOAD_TOKEN,
+        payload: token
+    }
+}
+
+export const tokenLoaded = () => {
+    return {
+        type: Constants.TOKEN_LOADED
+    }
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.SOCKET_CONNECTED: {
@@ -355,7 +405,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.SETSP_REQUEST: case Constants.TOGGLE_STATE_REQUEST: 
         case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
         case Constants.SET_SCRIPT_REQUEST: case Constants.LOAD_SAVED_STATE_REQUEST: 
-        case Constants.PERSIST_SAVED_STATE_REQUEST: {
+        case Constants.PERSIST_SAVED_STATE_REQUEST: case Constants.PASSPHRASE_GENERATE_REQUEST: 
+        case Constants.PASSPHRASE_VERIFY_REQUEST: {
             return {
                 ...state,
                 requesting: true,
@@ -365,7 +416,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
         case Constants.SETSP_RESPONSE: case Constants.TOGGLE_STATE_RESPONSE: 
         case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: 
-        case Constants.SET_SCRIPT_RESPONSE: {
+        case Constants.SET_SCRIPT_RESPONSE: case Constants.PASSPHRASE_GENERATE_RESPONSE: {
             return {
                 ...state,
                 requesting: false,
@@ -375,7 +426,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
         case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
         case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
-        case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR: {
+        case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR:
+        case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: {
             return {
                 ...state,
                 requesting: false,
@@ -390,6 +442,22 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 requesting: false,
                 error: false,
                 presets: (action.meta as ISavedState).presets
+            }
+        }
+
+        case Constants.PASSPHRASE_VERIFY_RESPONSE: {
+            return {
+                ...state,
+                requesting: false,
+                error: false,
+                token: (action.payload as IVerifyTokenResponse).token
+            };
+        }
+
+        case Constants.LOAD_TOKEN: {
+            return {
+                ...state,
+                token: action.payload as string
             }
         }
 
@@ -426,6 +494,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 reconnect: true
             };
         }
+
         default: {
             return state;
         }

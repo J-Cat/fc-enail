@@ -31,9 +31,10 @@ import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
 import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/stepHelper';
 import { calculateStepSizeForIncrease, calculateStepSizeForDecrease } from '../helpers/rotaryHelper';
-
+import { generate } from 'generate-password';
 import Debug from 'debug';
 import { ISavedState } from '../models/ISavedState';
+
 const debug = Debug('fc-enail:reducer');
 
 const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
@@ -77,7 +78,9 @@ const initialState: IEnailState = {
     scripts,
     currentScript: scripts.length > 0 ? scripts[0] : undefined,
     currentStep: scripts.length > 0 ? scripts[0].step : undefined,
-    presets: []
+    presets: [],
+    scriptStartTime: 0,
+    passphrase: ''
 };
 
 export const connect = () => {
@@ -322,6 +325,25 @@ export const persistSavedState = (savedState: ISavedState) => {
     };
 }
 
+export const generatePassphrase = () => {
+    return {
+        type: Constants.PASSPHRASE_GENERATE
+    };
+}
+
+export const verifyPassphrase = (passphrase: string) => {
+    return {
+        type: Constants.PASSPHRASE_VERIFY,
+        payload: passphrase
+    };
+}
+
+export const clearPassphrase = () => {
+    return {
+        type: Constants.PASSPHRASE_CLEAR
+    };
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.E5CC_CONNECTED: {
@@ -427,7 +449,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             return {
                 ...state,
                 scriptStartSP: action.payload as number,
-                scriptRunning: true
+                scriptRunning: true,
+                scriptStartTime: Date.now()
             }
         }
 
@@ -526,6 +549,25 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 presets: (action.payload as ISavedState).presets
             }
+        }
+
+        case Constants.PASSPHRASE_GENERATE: {
+            return {
+                ...state,
+                passphrase: generate({
+                    length: 8,
+                    numbers: true,
+                    symbols: true,
+                    uppercase: true
+                })
+            };
+        }
+
+        case Constants.PASSPHRASE_CLEAR: {
+            return {
+                ...state,
+                passphrase: ''
+            };
         }
 
         default: {

@@ -145,38 +145,48 @@ export class OledUi {
         let selectedIndex = state.menu.currentIndex;
         let selectedMenu = state.menu.currentMenu;
         let executing = state.menu.executing;
-        
-        switch (state.enail.mode) {
-            case EnailMode.Script: {
-                lines = [
-                    state.enail.currentScript ? state.enail.currentScript.title : '-Select-'
-                ];
-                break;
-            }
-            case EnailMode.Settings: {
-                lines = this.getSettingsItems();
-                break;
-            }
-            default: {
-                if (state.enail.scriptRunning) {
-                    lines = [state.enail.currentScript!.title, state.enail.currentStep!.message || `Step ${state.enail.currentStep!.key}`];
-                } else {
-                    lines = ['FC E-Nail']
-                }
-                break;
-            }
-        }
+        let isPassphrase = state.enail.passphrase !== '';
 
-        if (lines.length === 1) {
-            lines.push(`${format(Date.now(), 'h:mm')}`);
+        if (state.enail.passphrase !== '') {
+            lines = [Constants.APPLICATION_TITLE, state.enail.passphrase];            
+        } else {
+            switch (state.enail.mode) {
+                case EnailMode.Script: {
+                    lines = [
+                        state.enail.currentScript ? state.enail.currentScript.title : '-Select-'
+                    ];
+                    break;
+                }
+                case EnailMode.Settings: {
+                    lines = this.getSettingsItems();
+                    break;
+                }
+                default: {
+                    if (state.enail.scriptRunning) {
+                        const elapsed = Date.now() - state.enail.scriptStartTime;
+                        const m = Math.floor(elapsed / 60000);
+                        const s = Math.floor((elapsed % 60000) / 1000);
+                        const d = `${m}${s.toString().length === 1 ? '0' : ''}${s}`;
+                        lines = [state.enail.currentScript!.title, state.enail.currentStep!.message || d];
+                    } else {
+                        lines = [Constants.APPLICATION_TITLE];
+                    }
+                    break;
+                }
+            }
+
+            if (lines.length === 1) {
+                lines.push(`${format(Date.now(), 'h:mm')}`);
+            }
         }
 
         return {
-            lines, icon, flashRate, flashStatus, selectedIndex, selectedMenu, executing, mode: state.enail.mode
+            lines, icon, flashRate, flashStatus, selectedIndex, selectedMenu, executing, mode: state.enail.mode, isPassphrase
         };
     }
     
     drawLines = () => {        
+        const passphrase = store.getState().enail.passphrase;
         const state = store.getState().menu;
 
         if (state.currentMenu === Constants.MENU.SETTINGS.NETWORK.CONNECT.KEY
@@ -340,7 +350,7 @@ export class OledUi {
 
                 this.drawLines();
 
-                if ((this.flashStatus || this.flashRate === 0) && this.lines.length < 3) {
+                if ((this.flashStatus || this.flashRate === 0) && (this.lines.length < 3) && (!state.isPassphrase)) {
                     this.drawIcon();
                 }
 

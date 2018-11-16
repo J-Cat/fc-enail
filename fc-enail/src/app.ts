@@ -16,7 +16,7 @@
 import dial from './ui/rotaryDial';
 import aplay from './aplay';
 import store from './store/createStore';
-import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState } from './reducers/enailReducer';
+import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase } from './reducers/enailReducer';
 import oledUi from './ui/oledUi';
 import button from './ui/button';
 import led from './ui/led';
@@ -92,6 +92,11 @@ const initButton = async () => {
     button.init(25);
     button.onClick.subscribe(() => {
         const state = store.getState().enail;
+        if (state.passphrase !== '') {
+            store.dispatch(clearPassphrase());
+            return;
+        }
+        
         switch (state.mode) {
             case EnailMode.Home: {
                 store.dispatch<any>(toggleState());
@@ -146,7 +151,7 @@ const initButton = async () => {
         }
         
         e5cc.close().then(() => {
-            process.exit();
+            process.exit(1);
         });
     });
 
@@ -156,10 +161,7 @@ const initButton = async () => {
         }
 
         e5cc.close().then(() => {
-            process.on("SIGINT", function () {
-                exec('sudo reboot');
-            });
-            process.exit();
+            process.exit(2);
         });
     });
 }

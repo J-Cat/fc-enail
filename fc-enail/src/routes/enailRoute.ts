@@ -18,5 +18,7 @@ export class EnailRoute {
         this.router.post('/script/end', this.controller.endScript);
         this.router.get('/savedstate', this.controller.getSavedState);
         this.router.post('/savedstate', this.controller.persistSavedState);
+        this.router.post('/passphrase/generate', this.controller.generatePassphrase);
+        this.router.post('/passphrase/verify', this.controller.verifyPassphrase);
     }
 }

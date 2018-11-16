@@ -35,6 +35,8 @@ import { IStep } from './IStep';
     readonly scriptStartSP?: number;
     readonly mode: EnailMode;
     readonly presets: number[];
+    readonly scriptStartTime: number;
+    readonly passphrase: string;
 }
 
 export enum Direction {

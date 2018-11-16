@@ -5,17 +5,19 @@ import {
     createStore,
     Store
 } from 'redux';
-
-import { EnailAction } from 'src/models/Actions';
-import { IEnailStore } from 'src/models/IEnailStore';
-import { socketIoMiddleware } from './socketIoMiddleware';
-import { reconnect } from 'src/reducers/enailReducer';
-import { apiMiddleware } from 'redux-api-middleware';
 import thunk from 'redux-thunk';
+import { apiMiddleware } from 'redux-api-middleware';
+
+import { EnailAction } from '../models/Actions';
+import { IEnailStore } from '../models/IEnailStore';
+import { socketIoMiddleware } from './socketIoMiddleware';
+import { reconnect } from '../reducers/enailReducer';
+import { securityMiddleware } from './securityMiddleware';
 
 export function configureStore(initialState?: IEnailStore): Store<IEnailStore, EnailAction> {
     const middlewares: any = [
         thunk,
+        securityMiddleware,
         apiMiddleware,
         socketIoMiddleware
     ];

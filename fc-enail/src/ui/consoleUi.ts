@@ -125,7 +125,7 @@ export class ConsoleUi {
                 case 'exit': case 'quit': case 'e': case 'q': {
                     console.log('\n');
                     e5cc.close().then(() => {
-                        process.exit();
+                        process.exit(0);
                     });
                     break;
                 }

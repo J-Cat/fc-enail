@@ -32,9 +32,9 @@ const initialState: IMenuState = {
                 selectable: false,
                 maxAction: 1
             }, {
-                key: Constants.MENU.SETTINGS.NETWORK.EDIT.KEY,
-                title: Constants.MENU.SETTINGS.NETWORK.EDIT.TITLE,
-                action: Constants.MENU.SETTINGS.NETWORK.EDIT.ACTION,
+                key: Constants.MENU.SETTINGS.NETWORK.SAVE.KEY,
+                title: Constants.MENU.SETTINGS.NETWORK.SAVE.TITLE,
+                action: Constants.MENU.SETTINGS.NETWORK.SAVE.ACTION,
                 selectable: false,
                 maxAction: 1
             }]
@@ -75,6 +75,13 @@ export const settingUp = () => {
     return {
         type: Constants.SETTING_UP
     };
+}
+
+export const navigate = (key: string) => {
+    return {
+        type: Constants.MENU_NAVIGATE,
+        payload: key
+    }
 }
 
 export const getCurrentMenuItem = (state: IMenuState) => {
@@ -245,6 +252,30 @@ const getPreviousWpaChar = (c: string) => {
 
 export const menuReducer = (state: IMenuState = initialState, action: EnailAction): IMenuState => {
     switch (action.type) {
+        case Constants.PASSPHRASE_GENERATE: {
+            return {
+                ...state,
+                currentCharacter: 0,
+                currentIndex: 0,
+                currentMenu: Constants.MENU.SETTINGS.KEY,
+                actionStep: 0,
+                bottom: 0,
+                top: 3
+            }
+        }
+        
+        case Constants.MENU_NAVIGATE: {
+            return {
+                ...state,
+                currentCharacter: 0,
+                currentIndex: 0,
+                currentMenu: action.payload as string,
+                actionStep: 0,
+                bottom: 0,
+                top: 3
+            }
+        }
+
         case Constants.SETTING_SELECT: {
             const newKey = internalSelect(state);
             const currentItem = getCurrentMenuItem(state);

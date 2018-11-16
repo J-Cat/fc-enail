@@ -11,4 +11,5 @@ export interface IEnailState {
     readonly presets: number[];
     readonly error?: boolean;
     readonly message?: string;
+    readonly token: string;
 }

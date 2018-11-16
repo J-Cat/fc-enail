@@ -13,6 +13,9 @@
  * -----
  * Copyright (c) 2018
  */
+
+export const APPLICATION_TITLE = 'FC E-Nail';
+
 export const E5CC_CONNECT = 'ENAIL/E5CC/CONNECT';
 export const E5CC_CONNECTED = 'ENAIL/E5CC/CONNECTED';
 export const E5CC_UPDATE_SETPOINT = 'ENAIL/E5CC/UPDATE_SETPOINT';
@@ -57,9 +60,15 @@ export const SETTING_BACK = 'ENAIL/SETTING/BACK';
 export const SETTING_DOWN = 'ENAIL/SETTING/DOWN';
 export const SETTING_UP = 'ENAIL/SETTING/UP';
 
+export const MENU_NAVIGATE = 'ENAIL/MENU/NAVIGATE';
+
 export const NETWORK_INFO = 'ENAIL/NETWORK/INFO';
 export const NETWORK_SCAN = 'ENAIL/NETWORK/SCAN';
 export const NETWORK_CONNECTING = 'ENAIL/NETWORK/CONNECTING';
+
+export const PASSPHRASE_GENERATE = 'ENAIL/PASSPHRASE/GENERATE';
+export const PASSPHRASE_VERIFY = 'ENAIL/PASSPHRASE/VERIFY';
+export const PASSPHRASE_CLEAR = 'ENAIL/PASSPHRASE/CLEAR';
 
 export const MENU = {
     SETTINGS: {
@@ -78,10 +87,10 @@ export const MENU = {
                 TITLE: 'View',
                 ACTION: 'ENAIL/NETWORK/VIEW'
             },
-            EDIT: {
+            SAVE: {
                 KEY: '0.0.2',
-                TITLE: 'Edit',
-                ACTION: 'ENAIL/NETWORK/EDIT'
+                TITLE: 'Save',
+                ACTION: 'ENAIL/NETWORK/SAVE'
             }
         }
     }
