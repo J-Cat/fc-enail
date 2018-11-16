@@ -23,6 +23,8 @@ import e5cc from '../e5cc/e5cc';
 import { Direction } from '../models/IEnailState';
 import led from '../ui/led';
 import server from '../server/server';
+import globalStore from './createStore';
+import { reject } from 'async';
 
 const MONITOR_CYCLE_TIME = 1000;
 
@@ -32,7 +34,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
 
     switch (action.type) {
         case Constants.E5CC_CONNECTED: {
-            getE5CCState(store.dispatch, true);
+            getE5CCState(true);
             break;
         }
 
@@ -116,12 +118,43 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
     return result;
 }
 
-const getE5CCState = (dispatch: Dispatch<EnailAction>, immediate: boolean = false) => {
-    setTimeout((async () => {
-        const pv = await e5cc.readPV();
-        const isRunning = await e5cc.isRunning();
-        const sp = await e5cc.readSP();
-        dispatch(updateAllState(pv, sp, isRunning));
-        getE5CCState(dispatch, false);
-    }), immediate ? 0 : MONITOR_CYCLE_TIME);
+let fetchTimeout: NodeJS.Timeout;
+let lastUpdated = 0;
+const getE5CCState = (immediate: boolean = false) => {
+    return new Promise(async (resolve, reject) => {
+        if ((Date.now() - lastUpdated) < MONITOR_CYCLE_TIME) {
+            resolve();
+            return;
+        }
+
+        // timeout and reject if it takes way too long
+        fetchTimeout = setTimeout(() => {
+            reject();
+        }, MONITOR_CYCLE_TIME*5);    
+
+        try {
+            const pv = await e5cc.readPV();
+            const isRunning = await e5cc.isRunning();
+            const sp = await e5cc.readSP();
+            clearTimeout(fetchTimeout);
+            globalStore.dispatch(updateAllState(pv, sp, isRunning));
+            lastUpdated = Date.now();
+            resolve();
+        } catch {
+            reject();
+        }
+    }).then(() => {
+        getE5CCState(false);
+    }).catch(() => {
+        clearTimeout(fetchTimeout);
+        setTimeout(() => {
+            e5cc.close().then(() => {
+                e5cc.connect().then(() => {
+                    globalStore.dispatch({
+                        type: Constants.E5CC_CONNECTED
+                    });
+                });
+            })
+        }, MONITOR_CYCLE_TIME*2);
+    });
 }

@@ -11,7 +11,7 @@ export class Button {
     private button?: Gpio; 
     private timer?: NodeJS.Timeout;
     private clickCount = 0;
-    private startTime = Date.now();
+    private startTime = 0;
 
     protected _onClick: SimpleEventDispatcher<Button> = new SimpleEventDispatcher<Button>();
     get onClick(): ISimpleEvent<Button> {
@@ -45,12 +45,14 @@ export class Button {
 
             if (value === 0) {
                 const now = Date.now();
-                if ((now - this.startTime) > LONG_CLICK_TIMEOUT) {
+                if ((this.startTime !== 0) && ((now - this.startTime) > LONG_CLICK_TIMEOUT)) {
+                    this.startTime = 0;
                     this._onReallyLongClick.dispatch(this);
-                } else if ((now - this.startTime) > MEDIUM_CLICK_TIMEOUT) {
+                } else if ((this.startTime !== 0) && ((now - this.startTime) > MEDIUM_CLICK_TIMEOUT)) {
+                    this.startTime = 0;
                     this._onLongClick.dispatch(this);
-                } else {
-                    
+                } else {                    
+                    this.startTime = 0;
                     if (this.timer) {
                         clearTimeout(this.timer);
                         this.timer = undefined;

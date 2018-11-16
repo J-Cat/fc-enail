@@ -24,12 +24,14 @@ import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
 import server from './server/server';
 import { settingSelect, settingDown, settingUp, settingBack, connectWiFiNetwork, getNetworkInfo } from './reducers/menuReducer';
-import { spawn, exec } from 'child_process';
 import e5cc from './e5cc/e5cc';
 
 import * as Constants from './models/constants';
 
 const OLED_ADDRESS = 0x3C;
+
+let processExitCount = 0;
+let processExitRunning = false;
 
 const initDial = () => {
     dial.init(22, 23, 24);
@@ -91,6 +93,11 @@ const initDial = () => {
 const initButton = async () => {
     button.init(25);
     button.onClick.subscribe(() => {
+        if (processExitRunning) {
+            processExitRunning = false;
+            return;
+        }
+
         const state = store.getState().enail;
         if (state.passphrase !== '') {
             store.dispatch(clearPassphrase());
@@ -119,6 +126,11 @@ const initButton = async () => {
         }
     });
     button.onDoubleClick.subscribe(() => {
+        if (processExitRunning) {
+            processExitRunning = false;
+            return;
+        }
+
         const state = store.getState();
         switch (state.enail.mode) {
             case EnailMode.Script: {
@@ -146,23 +158,58 @@ const initButton = async () => {
     });
 
     button.onLongClick.subscribe(() => {
+        if (processExitRunning) {
+            processExitRunning = false;
+            return;
+        }
+
         if (store.getState().enail.mode !== EnailMode.Home) {
             return;
         }
         
         e5cc.close().then(() => {
-            process.exit(1);
+            processExitCount = 0;
+            processExitRunning = true;
+            processExit(1);
         });
     });
 
     button.onReallyLongLick.subscribe(() => {
+        if (processExitRunning) {
+            processExitRunning = false;
+            return;
+        }
+
         if (store.getState().enail.mode !== EnailMode.Home) {
             return;
         }
 
         e5cc.close().then(() => {
-            process.exit(2);
+            processExitCount = 0;
+            processExitRunning = true;
+            processExit(2);
         });
+    });
+}
+
+const processExit = (code: 1|2) => {
+    if (!processExitRunning) {
+        processExitCount = 0;
+        return;
+    }
+    
+    if (processExitCount >= (6 * code)) {
+        process.exit(code);
+    }
+
+    new Promise(resolve => {
+        aplay.play('beep');
+        setTimeout(() => {
+            resolve()
+        }, 1000/code);
+    }).then(() => {
+        processExitCount += 1;
+        processExit(code);
     });
 }
 

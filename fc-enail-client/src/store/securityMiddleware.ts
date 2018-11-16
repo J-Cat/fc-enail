@@ -17,9 +17,12 @@ import { Store, Dispatch } from "redux";
 import { RSAA } from "redux-api-middleware";
 import { IEnailStore } from "../models/IEnailStore";
 import { EnailAction } from "../models/Actions";
+import { generatePassphrase } from '../reducers/enailReducer';
+import history from '../history';
 
 export const securityMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const callApi = action[RSAA] || null;
+
     if (!!callApi) {
         const token = store.getState().enail.token;
         if (token) {
@@ -30,7 +33,22 @@ export const securityMiddleware = (store: Store<IEnailStore>) => <A extends Enai
                 'Content-Type': 'application/json'
             };
         }
-    } 
+    }
+
+    return next(action);
+}
+
+export const authorizationMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
+    if (action.type.endsWith('/ERROR')) {
+        const payload = action.payload as any;
+        if (payload && payload.status 
+            && (typeof(payload.status) === 'number')
+            && (payload.status === 401)
+        ) {
+            store.dispatch<any>(generatePassphrase());
+            history.push('signin');
+        }
+    }
 
     return next(action);
 }

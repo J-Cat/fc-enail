@@ -12,13 +12,14 @@ import { EnailAction } from '../models/Actions';
 import { IEnailStore } from '../models/IEnailStore';
 import { socketIoMiddleware } from './socketIoMiddleware';
 import { reconnect } from '../reducers/enailReducer';
-import { securityMiddleware } from './securityMiddleware';
+import { securityMiddleware, authorizationMiddleware } from './securityMiddleware';
 
 export function configureStore(initialState?: IEnailStore): Store<IEnailStore, EnailAction> {
     const middlewares: any = [
         thunk,
         securityMiddleware,
         apiMiddleware,
+        authorizationMiddleware,
         socketIoMiddleware
     ];
 
