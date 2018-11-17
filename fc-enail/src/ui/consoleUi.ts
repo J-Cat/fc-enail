@@ -50,13 +50,8 @@ export class ConsoleUi {
                         break;
                     }
 
-                    e5cc.read(address).then(value => {
-                        console.log(`Value: ${value}`);
-                        rl.prompt();
-                    }).catch(e => {
-                        console.log(`Error: ${e}`);
-                        rl.prompt();
-                    });
+                    e5cc.read(address);
+                    rl.prompt();
                     break;
                 }
 
@@ -84,14 +79,8 @@ export class ConsoleUi {
                         break;
                     }
 
-                    e5cc.write(address, newValue).then(result => {
-                        if (result) {
-                            console.log('Updated variable.');
-                        } else {
-                            console.log(`Failed to update variable`);
-                        }
-                        rl.prompt();
-                    });
+                    e5cc.write(address, newValue);
+                    rl.prompt();
                     break;
                 }
 
@@ -111,22 +100,14 @@ export class ConsoleUi {
                         break;
                     }
 
-                    e5cc.run(command).then(result => {
-                        if (result) {
-                            console.log('Executed command.');
-                        } else {
-                            console.log(`Failed to execute command.`);
-                        }
-                        rl.prompt();
-                    });
+                    e5cc.run(command);
+                    rl.prompt();
                     break;
                 }
 
                 case 'exit': case 'quit': case 'e': case 'q': {
                     console.log('\n');
-                    e5cc.close().then(() => {
-                        process.exit(0);
-                    });
+                    process.exit(0);
                     break;
                 }
 
@@ -143,9 +124,7 @@ export class ConsoleUi {
                 }
             }    
         }).on('close', () => {
-            e5cc.close().then(() => {
-                process.exit();
-            });
+            process.exit();
         });
     }
 }

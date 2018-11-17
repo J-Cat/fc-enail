@@ -58,13 +58,16 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
             break;
         }
 
+        //case Constants
+
         case Constants.SCRIPT_END: {
             led.flash(0);
             oledUi.setIcon(getModeIcon(state.mode), 0);
             aplay.once("complete", () => {
-                store.dispatch<any>(setSP(state.scriptStartSP!));
+                debug(`script end, reseting sp to ${state.scriptStartSP!}`);
             });
             aplay.play("complete");
+            store.dispatch<any>(setSP(state.scriptStartSP!));
         }
     }
 

@@ -30,7 +30,6 @@ import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
 import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/stepHelper';
-import { calculateStepSizeForIncrease, calculateStepSizeForDecrease } from '../helpers/rotaryHelper';
 import { generate } from 'generate-password';
 import Debug from 'debug';
 import { ISavedState } from '../models/ISavedState';
@@ -83,37 +82,25 @@ const initialState: IEnailState = {
     passphrase: ''
 };
 
-export const connect = () => {
-    return (dispatch: Dispatch<Action<string>>) => {
-        e5cc.connect().then(() => {
-            dispatch({
-                type: Constants.E5CC_CONNECTED    
-            });
-        })
+export const updateSetPoint = (value: number) => {
+    return {
+        type: Constants.E5CC_UPDATE_SETPOINT,
+        payload: value
     };
 }
 
-export const getSP = () => {
-    return (dispatch: Dispatch<IBasicAction>) => {
-        e5cc.readSP().then(value => {
-            dispatch({
-                type: Constants.E5CC_UPDATE_SETPOINT,
-                payload: value
-            });
-        });
-    }
+export const setSP = (value: number) => {
+    return {
+        type: Constants.E5CC_SET_SETPOINT,
+        payload: value
+    };    
 }
 
-export const setSP = (value: number) => {
-    return (dispatch: Dispatch<IBasicAction>) => {
-        e5cc.setSP(value).then(() => {
-            dispatch({
-                type: Constants.E5CC_UPDATE_SETPOINT,
-                payload: value
-            });
-        });
-    }
-    
+export const moveSetPoint = (offset: number) => {
+    return {
+        type: Constants.E5CC_MOVE_SETPOINT,
+        payload: offset
+    };
 }
 
 export const updateAllState = (pv: number, sp: number, isRunning: boolean) => {
@@ -124,18 +111,6 @@ export const updateAllState = (pv: number, sp: number, isRunning: boolean) => {
             sp,
             isRunning
         }
-    }
-}
-
-export const increaseSP = () => {
-    return {
-        type: Constants.E5CC_INCREASE_SETPOINT
-    }
-}
-
-export const decreaseSP = () => {
-    return {
-        type: Constants.E5CC_DECREASE_SETPOINT
     }
 }
 
@@ -157,43 +132,23 @@ export const setReady = () => {
     }
 }
 
-export const getState = () => {
-    return (dispatch: Dispatch<IBasicAction>) => {
-        e5cc.isRunning().then(value => {
-            dispatch({
-                type: Constants.E5CC_UPDATE_STATE,
-                payload: value
-            });
-        });
-    }
-}
-
-export const toggleState = () => {
-    return (dispatch: Dispatch<IBasicAction>) => {
-        e5cc.toggleState().then(value => {
-            dispatch({
-                type: Constants.E5CC_UPDATE_STATE,
-                payload: value
-            });
-        });
+export const updateState = (value: boolean) => {
+    return {
+        type: Constants.E5CC_UPDATE_STATE,
+        payload: value
     };
 }
 
-export const moveSP = (direction: Direction) => {
+export const toggleState = () => {
     return {
-        type: Constants.E5CC_MOVE_SETPOINT,
-        payload: direction
+        type: Constants.E5CC_TOGGLE_STATE
     };
 }
 
 export const runScript = ()  => {
-    return (dispatch: Dispatch<IBasicAction>) => {
-        e5cc.readSP().then(value => {
-            dispatch({
-                type: Constants.SCRIPT_RUN,
-                payload: value
-            });
-        });
+    return {
+        type: Constants.SCRIPT_RUN,
+        payload: e5cc.getSP()
     };
 }
 
@@ -243,6 +198,7 @@ export const stepFeedback = (step: IFeedbackStep) => {
         }
     };
 }
+
 export const stepTimer = (step: ITimerStep) => {
     return (dispatch: Dispatch<IBasicAction>) => {
         setTimeout(() => {
@@ -255,18 +211,6 @@ export const stepMoveTemp = (step: IMoveTempStep) => {
     return {
         type: Constants.E5CC_STEP_MOVE_TEMP,
         payload: step.value
-    };
-}
-
-export const stepMoveTempStart = () => {
-    return {
-        type: Constants.E5CC_STEP_MOVE_TEMP_START
-    };
-}
-
-export const stepMoveTempComplete = () => {
-    return {
-        type: Constants.E5CC_STEP_MOVE_TEMP_COMPLETE
     };
 }
 
@@ -369,59 +313,18 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             };
         }
 
-        case Constants.E5CC_STEP_MOVE_TEMP_START: {
+        case Constants.E5CC_SET_SETPOINT: {
             return {
                 ...state,
-                ready: true
+                setPoint: action.payload as number,
+                ready: false
             };
-        }
-
-        case Constants.E5CC_STEP_MOVE_TEMP_COMPLETE: {
-            return {
-                ...state,
-                ready: true
-            };
-        }
-
-        case Constants.E5CC_INCREASE_SETPOINT: {
-            if (!state.ready) {
-                return state;
-            } else {
-                let { stepSize, directionCount, lastDirection, changingDirection } = calculateStepSizeForIncrease(state);
-
-                return {
-                    ...state,
-                    ready: false,
-                    stepSize,
-                    directionCount,
-                    lastDirection,
-                    changingDirection,
-                    setPoint: state.setPoint + stepSize
-                };
-            }
-        }
-
-        case Constants.E5CC_DECREASE_SETPOINT: {
-            if (!state.ready) {
-                return state;
-            } else {
-                let { stepSize, directionCount, lastDirection, changingDirection } = calculateStepSizeForDecrease(state);
-
-                return {
-                    ...state,
-                    ready: false,
-                    stepSize,
-                    directionCount,
-                    lastDirection,
-                    changingDirection,
-                    setPoint: state.setPoint - stepSize
-                };
-            }
         }
 
         case Constants.E5CC_MOVE_SETPOINT: {
             return {
                 ...state,
+                setPoint: state.setPoint + (action.payload as number),
                 ready: true
             }
         }
@@ -448,7 +351,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
             return {
                 ...state,
-                scriptStartSP: action.payload as number,
+                scriptStartSP: state.setPoint,
                 scriptRunning: true,
                 scriptStartTime: Date.now()
             }
@@ -529,10 +432,14 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         }
 
         case Constants.E5CC_UPDATE_ALL_STATE: {
+            // if (!state.ready) {
+            //     return state;
+            // }
+
             return {
                 ...state,
                 presentValue: (action as IE5CCUpdateStateAction).payload!.pv,
-                setPoint: (action as IE5CCUpdateStateAction).payload!.sp,
+                setPoint: state.setPoint === 0 || state.ready ? (action as IE5CCUpdateStateAction).payload!.sp : state.setPoint,
                 running: (action as IE5CCUpdateStateAction).payload!.isRunning
             };
         }

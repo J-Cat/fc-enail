@@ -7,13 +7,11 @@ import * as Constants from '../models/constants';
 import led from '../ui/led';
 import oledUi from '../ui/oledUi';
 import { home, gear, script } from '../ui/icons';
-import aplay from '../aplay';
+
+import { EnailMode, IEnailState } from '../models/IEnailState';
+import { updateDisplay } from '../reducers/enailReducer';
 
 import Debug from 'debug';
-import { EnailMode, IEnailState } from '../models/IEnailState';
-import dial from '../ui/rotaryDial';
-import { updateDisplay } from '../reducers/enailReducer';
-import { networkInterfaces } from 'os';
 const debug = Debug("fc-enail:display");
 
 export const displayMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {

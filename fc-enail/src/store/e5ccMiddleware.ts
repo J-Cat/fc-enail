@@ -18,35 +18,18 @@ import { Dispatch, Store } from 'redux';
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { getSP, setReady, getState, moveSP, stepMoveTempStart, stepMoveTempComplete, nextStep, updateAllState } from '../reducers/enailReducer';
+import { nextStep } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
-import { Direction } from '../models/IEnailState';
 import led from '../ui/led';
 import server from '../server/server';
-import globalStore from './createStore';
-import { reject } from 'async';
-
-const MONITOR_CYCLE_TIME = 1000;
 
 export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
     const state = store.getState().enail;
 
     switch (action.type) {
-        case Constants.E5CC_CONNECTED: {
-            getE5CCState(true);
-            break;
-        }
-
         case Constants.E5CC_STEP_MOVE_TEMP: {
-            store.dispatch<any>(stepMoveTempStart());
-            break;
-        }
-
-        case Constants.E5CC_STEP_MOVE_TEMP_START: {
-            e5cc.setSP(state.setPoint).then(() => {
-                store.dispatch<any>(stepMoveTempComplete())
-            });
+            e5cc.setSP(state.setPoint, 3, { isStep: true });
             break;
         }
 
@@ -75,23 +58,20 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             break;
         }
 
-        case Constants.E5CC_INCREASE_SETPOINT: {
-            store.dispatch(moveSP(Direction.Up));
-            break;
-        }
-
-        case Constants.E5CC_DECREASE_SETPOINT: {
-            store.dispatch(moveSP(Direction.Down));
+        case Constants.E5CC_SET_SETPOINT: {
+//            store.dispatch(moveSP(Direction.None));
+            e5cc.setSP(action.payload as number);
             break;
         }
 
         case Constants.E5CC_MOVE_SETPOINT: {
-            if (action.payload === Direction.None || ((state.lastDirection === action.payload) && !state.changingDirection)) {
-                e5cc.setSP(state.setPoint).then(() => {
-                    store.dispatch(setReady());
-                });
-            }
+            e5cc.setSP(state.setPoint + (result.payload as number));
             break;
+        }
+
+        case Constants.E5CC_TOGGLE_STATE: {
+            e5cc.toggleState();
+            return;
         }
 
 //        case Constants.
@@ -116,45 +96,4 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
     }
 
     return result;
-}
-
-let fetchTimeout: NodeJS.Timeout;
-let lastUpdated = 0;
-const getE5CCState = (immediate: boolean = false) => {
-    return new Promise(async (resolve, reject) => {
-        if ((Date.now() - lastUpdated) < MONITOR_CYCLE_TIME) {
-            resolve();
-            return;
-        }
-
-        // timeout and reject if it takes way too long
-        fetchTimeout = setTimeout(() => {
-            reject();
-        }, MONITOR_CYCLE_TIME*5);    
-
-        try {
-            const pv = await e5cc.readPV();
-            const isRunning = await e5cc.isRunning();
-            const sp = await e5cc.readSP();
-            clearTimeout(fetchTimeout);
-            globalStore.dispatch(updateAllState(pv, sp, isRunning));
-            lastUpdated = Date.now();
-            resolve();
-        } catch {
-            reject();
-        }
-    }).then(() => {
-        getE5CCState(false);
-    }).catch(() => {
-        clearTimeout(fetchTimeout);
-        setTimeout(() => {
-            e5cc.close().then(() => {
-                e5cc.connect().then(() => {
-                    globalStore.dispatch({
-                        type: Constants.E5CC_CONNECTED
-                    });
-                });
-            })
-        }, MONITOR_CYCLE_TIME*2);
-    });
 }

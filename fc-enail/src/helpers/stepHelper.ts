@@ -73,6 +73,8 @@ export const monitorTemp = async (step: IWaitTempStep): Promise<void> => {
         const startTime = Date.now();
         while (!tempReached) {
             tempReached = await checkTemp(step);
+            debug(`reached = ${tempReached}`);
+
             if (!tempReached && ((Date.now() - startTime) > (step.timeout * 1000))) {
                 tempReached = true;
             }
@@ -133,10 +135,11 @@ const getNextStepKey = (step: IStep, stepIndex: number, parent: IStep, root: ISt
 }
 
 const checkTemp = (step: IWaitTempStep) => {
-    return new Promise<boolean>(async resolve => {
+    return new Promise<boolean>(resolve => {
         const state = store.getState().enail;
         const pv = state.presentValue;
         const setPoint = state.setPoint;
+        debug(`${pv}, ${setPoint}`);
         switch (step.direction) {
             case Direction.UP: {
                 if (Math.floor(pv) >= Math.floor(setPoint + step.offset)) {

@@ -13,174 +13,125 @@
  * -----
  * Copyright (c) 2018
  */
-import * as ModbusRtu from 'modbus-serial';
-import { SimpleEventDispatcher, ISimpleEvent } from 'ste-simple-events';
-import { SequentialTaskQueue } from 'sequential-task-queue';
-
-import { IE5CCOptions } from './IE5ccOptions';
+import Debug from 'debug';
 import store from '../store/createStore';
-import { updateAllState } from '../reducers/enailReducer';
+import { updateAllState, setReady, nextStep } from '../reducers/enailReducer';
+import { fork, ChildProcess } from 'child_process';
+const debug = Debug('fc-enail:e5cc');
 
-const CONNECT_DELAY = 250;
+class E5CC {  
+    private e5ccService: ChildProcess;
+    private isRunning: boolean = false;
+    private sp: number = 0;
+    private pv: number = 0;
+    private started: boolean = false;
 
-class E5CC {
-    private _client = new ModbusRtu();
-    private _options: IE5CCOptions = {
-        device: '/dev/ttyUSB0',
-        options: {
-            baudRate: 57600,
-            dataBits: 8,
-            stopBits: 2,
-            parity: 'none'
-        }
-    };
-    private queue: SequentialTaskQueue = new SequentialTaskQueue();
-    
     constructor() {
-    }
+        this.e5ccService = fork(`${__dirname}/service.js`);
 
-    protected _onConnect: SimpleEventDispatcher<E5CC> = new SimpleEventDispatcher<E5CC>();
-    get onConnect(): ISimpleEvent<E5CC> {
-        return this._onConnect.asEvent();
-    }
+        this.e5ccService.on('message', m => {
+            switch (m.type) {
+                case 'DATA': {
+                    this.pv = m.pv;
+                    this.sp = m.sp;
+                    this.isRunning = m.isRunning
+                    this.started = true;
+                    store.dispatch(updateAllState(m.pv, m.sp, m.isRunning));        
+                    break;
+                }
 
-    connect = (options?: IE5CCOptions): Promise<void> => {
-        return new Promise<void>(resolve => {
-            if (options !== undefined) {
-                this._options = options;
+                case 'SETSP': {
+                    store.dispatch<any>(setReady())
+                    break;
+                }
+
+                case 'SETSTATE': {
+                    store.dispatch<any>(setReady())
+                    break;
+                }
+
+                case 'READCOMPLETE': {
+                    break;
+                }
+
+                case 'WRITECOMPLETE': {
+                    if (m.address === 0x2103 && m.isStep) {
+                        store.dispatch(nextStep());
+                    }
+                    break;
+                }
             }
-            this._client.connectRTU(this._options.device, this._options.options, () => {
-                this._client.setID(1);
-                setTimeout((() => {
-                    //this._onConnect.dispatch(this);
-                    resolve();
-                }).bind(this), CONNECT_DELAY);
-            });
+        });
+
+        process.on('exit', () => {
+            this.e5ccService.kill();
         });
     }
 
-    close = (): Promise<void> => {
-        return new Promise<void>(resolve => {
-            this._client.close(() => {
-                resolve();
-            });
-        });
+    read = (address: number) => {
+        this.e5ccService.send({ type: 'READ', address });
     }
 
-    read = async (address: number, retry: boolean = true): Promise<number> => {
-        return new Promise<number>(resolve => {
-            this.queue.push(async () => {
-                await this.executeRead(address, resolve, retry);
-            });
-        });
+    write = (address: number, value: number, retry: boolean = true) => {
+        this.e5ccService.send({ type: 'WRITE', address, value, retry });
     }
 
-    executeRead = async (address: number, resolve: (value: number) => void, retry: boolean, retryCount: number = 0) => {
-        try {
-            const value = await this._client.readHoldingRegisters(address, 1);
-            resolve(value.data[0]);
-        } catch {
-            if (retryCount < 5 && retry) {
-                this.queue.push(async () => {
-                    await this.executeRead(address, resolve, retry, retryCount + 1)
-                })
-            } 
+    run = (command: number) => {
+        this.e5ccService.send({ type: 'RUN', command });
+    }
+
+    getPV = () => {
+        if (this.started) {
+            return this.pv;
         }
     }
 
-    write = async (address: number, value: number, retry: boolean = true): Promise<boolean> => {
-        return new Promise<boolean>(resolve => {
-            this.queue.push(async () => {
-                await this.executeWrite(address, value, resolve, retry);
-            });
-        });
-    }
-
-    executeWrite = async (address: number, value: number, resolve: (result: boolean) => void, retry: boolean, retryCount: number = 0) => {
-        try {
-            await this._client.writeRegister(address, value);
-            resolve(true);
-        } catch {
-            if (retryCount < 5 && retry) {
-                this.queue.push(async () => {
-                    await this.executeWrite(address, value, resolve, retry, retryCount + 1)
-                });
-            } else {
-                resolve(false);
-            }
+    getSP = () => {
+        if (this.started) {
+            return this.sp;
         }
     }
 
-    run = async (command: number, retry: boolean = true): Promise<boolean> => {
-        return new Promise<boolean>(resolve => {
-            this.queue.push(async () => {
-                await this.executeRun(command, resolve, retry)
-            });
-        });
-    }
-
-    executeRun = async (command: number, resolve: (result: boolean) => void, retry: boolean, retryCount: number = 0) => {
-        try {
-            await this._client.writeRegister(0x0000, command);
-            resolve(true);
-        } catch {
-            if (retryCount < 5 && retry) {
-                this.queue.push(async () => {
-                    await this.executeRun(command, resolve, retry, retryCount + 1)
-                });
-            } else {
-                resolve(false);
-            }
+    getIsRunning = () => {
+        if (this.started) {
+            return this.isRunning;
         }
     }
 
-    isRunning = async (): Promise<boolean> => {
-        try {
-            const value = await this.read(0x2407);
-            return (await ((value & 256) === 0));
-        } catch (e) {
-            return false;
-        }
+    start = () => {
+        this.e5ccService.send({ type: 'RUN', command: 0x0100 });
     }
 
-    start = async (): Promise<boolean> => {
-        return await this.run(0x0100);
-    }
-
-    stop = async (): Promise<boolean> => {
-        return await this.run(0x0101);
+    stop = () => {
+        this.e5ccService.send({ type: 'RUN', command: 0x0101 });
     }
 
     toggleState = async (): Promise<boolean> => {
-        if ((await this.isRunning())) {
-            await this.stop();
-            return false;
+        if (this.started) {
+            if (this.isRunning) {
+                this.stop();
+                return false;
+            } else {
+                this.start();
+                return true;
+            }
         } else {
-            await this.start();
-            return true;
+            return false;
         }
     }
 
-    readSP = async (): Promise<number> => {
-        return await this.read(0x2103);
+    setSP = (value: number, retry: number = 0, args: any = {}) => {
+        this.e5ccService.send({ type: 'WRITE', address: 0x2103, value, retry, args });
     }
 
-    setSP = async (value: number, retry: boolean = false): Promise<boolean> => {
-        return await this.write(0x2103, value, retry);
-    }
-
-    readPV = async (): Promise<number> => {
-        return await this.read(0x2000);        
-    }
-
-    toggleUnit = async (): Promise<boolean> => {
-        if (await this.run(0x0700)) {
-            if (await this.write(0x2C01, Math.abs((await this.read(0x2C01))-1))) {
-                return await this.run(0x0600);
-            }
-        } 
-        return false;
-    }
+    // toggleUnit = async (): Promise<boolean> => {
+    //     if (await run(0x0700)) {
+    //         if (await write(0x2C01, Math.abs((await read(0x2C01))-1))) {
+    //             return await run(0x0600);
+    //         }
+    //     } 
+    //     return false;
+    // }
 }
 
 const e5cc = new E5CC();

@@ -13,10 +13,10 @@
  * -----
  * Copyright (c) 2018
  */
-import dial from './ui/rotaryDial';
+// import dial from './ui/rotaryDial';
 import aplay from './aplay';
 import store from './store/createStore';
-import { connect, increaseSP, decreaseSP, toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase } from './reducers/enailReducer';
+import { toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase, setSP, stepMoveTemp, updateAllState, moveSetPoint } from './reducers/enailReducer';
 import oledUi from './ui/oledUi';
 import button from './ui/button';
 import led from './ui/led';
@@ -24,70 +24,139 @@ import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
 import server from './server/server';
 import { settingSelect, settingDown, settingUp, settingBack, connectWiFiNetwork, getNetworkInfo } from './reducers/menuReducer';
-import e5cc from './e5cc/e5cc';
-
 import * as Constants from './models/constants';
+import { fork, ChildProcess } from 'child_process'
+
+import Debug from 'debug';
+const debug = Debug('fc-enail:app');
 
 const OLED_ADDRESS = 0x3C;
 
 let processExitCount = 0;
 let processExitRunning = false;
+let dial: ChildProcess;
 
 const initDial = () => {
-    dial.init(22, 23, 24);
+    let env = process.env;
+    delete env.NODE_OPTIONS;
+    dial = fork(`${__dirname}/ui/rotaryDial.js`);
 
-    dial.onClockwise.subscribe(() => {
-        switch (store.getState().enail.mode) {
-            case EnailMode.Home: {
-                store.dispatch(increaseSP());
+    dial.on('message', m => {
+        switch (m.type) {
+            case 'ROTATION': {
+                switch (store.getState().enail.mode) {
+                    case EnailMode.Home: {
+                        const newValue: number = (m.offset < 0 ? -1 : 1) * m.step;
+                        debug(`Modify Set Point = ${newValue}`);
+                        store.dispatch(moveSetPoint(newValue));
+                        break;
+                    }
+
+                    case EnailMode.Script: {
+                        if (m.offset > 0) {
+                            store.dispatch(increaseCurrentScript());
+                        } else if (m.offset < 0) {
+                            store.dispatch(decreaseCurrentScript());
+                        }
+                        break;
+                    }
+                    case EnailMode.Settings: {
+                        if (m.offset > 0) {
+                            store.dispatch(settingDown());
+                        } else if (m.offset < 0) {
+                            store.dispatch(settingUp());
+                        }
+                        break;
+                    }
+                }
+                // } else if (m.offset > 0) {
+                //     store.dispatch(increaseSP());
+                // }
                 break;
             }
-            case EnailMode.Script: {
-                store.dispatch(increaseCurrentScript());
-                break;
-            }
-            case EnailMode.Settings: {
-                store.dispatch(settingDown());
+
+            case 'CLICK': {
+                // change menu
+                switch (store.getState().enail.mode) {
+                    case EnailMode.Home: {
+                        dial.send({ type: 'MODE', mode: EnailMode.Script});
+                        store.dispatch(setMode(EnailMode.Script));
+                        break;
+                    }
+                    case EnailMode.Script: {
+                        dial.send({ type: 'MODE', mode: EnailMode.Settings});
+                        store.dispatch(setMode(EnailMode.Settings));
+                        break;
+                    }
+                    case EnailMode.Settings: {
+                        dial.send({ type: 'MODE', mode: EnailMode.Home});
+                        store.dispatch(settingBack());
+                        //store.dispatch(setMode(EnailMode.Home));
+                        break;
+                    }
+                }
                 break;
             }
         }
-    });
+    })
+    // dial.init(22, 23, 24);
 
-    dial.onCounterClockwise.subscribe(() => {
-        switch (store.getState().enail.mode) {
-            case EnailMode.Home: {
-                store.dispatch(decreaseSP());
-                break;
-            }
-            case EnailMode.Script: {
-                store.dispatch(decreaseCurrentScript());
-                break;
-            }
-            case EnailMode.Settings: {
-                store.dispatch(settingUp());
-                break;
-            }
-        }
-    });
+    // dial.onChange.subscribe((dial, offset) => {
+    //     console.log('offset = ' + offset);
+    //     store.dispatch(setSetPoint(offset));
+    // });
+    // dial.onClockwise.subscribe(() => {
+    //     switch (store.getState().enail.mode) {
+    //         case EnailMode.Home: {
+    //             store.dispatch(increaseSP());
+    //             break;
+    //         }
+    //         case EnailMode.Script: {
+    //             store.dispatch(increaseCurrentScript());
+    //             break;
+    //         }
+    //         case EnailMode.Settings: {
+    //             store.dispatch(settingDown());
+    //             break;
+    //         }
+    //     }
+    // });
 
-    dial.onClick.subscribe(() => {
-        // change menu
-        switch (store.getState().enail.mode) {
-            case EnailMode.Home: {
-                store.dispatch(setMode(EnailMode.Script));
-                break;
-            }
-            case EnailMode.Script: {
-                store.dispatch(setMode(EnailMode.Settings));
-                break;
-            }
-            case EnailMode.Settings: {
-                store.dispatch(settingBack());
-                //store.dispatch(setMode(EnailMode.Home));
-                break;
-            }
-        }
-    });
+    // dial.onCounterClockwise.subscribe(() => {
+    //     switch (store.getState().enail.mode) {
+    //         case EnailMode.Home: {
+    //             store.dispatch(decreaseSP());
+    //             break;
+    //         }
+    //         case EnailMode.Script: {
+    //             store.dispatch(decreaseCurrentScript());
+    //             break;
+    //         }
+    //         case EnailMode.Settings: {
+    //             store.dispatch(settingUp());
+    //             break;
+    //         }
+    //     }
+    // });
+
+    // dial.onClick.subscribe(() => {
+    //     // change menu
+    //     switch (store.getState().enail.mode) {
+    //         case EnailMode.Home: {
+    //             store.dispatch(setMode(EnailMode.Script));
+    //             break;
+    //         }
+    //         case EnailMode.Script: {
+    //             store.dispatch(setMode(EnailMode.Settings));
+    //             break;
+    //         }
+    //         case EnailMode.Settings: {
+    //             store.dispatch(settingBack());
+    //             //store.dispatch(setMode(EnailMode.Home));
+    //             break;
+    //         }
+    //     }
+    // });
 }
 
 const initButton = async () => {
@@ -125,7 +194,8 @@ const initButton = async () => {
             }
         }
     });
-    button.onDoubleClick.subscribe(() => {
+
+    button.onMediumClick.subscribe(() => {
         if (processExitRunning) {
             processExitRunning = false;
             return;
@@ -167,11 +237,9 @@ const initButton = async () => {
             return;
         }
         
-        e5cc.close().then(() => {
-            processExitCount = 0;
-            processExitRunning = true;
-            processExit(1);
-        });
+        processExitCount = 0;
+        processExitRunning = true;
+        processExit(1);
     });
 
     button.onReallyLongLick.subscribe(() => {
@@ -184,11 +252,9 @@ const initButton = async () => {
             return;
         }
 
-        e5cc.close().then(() => {
-            processExitCount = 0;
-            processExitRunning = true;
-            processExit(2);
-        });
+        processExitCount = 0;
+        processExitRunning = true;
+        processExit(2);
     });
 }
 
@@ -198,19 +264,25 @@ const processExit = (code: 1|2) => {
         return;
     }
     
-    if (processExitCount >= (6 * code)) {
-        process.exit(code);
+    if (processExitCount >= (5 * code)) {
+        aplay.once('complete', () => {
+            if (processExitRunning) {
+                process.exit(code);
+            }
+        });
+        aplay.play('longbeep');
+        return;
     }
 
-    new Promise(resolve => {
-        aplay.play('beep');
-        setTimeout(() => {
-            resolve()
-        }, 1000/code);
-    }).then(() => {
-        processExitCount += 1;
-        processExit(code);
+    aplay.once('comlete', () => {
+        new Promise(resolve => {
+            setTimeout(() => {resolve();}, 1000/code);
+        }).then(() => {
+            processExitCount += 1;
+            processExit(code);        
+        });
     });
+    aplay.play('beep');
 }
 
 
@@ -218,7 +290,7 @@ const processExit = (code: 1|2) => {
 led.init(5);
 consoleUi.init();
 
-store.dispatch<any>(connect());
+//store.dispatch<any>(connect());
 store.dispatch<any>(loadSavedState());
 store.dispatch<any>(getNetworkInfo());
 
@@ -231,3 +303,7 @@ aplay.init({
 server.init();
 
 aplay.play('appear');
+
+process.on('exit', () => {
+    dial.kill();
+});
