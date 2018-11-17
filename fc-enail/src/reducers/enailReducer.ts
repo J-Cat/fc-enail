@@ -33,10 +33,11 @@ import { mapStep, getNextStep, getNextStepPos, monitorTemp } from '../helpers/st
 import { generate } from 'generate-password';
 import Debug from 'debug';
 import { ISavedState } from '../models/ISavedState';
+import { config } from '../config';
 
 const debug = Debug('fc-enail:reducer');
 
-const enailScripts: Array<IEnailScript> = require("../assets/enail-scripts.json")
+const enailScripts: Array<IEnailScript> = require(config.files.scripts);
 
 const scripts = enailScripts.map((script, index) => {
     const rootStep = {
@@ -189,10 +190,12 @@ export const stepFeedback = (step: IFeedbackStep) => {
         }
 
         if (step.sound) {
-            aplay.once("complete", () => {
-                dispatch(nextStep());
-            });
             aplay.play(step.sound);
+            new Promise(resolve => {
+                setTimeout(() => {resolve();}, 1000);
+            }).then(() => {
+                dispatch(nextStep());
+            })
         } else {
             dispatch(nextStep());
         }
@@ -237,7 +240,7 @@ export const updateDisplay = () => {
 
 export const loadSavedState = () => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.readFile('./saved-state.json', 'utf8', (err: NodeJS.ErrnoException, data: string) => {
+        fs.readFile(config.files.savedState, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
             if (err) {
                 dispatch({
                     type: Constants.LOAD_SAVED_STATE,
@@ -258,7 +261,7 @@ export const loadSavedState = () => {
 
 export const persistSavedState = (savedState: ISavedState) => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.writeFile('./saved-state.json', JSON.stringify(savedState), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+        fs.writeFile(config.files.savedState, JSON.stringify(savedState), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
             if (!err) {
                 dispatch({
                     type: Constants.PERSIST_SAVED_STATE,

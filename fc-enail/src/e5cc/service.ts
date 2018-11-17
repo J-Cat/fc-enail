@@ -5,18 +5,14 @@ import { IE5CCOptions } from './IE5ccOptions';
 import Debug from 'debug';
 const debug = Debug('fc-enail:e5cc-service');
 
-const MONITOR_CYCLE_TIME = 500;
+import { E5CC as Constants } from '../models/constants';
+const { VARIABLES, COMMANDS, FLAGS } = Constants;
+
+import { config } from '../config';
+
 const CONNECT_DELAY = 250;
 
-let _options: IE5CCOptions = {
-    device: '/dev/ttyUSB0',
-    options: {
-        baudRate: 57600,
-        dataBits: 8,
-        stopBits: 1,
-        parity: 'even'
-    }
-};
+let _options: IE5CCOptions = config.options.e5cc;
 
 let errorCount = 0;
 let fetchTimeout: NodeJS.Timeout;
@@ -125,7 +121,7 @@ export const run = async (command: number, retry: number = 3): Promise<boolean> 
 
 const executeRun = async (command: number, retry: number, retryCount: number = 0): Promise<boolean> => {
     try {
-        await _client.writeRegister(0x0000, command);
+        await _client.writeRegister(COMMANDS.RUN, command);
         return true;
     } catch {
         debug('Run error.')
@@ -143,7 +139,7 @@ const executeRun = async (command: number, retry: number, retryCount: number = 0
 
 const isRunning = async (retry: number = 3): Promise<void> => {
     try {
-        const value = await read(0x2407, retry);
+        const value = await read(VARIABLES.STATUS, retry);
         if (send && value) {
             send({
                 type: 'STATE/RESPONSE',
@@ -155,7 +151,7 @@ const isRunning = async (retry: number = 3): Promise<void> => {
 
 const readSP = async (retry: number = 3): Promise<void> => {
     try {
-        const value = await read(0x2103, retry);
+        const value = await read(VARIABLES.SETPOINT, retry);
         if (send && value) {
             send({
                 type: 'SP/RESPONSE',
@@ -167,7 +163,7 @@ const readSP = async (retry: number = 3): Promise<void> => {
 
 const readPV = async (retry: number = 3) => {
     try {
-        const value = await read(0x2000, retry);
+        const value = await read(VARIABLES.PRESENTVALUE, retry);
         if (send && value) {
             send({
                 type: 'PV/RESPONSE',
@@ -180,7 +176,7 @@ const readPV = async (retry: number = 3) => {
 const getE5CCState = () => {
     new Promise(async (resolve, reject) => {
         debug('Start');
-        if ((Date.now() - lastUpdated) < MONITOR_CYCLE_TIME) {
+        if ((Date.now() - lastUpdated) < config.options.monitorCycleTime) {
             resolve();
             return;
         }
@@ -188,14 +184,14 @@ const getE5CCState = () => {
         // timeout and reject if it takes way too long
         fetchTimeout = setTimeout(() => {
             reject();
-        }, MONITOR_CYCLE_TIME*5);
+        }, config.options.monitorCycleTime*5);
 
         try {
             debug('Get data');
-            const pv = await read(0x2000, 1);
-            const sp = await read(0x2103, 1);
-            const runningValue = await read(0x2407, 1);
-            const running = runningValue ? (runningValue & 256) === 0 : false;
+            const pv = await read(VARIABLES.PRESENTVALUE, 1);
+            const sp = await read(VARIABLES.SETPOINT, 1);
+            const runningValue = await read(VARIABLES.STATUS, 1);
+            const running = runningValue ? (runningValue & FLAGS.RUNNING) === 0 : false;
 
             debug(`Got -> ${sp}, ${pv}, ${running}`);
             if (send && sp && pv) {
@@ -217,7 +213,7 @@ const getE5CCState = () => {
         debug('no errors');
         errorCount = 0;
         new Promise(resolve => {
-            setTimeout(() => {resolve();}, MONITOR_CYCLE_TIME);
+            setTimeout(() => {resolve();}, config.options.monitorCycleTime);
         }).then(() => {
             getE5CCState();
         });
@@ -226,14 +222,14 @@ const getE5CCState = () => {
         errorCount += 1;
         if (errorCount < 10) {
             new Promise(resolve => {
-                setTimeout(() => {resolve();}, MONITOR_CYCLE_TIME);
+                setTimeout(() => {resolve();}, config.options.monitorCycleTime);
             }).then(() => {
                 getE5CCState();
             });
         } else {
             clearTimeout(fetchTimeout);
             new Promise(resolve => {
-                setTimeout(() => {resolve();}, MONITOR_CYCLE_TIME*2);
+                setTimeout(() => {resolve();}, config.options.monitorCycleTime*2);
             }).then(() => {
                 close().then(() => {
                     connect().then(() => {

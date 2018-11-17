@@ -1,12 +1,51 @@
 {
     "default": {
-        "privateKey": "/home/pi/fc-enail.key",
-        "publicKey": "/home/pi/fc-enail.cert",
+        "options": {
+            "monitorCycleTime": 1000,
+            "displayRefreshRate": 1000,
+            "click": {
+                "medium": 750,
+                "long": 5000,
+                "reallyLong": 10000
+            },
+            "httpPort": 80,
+            "mDNSName": "FC Community E-Nail",
+            "hardware": {
+                "oled": {
+                    "address": 60
+                },
+                "dial": {
+                    "A": 22,
+                    "B": 23,
+                    "C": 24
+                }
+            },
+            "e5cc": {    
+                "device": "/dev/ttyUSB0",
+                "options": {
+                    "baudRate": 57600,
+                    "dataBits": 8,
+                    "stopBits": 1,
+                    "parity": "even"
+                }
+            }
+        },
+        "files": {
+            "scripts": "/home/pi/enail-scripts.json",
+            "savedState": "/home/pi/saved-state.json"
+        },
+        "security": {
+            "tokenTitle": "FC E-Nail",
+            "privateKey": "/home/pi/fc-enail.key",
+            "publicKey": "/home/pi/fc-enail.cert",
+            "tempWPASupplicant": "/home/pi/wpa_supplicant.conf"
+        },
         "jwtOptions": {
             "algorithm": "RS256",
             "audience": "FC E-Nail",
             "issuer": "FC E-Nail",
             "subject": "FC E-Nail"
-        }
+        },
+        "inputCharacters": "-+_!#$%&*@=^ 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/\\,.:;?<>\"'`()[]{}|~"
     }
 }

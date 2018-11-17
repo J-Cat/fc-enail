@@ -23,10 +23,11 @@ import { getCurrentMenuItem } from '../reducers/menuReducer';
 import Debug from 'debug';
 import { HTTP_PORT } from '../server/server';
 import { IMenuState } from '../models/IMenuState';
+import { config } from '../config';
 
 const debug = Debug('fc-enail:oled');
 
-const DISPLAY_REFRESH_RATE = 1000;
+const DISPLAY_REFRESH_RATE = config.options.displayRefreshRate;
 
 export class OledUi {
     private running: boolean = false;

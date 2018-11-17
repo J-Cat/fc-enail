@@ -13,7 +13,6 @@
  * -----
  * Copyright (c) 2018
  */
-// import dial from './ui/rotaryDial';
 import aplay from './aplay';
 import store from './store/createStore';
 import { toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase, setSP, stepMoveTemp, updateAllState, moveSetPoint } from './reducers/enailReducer';
@@ -26,11 +25,10 @@ import server from './server/server';
 import { settingSelect, settingDown, settingUp, settingBack, connectWiFiNetwork, getNetworkInfo } from './reducers/menuReducer';
 import * as Constants from './models/constants';
 import { fork, ChildProcess } from 'child_process'
+import { config } from './config';
 
 import Debug from 'debug';
 const debug = Debug('fc-enail:app');
-
-const OLED_ADDRESS = 0x3C;
 
 let processExitCount = 0;
 let processExitRunning = false;
@@ -62,16 +60,13 @@ const initDial = () => {
                     }
                     case EnailMode.Settings: {
                         if (m.offset > 0) {
-                            store.dispatch(settingDown());
+                            store.dispatch(settingDown(Math.ceil(m.step/2.5)));
                         } else if (m.offset < 0) {
-                            store.dispatch(settingUp());
-                        }
+                            store.dispatch(settingUp(Math.ceil(m.step/2.5)));
+                        }    
                         break;
                     }
                 }
-                // } else if (m.offset > 0) {
-                //     store.dispatch(increaseSP());
-                // }
                 break;
             }
 
@@ -99,64 +94,6 @@ const initDial = () => {
             }
         }
     })
-    // dial.init(22, 23, 24);
-
-    // dial.onChange.subscribe((dial, offset) => {
-    //     console.log('offset = ' + offset);
-    //     store.dispatch(setSetPoint(offset));
-    // });
-    // dial.onClockwise.subscribe(() => {
-    //     switch (store.getState().enail.mode) {
-    //         case EnailMode.Home: {
-    //             store.dispatch(increaseSP());
-    //             break;
-    //         }
-    //         case EnailMode.Script: {
-    //             store.dispatch(increaseCurrentScript());
-    //             break;
-    //         }
-    //         case EnailMode.Settings: {
-    //             store.dispatch(settingDown());
-    //             break;
-    //         }
-    //     }
-    // });
-
-    // dial.onCounterClockwise.subscribe(() => {
-    //     switch (store.getState().enail.mode) {
-    //         case EnailMode.Home: {
-    //             store.dispatch(decreaseSP());
-    //             break;
-    //         }
-    //         case EnailMode.Script: {
-    //             store.dispatch(decreaseCurrentScript());
-    //             break;
-    //         }
-    //         case EnailMode.Settings: {
-    //             store.dispatch(settingUp());
-    //             break;
-    //         }
-    //     }
-    // });
-
-    // dial.onClick.subscribe(() => {
-    //     // change menu
-    //     switch (store.getState().enail.mode) {
-    //         case EnailMode.Home: {
-    //             store.dispatch(setMode(EnailMode.Script));
-    //             break;
-    //         }
-    //         case EnailMode.Script: {
-    //             store.dispatch(setMode(EnailMode.Settings));
-    //             break;
-    //         }
-    //         case EnailMode.Settings: {
-    //             store.dispatch(settingBack());
-    //             //store.dispatch(setMode(EnailMode.Home));
-    //             break;
-    //         }
-    //     }
-    // });
 }
 
 const initButton = async () => {
@@ -296,7 +233,7 @@ store.dispatch<any>(getNetworkInfo());
 
 initDial();
 initButton();
-oledUi.start(OLED_ADDRESS);
+oledUi.start(config.options.hardware.oled.address);
 aplay.init({
     basePath: `${__dirname}/assets/sounds/`
 });

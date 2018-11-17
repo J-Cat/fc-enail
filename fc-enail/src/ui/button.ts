@@ -1,9 +1,10 @@
 import { Gpio } from 'onoff';
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
+import { config } from '../config';
 
-const MEDIUM_CLICK_TIMEOUT = 750;
-const LONG_CLICK_TIMEOUT = 5000;
-const REALLY_LONG_CLICK_TIMEOUT = 10000;
+const MEDIUM_CLICK_TIMEOUT = config.options.click.medium;
+const LONG_CLICK_TIMEOUT = config.options.click.long;
+const REALLY_LONG_CLICK_TIMEOUT = config.options.click.reallyLong;
 
 // const running = store.getState().enail.running;
 // led.write(running ? 1 : 0, () => {});

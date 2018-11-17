@@ -17,6 +17,7 @@ import Debug from 'debug';
 import store from '../store/createStore';
 import { updateAllState, setReady, nextStep } from '../reducers/enailReducer';
 import { fork, ChildProcess } from 'child_process';
+import * as Constants from '../models/constants';
 const debug = Debug('fc-enail:e5cc');
 
 class E5CC {  
@@ -55,7 +56,7 @@ class E5CC {
                 }
 
                 case 'WRITECOMPLETE': {
-                    if (m.address === 0x2103 && m.isStep) {
+                    if (m.address === Constants.E5CC.VARIABLES.SETPOINT && m.isStep) {
                         store.dispatch(nextStep());
                     }
                     break;
@@ -99,11 +100,11 @@ class E5CC {
     }
 
     start = () => {
-        this.e5ccService.send({ type: 'RUN', command: 0x0100 });
+        this.e5ccService.send({ type: 'RUN', command: Constants.E5CC.COMMANDS.START });
     }
 
     stop = () => {
-        this.e5ccService.send({ type: 'RUN', command: 0x0101 });
+        this.e5ccService.send({ type: 'RUN', command: Constants.E5CC.COMMANDS.STOP });
     }
 
     toggleState = async (): Promise<boolean> => {
@@ -121,7 +122,13 @@ class E5CC {
     }
 
     setSP = (value: number, retry: number = 0, args: any = {}) => {
-        this.e5ccService.send({ type: 'WRITE', address: 0x2103, value, retry, args });
+        this.e5ccService.send({ 
+            type: 'WRITE', 
+            address: Constants.E5CC.VARIABLES.SETPOINT, 
+            value, 
+            retry, 
+            args 
+        });
     }
 
     // toggleUnit = async (): Promise<boolean> => {

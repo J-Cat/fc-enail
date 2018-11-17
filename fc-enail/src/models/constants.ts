@@ -21,12 +21,9 @@ export const E5CC_CONNECTED = 'ENAIL/E5CC/CONNECTED';
 export const E5CC_UPDATE_SETPOINT = 'ENAIL/E5CC/UPDATE_SETPOINT';
 export const E5CC_SET_SETPOINT = 'ENAIL/E5CC/SET_SETPOINT';
 export const E5CC_MOVE_SETPOINT = 'ENAIL/E5CC/MOVE_SETPOINT';
-export const E5CC_INCREASE_SETPOINT = 'ENAIL/E5CC/INCREASE_SETPOINT';
-export const E5CC_DECREASE_SETPOINT = 'ENAIL/E5CC/DECREASE_SETPOINT';
 export const E5CC_UPDATE_STATE = 'ENAIL/E5CC/UPDATE_STATE';
 export const E5CC_UPDATE_ALL_STATE = 'ENAIL/E5CC/UPDATE_ALL_STATE';
 export const E5CC_TOGGLE_STATE = 'ENAIL/E5CC/TOGGLE_STATE';
-export const GET_RUNNING = 'ENAIL/RUNNING';
 export const E5CC_READY = 'ENAIL/E5CC/READY';
 
 export const SCRIPT_RUN = 'ENAIL/SCRIPT/RUN';
@@ -46,7 +43,6 @@ export const STEP_TIMER = 'timer';
 export const STEP_SEQUENTIAL = 'sequential';
 
 export const E5CC_STEP_MOVE_TEMP = 'ENAIL/E5CC/STEP_MOVE_TEMP';
-export const E5CC_STEP_MOVE_TEMP_START = 'ENAIL/E5CC/STEP_MOVE_TEMP_START';
 export const E5CC_STEP_MOVE_TEMP_COMPLETE = 'ENAIL/E5CC/STEP_MOVE_TEMP_COMPLETE';
 
 export const SET_MODE = 'ENAIL/MODE';
@@ -95,5 +91,22 @@ export const MENU = {
                 ACTION: 'ENAIL/NETWORK/SAVE'
             }
         }
+    }
+}
+
+export const E5CC = {
+    COMMANDS: {
+        RUN: 0x0000,
+        STOP: 0x0101,
+        START: 0x0100,
+
+    },
+    VARIABLES: {
+        SETPOINT: 0x2103,
+        PRESENTVALUE: 0x2000,
+        STATUS: 0x2407
+    },
+    FLAGS: {
+        RUNNING: 256
     }
 }

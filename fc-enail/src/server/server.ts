@@ -18,7 +18,7 @@ import { verifyToken } from '../helpers/securityHelper';
 import { config } from '../config';
 const debug = Debug('fc-enail:server');
 
-export const HTTP_PORT = 80;
+export const HTTP_PORT = config.options.httpPort;
 
 export class Server {
     app!: express.Application;
@@ -101,8 +101,8 @@ export class Server {
         this.http.listen(HTTP_PORT);
 
         // advertise an HTTP server on port 3000
-        createAdvertisement(new ServiceType('_fc-enail', '_tcp'), HTTP_PORT, {
-            name: 'FC Community E-Nail'
+        createAdvertisement(new ServiceType('_fc-enail', '_tcp'), config.options.httpPort, {
+            name: config.options.mDNSName
         });
     }
 

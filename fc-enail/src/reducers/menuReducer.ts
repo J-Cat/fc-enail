@@ -3,12 +3,13 @@ import { wpa, IWpaCliStatus, IWpaScanResult, wpa_supplicant } from 'wireless-too
 
 import { IMenuState, IMenuItem } from '../models/IMenuState';
 import { EnailAction, INetworkInfoAction, IWiFiScanAction } from '../models/Actions';
+import { config } from '../config';
 import * as Constants from '../models/constants';
 
 import Debug from 'debug';
 const debug = Debug('fc-enail:reducer');
 
-const WPA_CHARS = "-+_!#$%&*@=^ 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/\\,.:;?<>\"'`()[]{}|~"
+const WPA_CHARS = config.inputCharacters;
 
 const initialState: IMenuState = {
     menu: {
@@ -65,15 +66,17 @@ export const settingBack = () => {
     };
 }
 
-export const settingDown = () => {
+export const settingDown = (step: number = 1) => {
     return {
-        type: Constants.SETTING_DOWN
+        type: Constants.SETTING_DOWN,
+        payload: step
     };
 }
 
-export const settingUp = () => {
+export const settingUp = (step: number = 1) => {
     return {
-        type: Constants.SETTING_UP
+        type: Constants.SETTING_UP,
+        payload: step
     };
 }
 
@@ -232,8 +235,8 @@ export const connectWiFiNetwork = (ssid: string, passphrase: string) => {
 }
 
 
-const getNextWpaChar = (c: string) => {
-    const newIndex = WPA_CHARS.indexOf(c) + 1;
+const getNextWpaChar = (c: string, step: number) => {
+    const newIndex = WPA_CHARS.indexOf(c) + step;
     if (newIndex < WPA_CHARS.length) {
         return WPA_CHARS[newIndex];
     } else {
@@ -241,8 +244,8 @@ const getNextWpaChar = (c: string) => {
     }
 }
 
-const getPreviousWpaChar = (c: string) => {
-    const newIndex = WPA_CHARS.indexOf(c) - 1;
+const getPreviousWpaChar = (c: string, step: number) => {
+    const newIndex = WPA_CHARS.indexOf(c) - step;
     if (newIndex >= 0) {
         return WPA_CHARS[newIndex];
     } else {
@@ -340,7 +343,7 @@ export const menuReducer = (state: IMenuState = initialState, action: EnailActio
                         && (state.actionStep >= 1)
                     ? (
                         state.passphrase.substr(0, state.currentCharacter) 
-                        + getNextWpaChar(state.passphrase.charAt(state.currentCharacter)) 
+                        + getNextWpaChar(state.passphrase.charAt(state.currentCharacter), action.payload as number) 
                         + state.passphrase.substr(state.currentCharacter+1)
                     ) : state.passphrase,
                 top: nextIndex > state.top ? state.top + 1 : state.top,
@@ -357,7 +360,7 @@ export const menuReducer = (state: IMenuState = initialState, action: EnailActio
                         && (state.actionStep >= 1) && (state.passphrase.length > 0)
                     ? (
                         state.passphrase.substr(0, state.currentCharacter) 
-                        + getPreviousWpaChar(state.passphrase.charAt(state.currentCharacter)) 
+                        + getPreviousWpaChar(state.passphrase.charAt(state.currentCharacter), action.payload as number) 
                         + state.passphrase.substr(state.currentCharacter+1)
                     ) : state.passphrase,
                 top: nextIndex < state.bottom ? state.top - 1 : state.top,

@@ -18,6 +18,7 @@ import { Gpio } from 'onoff';
 import Debug from 'debug';
 import { send } from "process";
 import { EnailMode } from "../models/IEnailState";
+import { config } from '../config';
 
 const debug = Debug('fc-enail:rotary');
 
@@ -117,8 +118,8 @@ export class RotaryDial {
     }
 
     init = (gpioA: number, gpioB: number, gpioButton: number) => {   
-        this.inputA = new Gpio(gpioA, 'in', 'both');
-        this.inputB = new Gpio(gpioB, 'in', 'both');
+        this.inputA = new Gpio(gpioA, 'in', 'both', { debounceTimeout: 10 });
+        this.inputB = new Gpio(gpioB, 'in', 'both', { debounceTimeout: 10 });
         this.button = new Gpio(gpioButton, 'in', 'rising', { activeLow: true, debounceTimeout: 20 });
 
         this.inputA.watch((err: Error, value: number) => {
@@ -149,6 +150,7 @@ export class RotaryDial {
         this.mode = mode;
     }
 }
+
 const dial = new RotaryDial();
 dial.onChange.subscribe((source, { offset, step }) => {
     if (process.send) {
@@ -170,4 +172,9 @@ process.on('message', m => {
         }
     }
 })
-dial.init(22, 23, 24);
+
+dial.init(
+    config.options.hardware.dial.A, 
+    config.options.hardware.dial.B, 
+    config.options.hardware.dial.C
+);

@@ -14,6 +14,13 @@
  * Copyright (c) 2018
  */
 export const getIconByName = (icon: string): Uint8Array => {
+    // const { icons } = require('./icon.js');
+    // if (icons[icon]) {
+    //     return icons[icon] as Uint8Array;
+    // } else {
+    //     return icons.home;
+    // }
+
     switch (icon) {
         case 'drop': {
             return drop;

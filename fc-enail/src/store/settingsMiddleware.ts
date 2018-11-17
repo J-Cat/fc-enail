@@ -1,17 +1,23 @@
-import { IEnailStore } from '../models/IEnailStore';
 import { Store, Dispatch } from 'redux';
+import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction } from '../models/Actions';
-
-import * as Constants from '../models/constants';
-
-import Debug from 'debug';
 import { setMode } from '../reducers/enailReducer';
 import { EnailMode } from '../models/IEnailState';
-import { getNetworkInfo, getMenuItemByKey, internalSelect, getWiFiNetworks, settingBack, navigate } from '../reducers/menuReducer';
+import { 
+    getNetworkInfo, 
+    getMenuItemByKey, 
+    internalSelect, 
+    getWiFiNetworks, 
+    navigate 
+} from '../reducers/menuReducer';
 import { exec } from 'child_process';
 import aplay from '../aplay';
-const TEMP_WPA_SUPPLICANT_CONF = '/home/pi/wpa_supplicant.conf';
+import * as Constants from '../models/constants';
+import { config } from '../config';
 
+const TEMP_WPA_SUPPLICANT_CONF = config.security.tempWPASupplicant;
+
+import Debug from 'debug';
 const debug = Debug("fc-enail:settings");
 
 export const settingsMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
@@ -50,7 +56,7 @@ export const settingsMiddleware = (store: Store<IEnailStore>) => <A extends Enai
                         break;
                     }
                     case Constants.MENU.SETTINGS.NETWORK.SAVE.ACTION: {
-                        exec("sudo cat /home/pi/wpa_supplicant.conf | grep -v -E '\s*#.*' > /etc/wpa_supplicant/wpa_supplicant.conf && sudo rm /home/pi/wpa_supplicant.conf", () => {
+                        exec("sudo cat " + TEMP_WPA_SUPPLICANT_CONF + " | grep -v -E '\s*#.*' > /etc/wpa_supplicant/wpa_supplicant.conf && sudo rm " + TEMP_WPA_SUPPLICANT_CONF, () => {
                             setTimeout(() => {
                                 aplay.play('complete');
                                 store.dispatch(navigate(Constants.MENU.SETTINGS.KEY));

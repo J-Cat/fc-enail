@@ -6,7 +6,7 @@ import * as Debug from 'debug';
 
 const debug = Debug('fc-enail:controller');
 
-const TOKEN_TITLE = 'FC E-Nail';
+const TOKEN_TITLE = config.security.tokenTitle;
 
 let privateKey: Buffer;
 let publicKey: Buffer;
@@ -44,7 +44,7 @@ const getPrivateKey = async () => {
             return;
         }
 
-        fs.readFile(path.resolve(`${config.privateKey}`), {}, (err, cert) => {
+        fs.readFile(path.resolve(`${config.security.privateKey}`), {}, (err, cert) => {
             if (err) {
                 debug('Error reading private key.');
 
@@ -66,7 +66,7 @@ const getPublicKey = async () => {
             return;
         }
 
-        fs.readFile(path.resolve(`${config.publicKey}`), {}, (err, cert) => {
+        fs.readFile(path.resolve(`${config.security.publicKey}`), {}, (err, cert) => {
             if (err) {
                 debug('Error reading public key.');
 
