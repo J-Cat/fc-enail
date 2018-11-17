@@ -265,24 +265,24 @@ const processExit = (code: 1|2) => {
     }
     
     if (processExitCount >= (5 * code)) {
-        aplay.once('complete', () => {
+        aplay.play('longbeep');    
+        new Promise(resolve => {
+            setTimeout(() => {resolve();}, 1000);
+        }).then(() => {
             if (processExitRunning) {
                 process.exit(code);
             }
-        });
-        aplay.play('longbeep');
+        })
         return;
     }
 
-    aplay.once('comlete', () => {
-        new Promise(resolve => {
-            setTimeout(() => {resolve();}, 1000/code);
-        }).then(() => {
-            processExitCount += 1;
-            processExit(code);        
-        });
-    });
     aplay.play('beep');
+    new Promise(resolve => {
+        setTimeout(() => {resolve();}, 1000/code);
+    }).then(() => {
+        processExitCount += 1;
+        processExit(code);        
+    });
 }
 
 
