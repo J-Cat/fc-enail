@@ -15,6 +15,7 @@ export interface IConfig {
             readonly oled: {
                 readonly address: number;
             }
+            readonly button: number;
             readonly dial: {
                 readonly A: number;
                 readonly B: number;

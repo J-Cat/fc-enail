@@ -35,8 +35,8 @@ const configureStore = (initialState?: IEnailStore): Store<IEnailStore, EnailAct
         thunk,
         e5ccMiddleware,
         scriptMiddleware,
-        displayMiddleware,
-        settingsMiddleware
+        settingsMiddleware,
+        displayMiddleware
     ];
 
     const composeEnhancers = process.env.NODE_ENV === 'development' 

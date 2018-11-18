@@ -1,10 +1,14 @@
 import { Gpio } from 'onoff';
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { config } from '../config';
+import Debug from 'debug';
+import { send } from 'process';
 
 const MEDIUM_CLICK_TIMEOUT = config.options.click.medium;
 const LONG_CLICK_TIMEOUT = config.options.click.long;
 const REALLY_LONG_CLICK_TIMEOUT = config.options.click.reallyLong;
+
+const debug = Debug('fc-enail:button');
 
 // const running = store.getState().enail.running;
 // led.write(running ? 1 : 0, () => {});
@@ -40,6 +44,8 @@ export class Button {
                 return;
             }
 
+            const elapsed = Date.now() - this.startTime;
+            debug(`Click = ${elapsed}, ${value}`);
             if (value === 1) {
                 this.startTime = Date.now();
             }
@@ -63,6 +69,31 @@ export class Button {
         });
     }
 }
+
 const button = new Button();
 
-export default button;
+button.onClick.subscribe(() => {
+    if (send) {
+        send({ type: 'CLICK' });
+    }
+});
+
+button.onMediumClick.subscribe(() => {
+    if (send) {
+        send({ type: 'MEDIUMCLICK' });
+    }
+});
+
+button.onLongClick.subscribe(() => {
+    if (send) {
+        send({ type: 'LONGCLICK' });
+    }
+});
+
+button.onReallyLongLick.subscribe(() => {
+    if (send) {
+        send({ type: 'REALLYLONGCLICK' });
+    }
+});
+
+button.init(config.options.hardware.button);

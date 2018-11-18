@@ -19,14 +19,12 @@ import { EnailAction } from '../models/Actions';
 
 import * as Constants from '../models/constants';
 import { IEnailState, EnailMode } from '../models/IEnailState';
-import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp, endScript, setSP } from '../reducers/enailReducer';
+import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp, endScript, setSP, setIcon } from '../reducers/enailReducer';
 import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IFeedbackStep } from '../models/IFeedbackStep';
 import { ITimerStep } from '../models/ITimerStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
-import oledUi from '../ui/oledUi';
-import { home, script, gear } from '../ui/icons';
 import aplay from '../aplay';
 
 import Debug from 'debug';
@@ -62,7 +60,7 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
 
         case Constants.SCRIPT_END: {
             led.flash(0);
-            oledUi.setIcon(getModeIcon(state.mode), 0);
+            store.dispatch(setIcon(getModeIcon(state.mode), 0));
             aplay.once("complete", () => {
                 debug(`script end, reseting sp to ${state.scriptStartSP!}`);
             });
@@ -74,18 +72,18 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
     return result;
 }
 
-const getModeIcon = (mode: EnailMode): Uint8Array => {
+const getModeIcon = (mode: EnailMode): string => {
     switch (mode) {
         case EnailMode.Script: {
-            return script;
+            return 'script';
         }
 
         case EnailMode.Settings: {
-            return gear;
+            return 'gear';
         }
 
         default: {
-            return home;
+            return 'home';
         }
     }
 }

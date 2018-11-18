@@ -1,12 +1,25 @@
 import { EnailMode } from './IEnailState';
+import { IWpaCliStatus } from 'wireless-tools';
+import { IMenuItem } from './IMenuState';
 
 export interface IOledState {
-    readonly lines: string[];
+    readonly mode: EnailMode;
+    readonly currentMenu: string;
+    readonly menuTop: number;
+    readonly menuBottom: number;
+    readonly selectedIndex: number;
+    readonly isPassphrase: boolean;
+    readonly passphrase: string;
+    readonly input: string;
+    readonly scriptTitle: string;
+    readonly scriptRunning: boolean;
+    readonly scriptStartTime: number;
+    readonly actionStep: number;
+    readonly stepMessage?: string;
+    readonly executing: boolean;
     readonly icon: string;
     readonly flashRate: number;
-    readonly selectedIndex: number;
-    readonly selectedMenu: number;
-    readonly executing: boolean;
-    readonly mode: EnailMode;
-    readonly isPassphrase: boolean;
+    readonly networkInfo?: IWpaCliStatus;
+    readonly availableNetworks: string[]; 
+    readonly menu: IMenuItem;
 }

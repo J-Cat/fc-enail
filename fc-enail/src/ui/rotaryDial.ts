@@ -19,11 +19,12 @@ import Debug from 'debug';
 import { send } from "process";
 import { EnailMode } from "../models/IEnailState";
 import { config } from '../config';
+import * as Constants from '../models/constants';
 
 const debug = Debug('fc-enail:rotary');
 
 const ROTATION_THROTTLE = 10;
-const MESSAGE_THROTTLE = 250;
+const MESSAGE_THROTTLE = 50;
 
 export class RotaryDial {
     private lastA: number = 0;
@@ -88,18 +89,18 @@ export class RotaryDial {
         if (elapsed > (this.mode === EnailMode.Home ? MESSAGE_THROTTLE : 0)) {
             this.dispatchPromise = new Promise(resolve => {
                 if (this.offset !== 0) {
-                    if (elapsed > 1000) {
+                    if (elapsed > 750) {
                         this.step = 1;
                     } else {
                         if (this.offset > 0) {
-                            if (this.lastOffset > 0 && this.step <= 25 && elapsed < 750) {
-                                this.step += this.step === 9 ? 1 : 2;
+                            if (this.lastOffset > 0 && this.step <= 10 && elapsed < 250) {
+                                this.step += 1;
                             } else if (this.step > 1) {
-                                this.step -= 1;
+                              this.step -= 1;
                             }
                         } else {
-                            if (this.lastOffset < 0 && this.step <= 25 && elapsed < 750) {
-                                this.step += this.step === 9 ? 1 : 2;
+                            if (this.lastOffset < 0 && this.step <= 10 && elapsed < 250) {
+                                this.step += 1;
                             } else if (this.step > 1) {
                                 this.step -= 1;
                             }
@@ -118,8 +119,8 @@ export class RotaryDial {
     }
 
     init = (gpioA: number, gpioB: number, gpioButton: number) => {   
-        this.inputA = new Gpio(gpioA, 'in', 'both', { debounceTimeout: 10 });
-        this.inputB = new Gpio(gpioB, 'in', 'both', { debounceTimeout: 10 });
+        this.inputA = new Gpio(gpioA, 'in', 'both', { debounceTimeout: 20 });
+        this.inputB = new Gpio(gpioB, 'in', 'both', { debounceTimeout: 20 });
         this.button = new Gpio(gpioButton, 'in', 'rising', { activeLow: true, debounceTimeout: 20 });
 
         this.inputA.watch((err: Error, value: number) => {
@@ -154,27 +155,19 @@ export class RotaryDial {
 const dial = new RotaryDial();
 dial.onChange.subscribe((source, { offset, step }) => {
     if (process.send) {
-        process.send({ type: 'ROTATION', offset, step });
+        process.send({ type: Constants.INPUT_ACTIONS.ROTATION, offset, step });
     }
 });
 
 dial.onClick.subscribe(source => {
     if (send) {
-        send({ type: 'CLICK' });
+        send({ type: Constants.INPUT_ACTIONS.ROTARYCLICK });
     }
 });
-
-process.on('message', m => {
-    switch (m.type) {
-        case 'MODE': {
-            dial.setMode(m.mode as EnailMode);
-            break;
-        }
-    }
-})
 
 dial.init(
     config.options.hardware.dial.A, 
     config.options.hardware.dial.B, 
     config.options.hardware.dial.C
 );
+

@@ -21,8 +21,6 @@ import { EnailAction, IBasicAction, IE5CCUpdateStateAction } from '../models/Act
 import * as Constants from '../models/constants';
 import e5cc from '../e5cc/e5cc';
 import { IEnailScript } from '../models/IEnailScript';
-import oledUi from '../ui/oledUi';
-import { getIconByName } from '../ui/icons';
 import { IFeedbackStep } from '../models/IFeedbackStep';
 import aplay from '../aplay';
 import { ITimerStep } from '../models/ITimerStep';
@@ -34,6 +32,7 @@ import { generate } from 'generate-password';
 import Debug from 'debug';
 import { ISavedState } from '../models/ISavedState';
 import { config } from '../config';
+import { IOledState } from '../models/IOledState';
 
 const debug = Debug('fc-enail:reducer');
 
@@ -80,7 +79,9 @@ const initialState: IEnailState = {
     currentStep: scripts.length > 0 ? scripts[0].step : undefined,
     presets: [],
     scriptStartTime: 0,
-    passphrase: ''
+    passphrase: '',
+    icon: 'home',
+    flashRate: 0
 };
 
 export const updateSetPoint = (value: number) => {
@@ -179,9 +180,9 @@ export const runStep = () => {
 }
 
 export const stepFeedback = (step: IFeedbackStep) => {
-    return (dispatch: Dispatch<IBasicAction>) => {
+    return (dispatch: Dispatch<EnailAction>) => {
         if (step.icon) {
-            oledUi.setIcon(getIconByName(step.icon), step.flashRate || 0);
+            dispatch(setIcon(step.icon, step.flashRate));
         }
 
         if (step.led !== undefined) {
@@ -232,9 +233,17 @@ export const setMode = (mode: EnailMode) => {
     };
 }
 
-export const updateDisplay = () => {
+export const updateDisplay = (state: IOledState) => {
     return {
-        type: Constants.DISPLAY_UPDATE
+        type: Constants.DISPLAY_UPDATE,
+        payload: state
+    };
+}
+
+export const setIcon = (icon: string, flashRate: number = 0) => {
+    return {
+        type: Constants.SET_ICON,
+        payload: { icon, flashRate }
     };
 }
 
@@ -477,6 +486,13 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             return {
                 ...state,
                 passphrase: ''
+            };
+        }
+
+        case Constants.SET_ICON: {
+            return {
+                ...state,
+                icon: action.payload as string
             };
         }
 

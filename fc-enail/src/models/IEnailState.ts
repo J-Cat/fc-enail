@@ -37,6 +37,8 @@ import { IStep } from './IStep';
     readonly presets: number[];
     readonly scriptStartTime: number;
     readonly passphrase: string;
+    readonly icon: string;
+    readonly flashRate: number;
 }
 
 export enum Direction {

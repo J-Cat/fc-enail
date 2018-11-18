@@ -1,58 +1,47 @@
-import { IEnailStore } from '../models/IEnailStore';
 import { Store, Dispatch } from 'redux';
-import { EnailAction } from '../models/Actions';
-
-import * as Constants from '../models/constants';
-
-import led from '../ui/led';
-import oledUi from '../ui/oledUi';
-import { home, gear, script } from '../ui/icons';
-
-import { EnailMode, IEnailState } from '../models/IEnailState';
-import { updateDisplay } from '../reducers/enailReducer';
-
+import { fork } from 'child_process';
 import Debug from 'debug';
+
+import { IEnailStore } from '../models/IEnailStore';
+import { EnailAction } from '../models/Actions';
+import { IOledState } from '../models/IOledState';
+
 const debug = Debug("fc-enail:display");
+
+const oledUi = fork(`${__dirname}/../ui/oledUi.js`);
+
+process.on('exit', () => {
+    oledUi.kill();
+});
 
 export const displayMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
     const result = next(action);
+    const state = store.getState();
 
-    const state = store.getState().enail;
+    const oledState: IOledState = {
+        actionStep: state.menu.actionStep || 0,
+        availableNetworks: state.menu.scan.map(n => n.ssid),
+        currentMenu: state.menu.currentMenu,
+        executing: state.menu.executing,
+        flashRate: state.enail.flashRate,
+        icon: state.enail.icon,
+        input: state.menu.passphrase,
+        isPassphrase: state.enail.passphrase !== '',
+        menu: state.menu.menu,
+        menuBottom: state.menu.bottom,
+        menuTop: state.menu.top,
+        mode: state.enail.mode,
+        networkInfo: state.menu.networkInfo,
+        passphrase: state.menu.passphrase,
+        scriptRunning: state.enail.scriptRunning,
+        scriptStartTime: state.enail.scriptStartTime,
+        scriptTitle: state.enail.currentScript ? state.enail.currentScript.title : '',
+        selectedIndex: state.menu.currentIndex,
+        stepMessage: state.enail.currentStep ? state.enail.currentStep.message : ''
+    };
 
-    switch (action.type) {
-        case Constants.SET_MODE: case Constants.SCRIPT_INCREASE: case Constants.SCRIPT_DECREASE: case Constants.NETWORK_INFO: {
-            store.dispatch<any>(updateDisplay());
-            break;
-        }
-
-        case Constants.DISPLAY_UPDATE: {
-            debug(state.mode);
-            render(state, action);
-            break;
-        }
-    }
+    oledUi.send(oledState);
 
     return result;
 }
 
-export const render = (state: IEnailState, action: EnailAction) => {
-    switch (state.mode) {
-        case EnailMode.Home: {
-            led.flash(0);
-            oledUi.setIcon(home);
-            break;
-        }
-
-        case EnailMode.Script: {
-            led.flash(0);
-            oledUi.setIcon(script);
-            break;
-        }
-
-        case EnailMode.Settings: {
-            led.flash(0);
-            oledUi.setIcon(gear);
-            break;
-        }
-    }
-}
