@@ -31,33 +31,34 @@ class E5CC {
         this.e5ccService = fork(`${__dirname}/service.js`);
 
         this.e5ccService.on('message', m => {
+            debug(m);
             switch (m.type) {
                 case 'DATA': {
-                    this.pv = m.pv;
-                    this.sp = m.sp;
-                    this.isRunning = m.isRunning
+                    this.pv = m.pv as number;
+                    this.sp = m.sp as number;
+                    this.isRunning = m.isRunning as boolean
                     this.started = true;
                     store.dispatch(updateAllState(m.pv, m.sp, m.isRunning));        
                     break;
                 }
 
-                case 'SETSP': {
-                    store.dispatch<any>(setReady())
-                    break;
-                }
-
-                case 'SETSTATE': {
-                    store.dispatch<any>(setReady())
-                    break;
-                }
-
                 case 'READCOMPLETE': {
+                    if (m.console) {
+                        console.log(m.result);
+                    }
+                    break;
+                }
+
+                case 'RUNCOMPLETE': {
+                    store.dispatch<any>(setReady());
                     break;
                 }
 
                 case 'WRITECOMPLETE': {
-                    if (m.address === Constants.E5CC.VARIABLES.SETPOINT && m.isStep) {
+                    if ((m.address as number) === Constants.E5CC.VARIABLES.SETPOINT && (m.isStep as boolean)) {
                         store.dispatch(nextStep());
+                    } else {
+                        store.dispatch<any>(setReady());
                     }
                     break;
                 }
@@ -69,16 +70,16 @@ class E5CC {
         });
     }
 
-    read = (address: number) => {
-        this.e5ccService.send({ type: 'READ', address });
+    read = (address: number, retry: number = 3, args: any = {}) => {
+        this.e5ccService.send({ type: 'READ', address, retry, args });
     }
 
     write = (address: number, value: number, retry: boolean = true) => {
         this.e5ccService.send({ type: 'WRITE', address, value, retry });
     }
 
-    run = (command: number) => {
-        this.e5ccService.send({ type: 'RUN', command });
+    run = (command: number, args: any = {}) => {
+        this.e5ccService.send({ type: 'RUN', command, args });
     }
 
     getPV = () => {

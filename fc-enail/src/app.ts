@@ -66,7 +66,7 @@ const initInput = () => {
                 break;
             }
             case Constants.INPUT_ACTIONS.ROTATION: {
-                processRotation(m.offset, m.step);
+                processRotation(m.offset as number, m.step as number);
                 break;
             }
         }

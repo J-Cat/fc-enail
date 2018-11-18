@@ -43,15 +43,25 @@ const close = (): Promise<void> => {
     });
 }
 
-export const read = async (address: number, retry: number = 3): Promise<number|undefined> => {
+export const read = async (address: number, retry: number = 3, args: any = {}): Promise<number|undefined> => {
+    let result = undefined;
     try {
-        return await executeRead(address, retry);
-    } catch {
-        return undefined;
+        result = await executeRead(address, retry, 0, args);
+    } catch (e) {
+        debug(e);
     }
+    if (send) {
+        send({
+            type: 'READCOMPLETE',
+            address,
+            result,
+            ...args
+        });
+    }
+    return result;
 }
 
-const executeRead = async (address: number, retry: number, retryCount: number = 0): Promise<number|undefined> => {
+const executeRead = async (address: number, retry: number, retryCount: number = 0, args: any): Promise<number|undefined> => {
     try {
         const value = await _client.readHoldingRegisters(address, 1);
         return value.data[0];
@@ -62,7 +72,7 @@ const executeRead = async (address: number, retry: number, retryCount: number = 
             return new Promise(resolve => {
                 setTimeout(() => { resolve(); }, 250);
             }).then(async () => {
-                return await executeRead(address, retry, retryCount + 1);
+                return await executeRead(address, retry, retryCount + 1, args);
             })
         } else {
             return undefined;
@@ -74,16 +84,14 @@ export const write = async (address: number, value: number, retry: number = 3, a
     try {
         debug(`${address}, ${value}`);
         const result = await executeWrite(address, value, retry) || false;
-        if (result) {
-            if (send) {
-                send({
-                    type: 'WRITECOMPLETE',
-                    address,
-                    value,
-                    result,
-                    ...args
-                });
-            }
+        if (send) {
+            send({
+                type: 'WRITECOMPLETE',
+                address,
+                value,
+                result,
+                ...args
+            });
         }
         return result;
     } catch {
@@ -110,13 +118,22 @@ const executeWrite = async (address: number, value: number, retry: number, retry
     }
 }
 
-export const run = async (command: number, retry: number = 3): Promise<boolean> => {
+export const run = async (command: number, retry: number = 3, args: any): Promise<boolean> => {
+    let result = false;
     try {
         await executeRun(command, retry);
-        return true;
-    } catch {
-        return false;
+        result = true;
+    } catch (e) {
+        debug(e);
     }
+    if (send) {
+        send({
+            type: 'RUNCOMPLETE',
+            command,
+            ...args
+        });
+    }
+    return result;
 }
 
 const executeRun = async (command: number, retry: number, retryCount: number = 0): Promise<boolean> => {
@@ -137,42 +154,6 @@ const executeRun = async (command: number, retry: number, retryCount: number = 0
     }
 }
 
-const isRunning = async (retry: number = 3): Promise<void> => {
-    try {
-        const value = await read(VARIABLES.STATUS, retry);
-        if (send && value) {
-            send({
-                type: 'STATE/RESPONSE',
-                value: (value & 256) === 0
-            });
-        }
-    } catch {}
-}
-
-const readSP = async (retry: number = 3): Promise<void> => {
-    try {
-        const value = await read(VARIABLES.SETPOINT, retry);
-        if (send && value) {
-            send({
-                type: 'SP/RESPONSE',
-                value
-            });
-        }
-    } catch {}
-}
-
-const readPV = async (retry: number = 3) => {
-    try {
-        const value = await read(VARIABLES.PRESENTVALUE, retry);
-        if (send && value) {
-            send({
-                type: 'PV/RESPONSE',
-                value
-            });
-        }
-    } catch {}
-}
-
 const getE5CCState = () => {
     new Promise(async (resolve, reject) => {
         debug('Start');
@@ -188,9 +169,9 @@ const getE5CCState = () => {
 
         try {
             debug('Get data');
-            const pv = await read(VARIABLES.PRESENTVALUE, 1);
-            const sp = await read(VARIABLES.SETPOINT, 1);
-            const runningValue = await read(VARIABLES.STATUS, 1);
+            const pv = await read(VARIABLES.PRESENTVALUE, 1, {});
+            const sp = await read(VARIABLES.SETPOINT, 1, {});
+            const runningValue = await read(VARIABLES.STATUS, 1, {});
             const running = runningValue ? (runningValue & FLAGS.RUNNING) === 0 : false;
 
             debug(`Got -> ${sp}, ${pv}, ${running}`);
@@ -249,17 +230,17 @@ connect(_options).then(() => {
 process.on('message', async m => {
     switch (m.type) {
         case 'READ': {
-            const value = await read(m.address, m.retry)
+            const value = await read(m.address as number, m.retry as number, m.args)
             break;
         }
 
         case 'WRITE': {
-            const value = await write(m.address, m.value, m.retry, m.args);
+            const value = await write(m.address as number, m.value as number, m.retry as number, m.args);
             break;
         }
 
         case 'RUN': {
-            const value = await run(m.command, m.retry);
+            const value = await run(m.command as number, m.retry as number, m.args);
             break;
         }
     }

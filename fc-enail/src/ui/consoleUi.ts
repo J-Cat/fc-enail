@@ -50,7 +50,7 @@ export class ConsoleUi {
                         break;
                     }
 
-                    e5cc.read(address);
+                    e5cc.read(address, 3, { console: true });
                     rl.prompt();
                     break;
                 }
