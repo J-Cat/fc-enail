@@ -13,4 +13,5 @@ export interface IEnailEmitState {
     readonly p: number;
     readonly i: number;
     readonly d: number;
+    readonly profile?: string;
 }

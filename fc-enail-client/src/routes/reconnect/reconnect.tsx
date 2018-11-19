@@ -16,15 +16,14 @@
 import * as React from 'react';
 import { Form, Input, Button } from 'antd';
 
-const FormItem = Form.Item;
+import { ReconnectProps } from './container';
+import * as Constants from '../../models/constants';
+import config from '../../config';
 
 import './reconnect.less';
 
-import { ReconnectProps } from './container';
-
-import config from '../../config';
-
 const fcLogo = require('../../assets/fclogo.png');
+const FormItem = Form.Item;
 
 export class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectProps.IState> {
 
@@ -68,10 +67,10 @@ export class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectP
                                     >
                                     {getFieldDecorator('serviceUrl', {
                                         rules: [{ required: true, message: 'Please enter a valid service URL!' }],
-                                        initialValue: config.serviceUrl
+                                        initialValue: localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) || config.serviceUrl
                                       })(
                                         <Input
-                                            placeholder='http://<IP Address>:4000'
+                                            placeholder='http://<IP Address>'
                                             inputMode="url"
                                             // tslint:disable-next-line:jsx-no-lambda
                                         />

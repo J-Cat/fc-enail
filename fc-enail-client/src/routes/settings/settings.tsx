@@ -14,15 +14,17 @@
  * Copyright (c) 2018
  */
 import * as React from 'react';
-import { Form, InputNumber, Button } from 'antd';
+import { Form, InputNumber, Button, Select } from 'antd';
+import { Modal, Toast } from 'antd-mobile';
+import { Action } from 'antd-mobile/lib/modal/PropsType';
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 
 import './settings.less';
 
 import { SettingsProps } from './container';
 
-const fcLogo = require('../../assets/fclogo.png');
 const MIN_PRESET = 0;
 const MAX_PRESET = 1000;
 
@@ -39,8 +41,10 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
             start: {
                 p: this.props.p,
                 i: this.props.i,
-                d: this.props.d
-            }
+                d: this.props.d,
+                profile: this.props.profile
+            },
+            profile: this.props.profile
         };
     }
 
@@ -50,19 +54,41 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         if (nextProps.p !== prevState.start.p) {
             newState = {
                 ...newState,
-                p: nextProps.p
+                p: nextProps.p,
+                start: {
+                    ...prevState.start,
+                    p: nextProps.p
+                }
             };
         }
         if (nextProps.i !== prevState.start.i) {
             newState = {
                 ...newState,
-                i: nextProps.i
+                i: nextProps.i,
+                start: {
+                    ...prevState.start,
+                    i: nextProps.i
+                }
             };
         }
         if (nextProps.d !== prevState.start.d) {
             newState = {
                 ...newState,
-                d: nextProps.d
+                d: nextProps.d,
+                start: {
+                    ...prevState.start,
+                    d: nextProps.d
+                }            
+            };
+        }
+        if (nextProps.profile !== prevState.start.profile) {
+            newState = {
+                ...newState,
+                profile: nextProps.profile,
+                start: {
+                    ...prevState.start,
+                    profile: nextProps.profile
+                }            
             };
         }
 
@@ -99,6 +125,25 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         }
     }
 
+    handleProfileChange = (value: string) => {
+        const prof = this.props.profiles[value];
+        if (prof) {
+            this.setState({
+                profile: value,
+                p: prof.p,
+                i: prof.i,
+                d: prof.d
+            });
+        } else {
+            this.setState({
+                profile: '',
+                p: this.props.p,
+                i: this.props.i,
+                d: this.props.d
+            });       
+        }
+    }
+
     isValid = (): boolean => {
         for (const index of Object.keys(this.props.presets)) {
             if (this.state.presets[index] && this.state.presets[index].validationStatus !== 'success') {
@@ -119,12 +164,67 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
 
     savePidSettings = (e: React.FormEvent) => {
         e.preventDefault();
-        this.props.savePidSettings({
-            p: this.state.p,
-            i: this.state.i,
-            d: this.state.d
-        });
+
+        const modal = Modal.prompt('Profile Name', 'Please enter the profile name.', [{
+            text: 'Ok',
+            onPress: (value: string) => {
+                return new Promise<string>((resolve, reject) => {
+                    Toast.info(`Saving ${value}`, 1);
+                    setTimeout(() => {
+                        this.setState({
+                            profile: value,
+                            start: {
+                                p: this.state.p,
+                                i: this.state.i,
+                                d: this.state.d,
+                                profile: value
+                            }
+                        });
+                        this.props.savePidSettings({
+                            title: value,
+                            p: this.state.p,
+                            i: this.state.i,
+                            d: this.state.d
+                        });
+                        this.setState({
+
+                        })
+                        resolve(value);
+                        modal.close();
+                    }, 1000);
+                });
+            },
+        }, {
+            text: 'Cancel',
+            onPress: () => { 
+                return new Promise<string>((resolve, reject) => {
+                    Toast.info('Cancelled', 1);
+                    setTimeout(() => {
+                        reject();
+                        modal.close();
+                    }, 1000);
+                })},
+            },
+        ] as Array<Action<string>>, 'default', this.state.profile, ['profile name']);  
+        
         // this.props.
+    }
+
+    deleteProfile = (e: React.FormEvent) => {
+        const isCurrent = this.state.profile === this.props.profile;
+        this.props.deleteProfile(this.state.profile);
+        this.setState({
+            p: this.props.p,
+            i: this.props.i,
+            d: this.props.d,
+            start: {
+                p: this.props.p,
+                i: this.props.i,
+                d: this.props.d,
+                profile: isCurrent ? '' : this.props.profile
+            },
+            profile: isCurrent ? '' : this.props.profile
+        })
     }
 
     autoTune = (e: React.FormEvent) => {
@@ -153,9 +253,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         return (
             <div className="settings">
                 <div className="version-label">{this.props.version}</div>
-                <div className="settings-header">
-                    <img src={fcLogo} alt="FC" className="settings-header-logo" />
-                </div>
                 <div className="settings-halfspacer" />
                 <div className="settings-content">
                     {this.props.state
@@ -198,43 +295,58 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                         <Form className="settings-content-container-pid" onSubmit={this.savePidSettings}>
                             <div className='settings-content-container-pid-datarow'>
                                 <div className='settings-content-container-pid-datarow-spacer' />
-                                <div className='settings-content-container-pid-datarow-content'>
-                                    <FormItem
-                                        label={`Propertional Band`}
-                                    >
-                                        <InputNumber
-                                            min={0.1}
-                                            max={999.9}
-                                            defaultValue={this.props.p}
-                                            value={this.state.p}
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                            onChange={(value) => { this.handlePidValueChange('P', value as number); }}
-                                        />
-                                    </FormItem>
-                                    <FormItem
-                                        label={`Integral Time`}
-                                    >
-                                        <InputNumber
-                                            min={0}
-                                            max={9999}
-                                            defaultValue={this.props.i}
-                                            value={this.state.i}
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                            onChange={(value) => { this.handlePidValueChange('I', value as number); }}
-                                        />
-                                    </FormItem>
-                                    <FormItem
-                                        label={`Derivative Time`}
-                                    >
-                                        <InputNumber
-                                            min={0}
-                                            max={9999}
-                                            defaultValue={this.props.d}
-                                            value={this.state.d}
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                            onChange={(value) => { this.handlePidValueChange('D', value as number); }}
-                                        />
-                                    </FormItem>
+                                <div className='settings-content-container-pid-datarow-container'>
+                                    <div className='settings-content-container-pid-datarow-header'>
+                                        <FormItem label='Profile' className="settings-content-container-pid-datarow-header-title">
+                                            { // tslint:disable-next-line:jsx-no-lambda
+                                            <Select value={this.state.profile} labelInValue={false} onChange={(value) => { this.handleProfileChange(value as string); }}>
+                                                <Option key='' value=''>-New-</Option>
+                                                {Object.keys(this.props.profiles).map((profile: string) => {
+                                                    // tslint:disable-next-line:no-unused-expression
+                                                    return <Option key={profile} value={profile}>{profile}</Option>;
+                                                })}                                               
+                                            </Select>
+                                            }
+                                        </FormItem>
+                                    </div>
+                                    <div className='settings-content-container-pid-datarow-content'>
+                                        <FormItem
+                                            label={`Propertional Band`}
+                                        >
+                                            <InputNumber
+                                                min={0.1}
+                                                max={999.9}
+                                                defaultValue={this.props.p}
+                                                value={this.state.p}
+                                                // tslint:disable-next-line:jsx-no-lambda
+                                                onChange={(value) => { this.handlePidValueChange('P', value as number); }}
+                                            />
+                                        </FormItem>
+                                        <FormItem
+                                            label={`Integral Time`}
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                max={9999}
+                                                defaultValue={this.props.i}
+                                                value={this.state.i}
+                                                // tslint:disable-next-line:jsx-no-lambda
+                                                onChange={(value) => { this.handlePidValueChange('I', value as number); }}
+                                            />
+                                        </FormItem>
+                                        <FormItem
+                                            label={`Derivative Time`}
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                max={9999}
+                                                defaultValue={this.props.d}
+                                                value={this.state.d}
+                                                // tslint:disable-next-line:jsx-no-lambda
+                                                onChange={(value) => { this.handlePidValueChange('D', value as number); }}
+                                            />
+                                        </FormItem>
+                                    </div>
                                 </div>
                                 <div className='settings-content-container-pid-datarow-spacer' />
                             </div>
@@ -243,11 +355,20 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                     type="primary"
                                     htmlType="submit"
                                     disabled={
-                                        ((this.state.p === this.state.start.p) && (this.state.i === this.state.start.i) && (this.state.d === this.state.start.d))
-                                        || this.props.state.tuning
+                                        (((this.state.p === this.state.start.p) && (this.state.i === this.state.start.i) && (this.state.d === this.state.start.d))
+                                        || this.props.state.tuning) && (this.state.profile !== '')
                                     }
                                 >
-                                    Save
+                                    Save/Select
+                                </Button>
+                                &nbsp;&nbsp;
+                                <Button
+                                    type="primary"
+                                    htmlType="button"
+                                    disabled={this.state.profile === ''}
+                                    onClick={this.deleteProfile}
+                                >
+                                    Delete
                                 </Button>
                                 &nbsp;&nbsp;
                                 <Button

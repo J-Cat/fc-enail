@@ -21,7 +21,7 @@ import { IEnailStore } from '../../models/IEnailStore';
 import Settings from './settings';
 import { IEnailEmitState } from '../../models/IEnailEmitState';
 import { ISavedState } from '../../models/ISavedState';
-import { persistSavedState, toggleTuning, savePidSettings } from '../../reducers/enailReducer';
+import { persistSavedState, toggleTuning, savePidSettings, deleteProfile } from '../../reducers/enailReducer';
 import { IPidSettings } from '../../models/IPidSettings';
 
 export namespace SettingsProps {
@@ -32,12 +32,17 @@ export namespace SettingsProps {
         readonly p: number;
         readonly i: number;
         readonly d: number;
+        readonly profile: string;
+        readonly profiles: {
+            [profile: string]: IPidSettings;
+        };
     }
 
     export interface IDispatchProps {
         persistSavedState: (savedState: ISavedState) => void;
         toggleTuning: () => void;
         savePidSettings: (settings: IPidSettings) => void;
+        deleteProfile: (profile: string) => void;
     }
 
     export interface IOwnProps {
@@ -61,7 +66,9 @@ export namespace SettingsProps {
             readonly p: number;
             readonly i: number;
             readonly d: number;
+            readonly profile: string;
         }
+        readonly profile: string;
     }
 }
 
@@ -72,7 +79,9 @@ function mapStateToProps(state: IEnailStore, ownProps: SettingsProps.IOwnProps) 
         p: state.enail.emitState ? state.enail.emitState.p : 0,
         i: state.enail.emitState ? state.enail.emitState.i : 0,
         d: state.enail.emitState ? state.enail.emitState.d : 0,
-        presets: state.enail.presets
+        presets: state.enail.presets,
+        profile: state.enail.emitState ? state.enail.emitState.profile || '' : state.enail.profiles.currentProfile || '',
+        profiles: state.enail.profiles.profiles
     };
 }
 
@@ -80,7 +89,8 @@ function mapDispatchToProps(dispatch: (...args: any[]) => void) {
     return {
         persistSavedState: (savedState: ISavedState) => dispatch(persistSavedState(savedState)),
         toggleTuning: () => dispatch(toggleTuning()),
-        savePidSettings: (settings: IPidSettings) => dispatch(savePidSettings(settings))
+        savePidSettings: (settings: IPidSettings) => dispatch(savePidSettings(settings)),
+        deleteProfile: (profile: string) => dispatch(deleteProfile(profile))
     };
 }
 

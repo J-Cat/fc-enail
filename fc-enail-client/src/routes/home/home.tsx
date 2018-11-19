@@ -73,8 +73,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     }
 
     getSPDialog = () => {
-        const modal = Modal.prompt('Set Point', 'Please enter the desired set point temperature.', [
-          {
+        const modal = Modal.prompt('Set Point', 'Please enter the desired set point temperature.', [{
             text: 'Ok',
             onPress: (value: string) => {
                 return new Promise<number>((resolve, reject) => {
@@ -91,8 +90,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                     }, 1000);
                 })
             },
-        },
-        {
+        }, {
             text: 'Cancel',
             onPress: () => { 
                 return new Promise<string>((resolve, reject) => {
@@ -103,7 +101,9 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                     }, 1000);
                 })},
             },
-        ] as Array<Action<string>>, 'default', this.props.state ? this.props.state.sp.toString() : '', ['input your name']);
+        ] as Array<Action<string>>, 
+        'default', 
+        this.props.state ? this.props.state.sp.toString() : '', ['input your name']);
     }
 
     toggleState = () => {

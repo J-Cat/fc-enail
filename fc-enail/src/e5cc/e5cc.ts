@@ -39,7 +39,7 @@ class E5CC {
             switch (m.type) {
                 case 'DATA': {
                     if (this.isTuning !== m.isTuning) {
-                        store.dispatch(getPidSettings());
+                        store.dispatch(getPidSettings(true));
                     }
                     
                     this.pv = m.pv as number;

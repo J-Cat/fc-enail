@@ -1,5 +1,6 @@
 import { IEnailEmitState } from './IEnailEmitState';
 import { IEnailScript } from './IEnailScript';
+import { ISavedProfiles } from './ISavedProfiles';
 
 export interface IEnailState {
     readonly connected: boolean;
@@ -12,4 +13,5 @@ export interface IEnailState {
     readonly error?: boolean;
     readonly message?: string;
     readonly token: string;
+    readonly profiles: ISavedProfiles;
 }

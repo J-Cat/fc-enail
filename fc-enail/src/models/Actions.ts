@@ -19,8 +19,9 @@ import { ISavedState } from './ISavedState';
 import { IWpaCliStatus, IWpaScanResult } from 'wireless-tools';
 import { IOledState } from './IOledState';
 import { IPidSettings } from './IPidSettings';
+import { ISavedProfiles } from './ISavedProfiles';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction | IUpdatePidSettingsAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction | IUpdatePidSettingsAction | IProfileAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
@@ -39,6 +40,10 @@ export interface IE5CCUpdateStateAction extends Action<string> {
 
 export interface IUserStateAction extends Action<string> {
     payload?: ISavedState;
+}
+
+export interface IProfileAction extends Action<string> {
+    payload?: ISavedProfiles;
 }
 
 export interface INetworkInfoAction extends Action<string> {

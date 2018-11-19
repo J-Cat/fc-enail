@@ -34,6 +34,7 @@ import { ISavedState } from '../models/ISavedState';
 import { config } from '../config';
 import { IOledState } from '../models/IOledState';
 import { IPidSettings } from '../models/IPidSettings';
+import { ISavedProfiles } from '../models/ISavedProfiles';
 
 const debug = Debug('fc-enail:reducer');
 
@@ -80,6 +81,9 @@ const initialState: IEnailState = {
     currentScript: scripts.length > 0 ? scripts[0] : undefined,
     currentStep: scripts.length > 0 ? scripts[0].step : undefined,
     presets: [],
+    profiles: {
+        profiles: {}
+    },
     scriptStartTime: 0,
     passphrase: '',
     icon: 'home',
@@ -122,9 +126,10 @@ export const updateAllState = (pv: number, sp: number, isRunning: boolean, isTun
     }
 }
 
-export const getPidSettings = () => {
+export const getPidSettings = (clearSelectedProfile = false) => {
     return {
-        type: Constants.E5CC_GET_PID_SETTINGS
+        type: Constants.E5CC_GET_PID_SETTINGS,
+        payload: clearSelectedProfile
     };
 }
 
@@ -133,6 +138,13 @@ export const savePidSettings = (settings: IPidSettings) => {
         type: Constants.E5CC_SAVE_PID_SETTINGS,
         payload: settings
     };
+}
+
+export const deleteProfile = (profile: string) => {
+    return {
+        type: Constants.DELETE_PROFILE,
+        payload: profile
+    }
 }
 
 export const updateP = (value: number) => {
@@ -321,6 +333,40 @@ export const persistSavedState = (savedState: ISavedState) => {
                 dispatch({
                     type: Constants.PERSIST_SAVED_STATE,
                     payload: savedState
+                });
+            }
+        });
+    };
+}
+
+export const loadProfiles = () => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        fs.readFile(config.files.savedProfiles, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
+            if (err) {
+                dispatch({
+                    type: Constants.LOAD_SAVED_PROFILES,
+                    payload: {
+                        profiles: {}
+                    } as ISavedProfiles
+                });
+            } else {
+                const savedProfiles: ISavedProfiles = JSON.parse(data);
+                dispatch({
+                    type: Constants.LOAD_SAVED_PROFILES,
+                    payload: savedProfiles
+                });
+            }
+        });
+    };
+}
+
+export const persistProfiles = (savedProfiles: ISavedProfiles) => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        fs.writeFile(config.files.savedProfiles, JSON.stringify(savedProfiles), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+            if (!err) {
+                dispatch({
+                    type: Constants.PERSIST_SAVED_PROFILES,
+                    payload: savedProfiles
                 });
             }
         });
@@ -564,6 +610,31 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.LOAD_SAVED_PROFILES: {
+            const profiles = action.payload as ISavedProfiles;
+
+            // if (!profiles.currentProfile && profiles.profiles.length === 0) {
+            //     profiles.profiles.push({
+            //         title: '',
+            //         p: state.p,
+            //         i: state.i,
+            //         d: state.d
+            //     });
+            // }
+
+            return {
+                ...state,
+                profiles
+            };
+        }
+
+        case Constants.PERSIST_SAVED_PROFILES: {
+            return {
+                ...state,
+                profiles: action.payload as ISavedProfiles
+            }
+        }
+
         case Constants.PASSPHRASE_GENERATE: {
             return {
                 ...state,
@@ -593,11 +664,52 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
         case Constants.E5CC_SAVE_PID_SETTINGS: {
             const pid = action.payload as IPidSettings;
+            let profiles = state.profiles.profiles;
+            if (pid.title !== '') {
+                profiles = {
+                    ...profiles,
+                    [pid.title]: pid
+                };
+            }
+
             return {
                 ...state,
+                profiles: {
+                    currentProfile: pid.title,
+                    profiles,
+                },
                 p: pid.p,
                 i: pid.i,
                 d: pid.d
+            };
+        }
+
+        case Constants.E5CC_GET_PID_SETTINGS: {
+            if (action.payload as boolean) {
+                return {
+                    ...state,
+                    profiles: {
+                        currentProfile: undefined,
+                        profiles: state.profiles.profiles
+                    }
+                };
+            } else {
+                return state;
+            }
+        }
+
+        case Constants.DELETE_PROFILE: {
+            if (!state.profiles) {
+                return state;
+            }
+            const profile = action.payload as string;
+            const { [profile]: removedValue, ...newProfiles } = state.profiles.profiles;
+            return {
+                ...state,
+                profiles: {
+                    currentProfile: state.profiles.currentProfile ? state.profiles.currentProfile === profile ? undefined : state.profiles.currentProfile : undefined,
+                    profiles: newProfiles
+                }
             };
         }
 

@@ -18,7 +18,7 @@ import { Dispatch, Store } from 'redux';
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { nextStep } from '../reducers/enailReducer';
+import { nextStep, persistProfiles } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import led from '../ui/led';
 import server from '../server/server';
@@ -72,12 +72,12 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
 
         case Constants.E5CC_TOGGLE_STATE: {
             e5cc.toggleState();
-            return;
+            break;
         }
 
         case Constants.E5CC_TOGGLE_TUNE: {
             e5cc.toggleTune();
-            return;
+            break;
         }
 
         case Constants.E5CC_GET_PID_SETTINGS: {
@@ -86,7 +86,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
                 Constants.E5CC.VARIABLES.I,
                 Constants.E5CC.VARIABLES.D
             ]);
-            return;
+            break;
         }
 
         case Constants.E5CC_SAVE_PID_SETTINGS: {
@@ -96,7 +96,13 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
                 { address: Constants.E5CC.VARIABLES.I, value: pid.i },
                 { address: Constants.E5CC.VARIABLES.D, value: pid.d }
             ]);
-            return;
+            store.dispatch<any>(persistProfiles(store.getState().enail.profiles));
+            break;
+        }
+
+        case Constants.DELETE_PROFILE: {
+            store.dispatch<any>(persistProfiles(store.getState().enail.profiles));
+            break;
         }
     }
 
