@@ -115,11 +115,15 @@ export class Server {
             pv: state.presentValue,
             sp: state.setPoint,
             running: state.running,
+            tuning: state.tuning,
             scriptRunning: state.scriptRunning,
             currentScript: state.currentScript ? state.currentScript.index : undefined,
             currentStep: state.currentStep ? state.currentStep.key : undefined,
             currentStepPos: state.currentStepPos,
-            mode: state.mode
+            mode: state.mode,
+            p: state.p,
+            i: state.i,
+            d: state.d
         };
 
         this.io.emit(Constants.EMIT_STATE, emitState);

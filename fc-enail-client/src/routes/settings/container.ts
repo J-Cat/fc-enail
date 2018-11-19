@@ -21,17 +21,23 @@ import { IEnailStore } from '../../models/IEnailStore';
 import Settings from './settings';
 import { IEnailEmitState } from '../../models/IEnailEmitState';
 import { ISavedState } from '../../models/ISavedState';
-import { persistSavedState } from '../../reducers/enailReducer';
+import { persistSavedState, toggleTuning, savePidSettings } from '../../reducers/enailReducer';
+import { IPidSettings } from '../../models/IPidSettings';
 
 export namespace SettingsProps {
     export interface IStateProps {
         readonly version: string;
         readonly state?: IEnailEmitState;
         readonly presets: number[];
+        readonly p: number;
+        readonly i: number;
+        readonly d: number;
     }
 
     export interface IDispatchProps {
         persistSavedState: (savedState: ISavedState) => void;
+        toggleTuning: () => void;
+        savePidSettings: (settings: IPidSettings) => void;
     }
 
     export interface IOwnProps {
@@ -48,6 +54,14 @@ export namespace SettingsProps {
                 errorMsg: string|undefined;    
             }
         };
+        readonly p: number;
+        readonly i: number;
+        readonly d: number;
+        readonly start: {
+            readonly p: number;
+            readonly i: number;
+            readonly d: number;
+        }
     }
 }
 
@@ -55,6 +69,9 @@ function mapStateToProps(state: IEnailStore, ownProps: SettingsProps.IOwnProps) 
     return {
         version: state.version.version,
         state: state.enail.emitState,
+        p: state.enail.emitState ? state.enail.emitState.p : 0,
+        i: state.enail.emitState ? state.enail.emitState.i : 0,
+        d: state.enail.emitState ? state.enail.emitState.d : 0,
         presets: state.enail.presets
     };
 }
@@ -62,6 +79,8 @@ function mapStateToProps(state: IEnailStore, ownProps: SettingsProps.IOwnProps) 
 function mapDispatchToProps(dispatch: (...args: any[]) => void) {
     return {
         persistSavedState: (savedState: ISavedState) => dispatch(persistSavedState(savedState)),
+        toggleTuning: () => dispatch(toggleTuning()),
+        savePidSettings: (settings: IPidSettings) => dispatch(savePidSettings(settings))
     };
 }
 

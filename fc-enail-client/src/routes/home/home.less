@@ -149,6 +149,32 @@
                         background-color: #AAA !important;
                     }
                 }
+
+                &-badge {
+                    .am-badge-text {
+                        background-color: @warning-color;
+                        color: @text-color;
+                        font-weight: bold;
+                        animation: blinking 1s infinite;
+                        @keyframes blinking {
+                            0% {
+                                opacity: 0;
+                            }
+                            25% {
+                                opacity: 0.5;
+                            }
+                            50% {
+                                opacity: 1;
+                            }
+                            75% {
+                                opacity: 0.5;
+                            }
+                            100% {
+                                opacity: 0;
+                            }
+                        }
+                    }
+                }
             }
         }
 

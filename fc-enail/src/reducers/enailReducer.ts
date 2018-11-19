@@ -17,7 +17,7 @@ import { Dispatch, Action } from 'redux';
 import * as fs from 'fs';
 
 import { IEnailState, Direction, EnailMode } from '../models/IEnailState';
-import { EnailAction, IBasicAction, IE5CCUpdateStateAction } from '../models/Actions';
+import { EnailAction, IBasicAction, IE5CCUpdateStateAction, ISetIconAction } from '../models/Actions';
 import * as Constants from '../models/constants';
 import e5cc from '../e5cc/e5cc';
 import { IEnailScript } from '../models/IEnailScript';
@@ -33,6 +33,7 @@ import Debug from 'debug';
 import { ISavedState } from '../models/ISavedState';
 import { config } from '../config';
 import { IOledState } from '../models/IOledState';
+import { IPidSettings } from '../models/IPidSettings';
 
 const debug = Debug('fc-enail:reducer');
 
@@ -64,6 +65,7 @@ const initialState: IEnailState = {
     setPoint: 0,
     presentValue: 0,
     running: false,
+    tuning: false,
     connected: false,
     ready: false,
     lastDirection: Direction.None,
@@ -81,7 +83,10 @@ const initialState: IEnailState = {
     scriptStartTime: 0,
     passphrase: '',
     icon: 'home',
-    flashRate: 0
+    flashRate: 0,
+    p: 0,
+    i: 0,
+    d: 0
 };
 
 export const updateSetPoint = (value: number) => {
@@ -105,21 +110,56 @@ export const moveSetPoint = (offset: number) => {
     };
 }
 
-export const updateAllState = (pv: number, sp: number, isRunning: boolean) => {
+export const updateAllState = (pv: number, sp: number, isRunning: boolean, isTuning: boolean) => {
     return {
         type: Constants.E5CC_UPDATE_ALL_STATE,
         payload: {
             pv,
             sp,
-            isRunning
+            isRunning,
+            isTuning
         }
     }
+}
+
+export const getPidSettings = () => {
+    return {
+        type: Constants.E5CC_GET_PID_SETTINGS
+    };
+}
+
+export const savePidSettings = (settings: IPidSettings) => {
+    return {
+        type: Constants.E5CC_SAVE_PID_SETTINGS,
+        payload: settings
+    };
+}
+
+export const updateP = (value: number) => {
+    return {
+        type: Constants.E5CC_UPDATE_P,
+        payload: value
+    };
+}
+
+export const updateI = (value: number) => {
+    return {
+        type: Constants.E5CC_UPDATE_I,
+        payload: value
+    };
+}
+
+export const updateD = (value: number) => {
+    return {
+        type: Constants.E5CC_UPDATE_D,
+        payload: value
+    };
 }
 
 export const increaseCurrentScript = () => {
     return {
         type: Constants.SCRIPT_INCREASE
-    }
+    };
 }
 
 export const decreaseCurrentScript = () => {
@@ -144,6 +184,12 @@ export const updateState = (value: boolean) => {
 export const toggleState = () => {
     return {
         type: Constants.E5CC_TOGGLE_STATE
+    };
+}
+
+export const toggleTune = () => {
+    return {
+        type: Constants.E5CC_TOGGLE_TUNE
     };
 }
 
@@ -348,6 +394,27 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.E5CC_UPDATE_P: {
+            return {
+                ...state,
+                p: action.payload as number
+            }
+        }
+
+        case Constants.E5CC_UPDATE_I: {
+            return {
+                ...state,
+                i: action.payload as number
+            }
+        }
+
+        case Constants.E5CC_UPDATE_D: {
+            return {
+                ...state,
+                d: action.payload as number
+            }
+        }
+
         case Constants.E5CC_READY: {
             return {
                 ...state,
@@ -437,10 +504,36 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 return state;
             }
 
-            return {
+            const mode = action.payload as EnailMode;
+            let newState = {
                 ...state,
-                mode: action.payload as EnailMode
+                mode
+            };
+
+            switch (mode) {
+                case EnailMode.Script: {
+                    newState = {
+                        ...newState,
+                        icon: 'script'
+                    };
+                    break;
+                }
+                case EnailMode.Settings: {
+                    newState = {
+                        ...newState,
+                        icon: 'gear'
+                    };
+                    break;
+                }
+                default: {
+                    newState = {
+                        ...newState,
+                        icon: 'home'
+                    };
+                    break;
+                }
             }
+            return newState;
         }
 
         case Constants.E5CC_UPDATE_ALL_STATE: {
@@ -452,7 +545,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 presentValue: (action as IE5CCUpdateStateAction).payload!.pv,
                 setPoint: state.setPoint === 0 || state.ready ? (action as IE5CCUpdateStateAction).payload!.sp : state.setPoint,
-                running: (action as IE5CCUpdateStateAction).payload!.isRunning
+                running: (action as IE5CCUpdateStateAction).payload!.isRunning,
+                tuning: (action as IE5CCUpdateStateAction).payload!.isTuning
             };
         }
 
@@ -492,7 +586,18 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.SET_ICON: {
             return {
                 ...state,
-                icon: action.payload as string
+                icon: (action as ISetIconAction).payload!.icon,
+                flashRate: (action as ISetIconAction).payload!.flashRate
+            };
+        }
+
+        case Constants.E5CC_SAVE_PID_SETTINGS: {
+            const pid = action.payload as IPidSettings;
+            return {
+                ...state,
+                p: pid.p,
+                i: pid.i,
+                d: pid.d
             };
         }
 

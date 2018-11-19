@@ -9,6 +9,7 @@ import { E5CC as Constants } from '../models/constants';
 const { VARIABLES, COMMANDS, FLAGS } = Constants;
 
 import { config } from '../config';
+import { SequentialTaskQueue } from 'sequential-task-queue';
 
 const CONNECT_DELAY = 250;
 
@@ -17,6 +18,10 @@ let _options: IE5CCOptions = config.options.e5cc;
 let errorCount = 0;
 let fetchTimeout: NodeJS.Timeout;
 let lastUpdated = 0;
+const taskQueue = new SequentialTaskQueue({
+    timeout: 10000
+});
+
 const _client = new ModbusRtu();
 
 const connect = (options?: IE5CCOptions): Promise<void> => {
@@ -50,7 +55,9 @@ export const read = async (address: number, retry: number = 3, args: any = {}): 
     } catch (e) {
         debug(e);
     }
+    debug(`Read Result, ${address} = ${result}`);
     if (send) {
+        debug(`Sending, ${address} = ${result}`);
         send({
             type: 'READCOMPLETE',
             address,
@@ -155,93 +162,116 @@ const executeRun = async (command: number, retry: number, retryCount: number = 0
 }
 
 const getE5CCState = () => {
-    new Promise(async (resolve, reject) => {
-        debug('Start');
-        if ((Date.now() - lastUpdated) < config.options.monitorCycleTime) {
-            resolve();
-            return;
-        }
-
-        // timeout and reject if it takes way too long
-        fetchTimeout = setTimeout(() => {
-            reject();
-        }, config.options.monitorCycleTime*5);
-
-        try {
-            debug('Get data');
-            const pv = await read(VARIABLES.PRESENTVALUE, 1, {});
-            const sp = await read(VARIABLES.SETPOINT, 1, {});
-            const runningValue = await read(VARIABLES.STATUS, 1, {});
-            const running = runningValue ? (runningValue & FLAGS.RUNNING) === 0 : false;
-
-            debug(`Got -> ${sp}, ${pv}, ${running}`);
-            if (send && sp && pv) {
-                debug(`Sending -> ${sp}, ${pv}, ${running}`);
-                send({
-                    type: 'DATA',
-                    pv,
-                    sp,
-                    isRunning: running
-                });
+    taskQueue.push(() => {
+        new Promise(async (resolve, reject) => {
+            debug('Start');
+            if ((Date.now() - lastUpdated) < config.options.monitorCycleTime) {
+                resolve();
+                return;
             }
-            lastUpdated = Date.now();
-            resolve();
-        } catch (e) {
-            debug(e);
-            reject();
-        }
-    }).then(() => {
-        debug('no errors');
-        errorCount = 0;
-        new Promise(resolve => {
-            setTimeout(() => {resolve();}, config.options.monitorCycleTime);
+
+            // timeout and reject if it takes way too long
+            fetchTimeout = setTimeout(() => {
+                reject();
+            }, config.options.monitorCycleTime*5);
+
+            try {
+                debug('Get data');
+                const pv = await read(VARIABLES.PRESENTVALUE, 1, {});
+                const sp = await read(VARIABLES.SETPOINT, 1, {});
+                const status = await read(VARIABLES.STATUS, 1, {});
+                const running = status ? (status & FLAGS.STOPPED) === 0 : false;
+                const tuning = status ? (status & FLAGS.TUNING) !== 0 : false;
+
+                debug(`Got -> ${sp}, ${pv}, ${running}`);
+                if (send && sp && pv) {
+                    debug(`Sending -> ${sp}, ${pv}, ${running}`);
+                    send({
+                        type: 'DATA',
+                        pv,
+                        sp,
+                        isRunning: running,
+                        isTuning: tuning
+                    });
+                }
+                lastUpdated = Date.now();
+                resolve();
+            } catch (e) {
+                debug(e);
+                reject();
+            }
         }).then(() => {
-            getE5CCState();
-        });
-    }).catch(() => {
-        debug(`error count = ${errorCount}`);
-        errorCount += 1;
-        if (errorCount < 10) {
+            debug('no errors');
+            errorCount = 0;
             new Promise(resolve => {
                 setTimeout(() => {resolve();}, config.options.monitorCycleTime);
             }).then(() => {
                 getE5CCState();
             });
-        } else {
-            clearTimeout(fetchTimeout);
-            new Promise(resolve => {
-                setTimeout(() => {resolve();}, config.options.monitorCycleTime*2);
-            }).then(() => {
-                close().then(() => {
-                    connect().then(() => {
-                        getE5CCState();
-                    });
-                })
-            });
-        }
+        }).catch(() => {
+            debug(`error count = ${errorCount}`);
+            errorCount += 1;
+            if (errorCount < 10) {
+                new Promise(resolve => {
+                    setTimeout(() => {resolve();}, config.options.monitorCycleTime);
+                }).then(() => {
+                    getE5CCState();
+                });
+            } else {
+                clearTimeout(fetchTimeout);
+                new Promise(resolve => {
+                    setTimeout(() => {resolve();}, config.options.monitorCycleTime*2);
+                }).then(() => {
+                    close().then(() => {
+                        connect().then(() => {
+                            getE5CCState();
+                        });
+                    })
+                });
+            }
+        });
     });
 }
 
-connect(_options).then(() => {
+connect(_options).then(async () => {
     debug('connect');
+    await read(Constants.VARIABLES.P);
+    await read(Constants.VARIABLES.I);
+    await read(Constants.VARIABLES.D);
     getE5CCState();
 });
 
 process.on('message', async m => {
-    switch (m.type) {
-        case 'READ': {
-            const value = await read(m.address as number, m.retry as number, m.args)
-            break;
-        }
-
-        case 'WRITE': {
-            const value = await write(m.address as number, m.value as number, m.retry as number, m.args);
-            break;
-        }
-
-        case 'RUN': {
-            const value = await run(m.command as number, m.retry as number, m.args);
-            break;
-        }
-    }
+    taskQueue.push(async () => {
+        switch (m.type) {
+            case 'READ': {
+                const value = await read(m.address as number, m.retry as number, m.args)
+                break;
+            }
+    
+            case 'READBATCH': {
+                for (let address of m.addressList) {
+                    await read(address as number, m.retry as number, m.args);
+                }
+                break;
+            }
+    
+            case 'WRITE': {
+                const value = await write(m.address as number, m.value as number, m.retry as number, m.args);
+                break;
+            }
+    
+            case 'WRITEBATCH': {
+                for (let value of m.data) {
+                    await write(value.address as number, value.value as number, m.retry as number, m.args);
+                }
+                break;
+            }
+    
+            case 'RUN': {
+                const value = await run(m.command as number, m.retry as number, m.args);
+                break;
+            }
+        }    
+    })
 });

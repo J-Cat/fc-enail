@@ -19,12 +19,18 @@ export const APPLICATION_TITLE = 'FC E-Nail';
 export const E5CC_CONNECT = 'ENAIL/E5CC/CONNECT';
 export const E5CC_CONNECTED = 'ENAIL/E5CC/CONNECTED';
 export const E5CC_UPDATE_SETPOINT = 'ENAIL/E5CC/UPDATE_SETPOINT';
+export const E5CC_UPDATE_P = 'ENAIL/E5CC/UPDATE_P';
+export const E5CC_UPDATE_I = 'ENAIL/E5CC/UPDATE_I';
+export const E5CC_UPDATE_D = 'ENAIL/E5CC/UPDATE_D';
 export const E5CC_SET_SETPOINT = 'ENAIL/E5CC/SET_SETPOINT';
 export const E5CC_MOVE_SETPOINT = 'ENAIL/E5CC/MOVE_SETPOINT';
 export const E5CC_UPDATE_STATE = 'ENAIL/E5CC/UPDATE_STATE';
 export const E5CC_UPDATE_ALL_STATE = 'ENAIL/E5CC/UPDATE_ALL_STATE';
 export const E5CC_TOGGLE_STATE = 'ENAIL/E5CC/TOGGLE_STATE';
+export const E5CC_TOGGLE_TUNE = 'ENAIL/E5CC/TOGGLE_TUNE';
 export const E5CC_READY = 'ENAIL/E5CC/READY';
+export const E5CC_GET_PID_SETTINGS = 'ENAIL/E5CC/GET_PID_SETTINGS';
+export const E5CC_SAVE_PID_SETTINGS = 'ENAIL/E5CC/SAVE_PID_SETTINGS';
 
 export const SCRIPT_RUN = 'ENAIL/SCRIPT/RUN';
 export const SCRIPT_END = 'ENAIL/SCRIPT/END';
@@ -34,6 +40,7 @@ export const SET_CURRENT_SCRIPT = 'ENAIL/SCRIPT/SET';
 
 export const RUN_STEP = 'ENAIL/STEP/RUN';
 export const NEXT_STEP = 'ENAIL/STEP/NEXT';
+
 export const STEP_PARALLEL = 'parallel';
 export const STEP_LOOP = 'loop';
 export const STEP_FEEDBACK = 'feedback';
@@ -109,14 +116,21 @@ export const E5CC = {
         RUN: 0x0000,
         STOP: 0x0101,
         START: 0x0100,
+        TUNE_100: 0x0301,
+        TUNE_40: 0x0302,
+        TUNE_CANCEL: 0X0300
 
     },
     VARIABLES: {
         SETPOINT: 0x2103,
         PRESENTVALUE: 0x2000,
-        STATUS: 0x2407
+        STATUS: 0x2407,
+        P: 0x2A00,
+        I: 0x2A01,
+        D: 0x2A02
     },
     FLAGS: {
-        RUNNING: 256
+        STOPPED: 256,
+        TUNING: 128
     }
 }

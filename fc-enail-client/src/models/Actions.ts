@@ -3,6 +3,7 @@ import { IEnailEmitState } from './IEnailEmitState';
 import { IEnailScript } from './IEnailScript';
 import { ISavedState } from './ISavedState';
 import { IVerifyTokenResponse } from './IVerifyTokenResponse';
+import { IPidSettings } from './IPidSettings';
 
 export type EnailAction = IErrorAction | IBasicAction | IEnailEmitStateAction;
 
@@ -14,7 +15,7 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IBasicAction extends Action<string> {
-    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse;
+    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings;
     meta?: string;
 }
 

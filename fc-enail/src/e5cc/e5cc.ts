@@ -15,7 +15,7 @@
  */
 import Debug from 'debug';
 import store from '../store/createStore';
-import { updateAllState, setReady, nextStep } from '../reducers/enailReducer';
+import { updateAllState, setReady, nextStep, updateP, updateD, updateI, getPidSettings } from '../reducers/enailReducer';
 import { fork, ChildProcess } from 'child_process';
 import * as Constants from '../models/constants';
 const debug = Debug('fc-enail:e5cc');
@@ -23,9 +23,13 @@ const debug = Debug('fc-enail:e5cc');
 class E5CC {  
     private e5ccService: ChildProcess;
     private isRunning: boolean = false;
+    private isTuning: boolean = false;
     private sp: number = 0;
     private pv: number = 0;
     private started: boolean = false;
+    private p: number = 0;
+    private i: number = 0;
+    private d: number = 0;
 
     constructor() {
         this.e5ccService = fork(`${__dirname}/service.js`);
@@ -34,17 +38,39 @@ class E5CC {
             debug(m);
             switch (m.type) {
                 case 'DATA': {
+                    if (this.isTuning !== m.isTuning) {
+                        store.dispatch(getPidSettings());
+                    }
+                    
                     this.pv = m.pv as number;
                     this.sp = m.sp as number;
                     this.isRunning = m.isRunning as boolean
+                    this.isTuning = m.isTuning;
                     this.started = true;
-                    store.dispatch(updateAllState(m.pv, m.sp, m.isRunning));        
+                    store.dispatch(updateAllState(m.pv, m.sp, m.isRunning, m.isTuning));        
                     break;
                 }
 
                 case 'READCOMPLETE': {
                     if (m.console) {
-                        console.log(m.result);
+                        console.log(`${m.address} = ${m.result}`);
+                    }
+                    switch (m.address) {
+                        case Constants.E5CC.VARIABLES.P: {
+                            this.p = m.result as number;
+                            store.dispatch(updateP(this.p));
+                            break;
+                        }
+                        case Constants.E5CC.VARIABLES.I: {
+                            this.i = m.result as number;
+                            store.dispatch(updateI(this.i));
+                            break;
+                        }
+                        case Constants.E5CC.VARIABLES.D: {
+                            this.d = m.result as number;
+                            store.dispatch(updateD(this.d));
+                            break;
+                        }
                     }
                     break;
                 }
@@ -74,8 +100,16 @@ class E5CC {
         this.e5ccService.send({ type: 'READ', address, retry, args });
     }
 
+    readBatch = (addressList: number[], retry: number = 3, args: any = {}) => {
+        this.e5ccService.send({ type: 'READBATCH', addressList, retry, args });
+    }
+
     write = (address: number, value: number, retry: boolean = true) => {
         this.e5ccService.send({ type: 'WRITE', address, value, retry });
+    }
+
+    writeBatch = (data: { address: number; value: number; }[], retry: boolean = true) => {
+        this.e5ccService.send({ type: 'WRITEBATCH', data, retry });
     }
 
     run = (command: number, args: any = {}) => {
@@ -100,12 +134,29 @@ class E5CC {
         }
     }
 
+    getIsTuning = () => {
+        if (this.started) {
+            return this.isTuning;
+        }
+    }
+
     start = () => {
         this.e5ccService.send({ type: 'RUN', command: Constants.E5CC.COMMANDS.START });
     }
 
     stop = () => {
         this.e5ccService.send({ type: 'RUN', command: Constants.E5CC.COMMANDS.STOP });
+    }
+
+    toggleTune = (percent: 40|100 = 100) => {
+        if (this.isTuning) {
+            this.e5ccService.send({ type: 'RUN', command: Constants.E5CC.COMMANDS.TUNE_CANCEL });
+        } else {
+            this.e5ccService.send({ 
+                type: 'RUN', 
+                command: percent === 100 ? Constants.E5CC.COMMANDS.TUNE_100 : Constants.E5CC.COMMANDS.TUNE_40
+            });
+        }
     }
 
     toggleState = async (): Promise<boolean> => {

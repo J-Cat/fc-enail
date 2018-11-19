@@ -1,9 +1,10 @@
 import * as HttpStatus from 'http-status-codes';
 import store from '../store/createStore';
 import { Request, Response, NextFunction } from 'express';
-import { setSP, toggleState, setCurrentScript, runScript, endScript, persistSavedState, generatePassphrase, verifyPassphrase, clearPassphrase } from '../reducers/enailReducer';
+import { setSP, toggleState, setCurrentScript, runScript, endScript, persistSavedState, generatePassphrase, verifyPassphrase, clearPassphrase, toggleTune, getPidSettings, savePidSettings } from '../reducers/enailReducer';
 import { ISavedState } from '../models/ISavedState';
 import { generateToken } from '../helpers/securityHelper';
+import { IPidSettings } from '../models/IPidSettings';
 
 export class EnailController {
     get = (req: Request, res: Response, next: NextFunction): void => {
@@ -22,6 +23,11 @@ export class EnailController {
 
     toggleState = (req: Request, res: Response, next: NextFunction): void => {
         store.dispatch<any>(toggleState());
+        res.sendStatus(HttpStatus.OK);
+    }
+
+    toggleTune = (req: Request, res: Response, next: NextFunction): void => {
+        store.dispatch<any>(toggleTune());
         res.sendStatus(HttpStatus.OK);
     }
 
@@ -46,6 +52,11 @@ export class EnailController {
 
     persistSavedState = (req: Request, res: Response, next: NextFunction): void => {
         store.dispatch<any>(persistSavedState(req.body as ISavedState));
+        res.sendStatus(HttpStatus.OK);
+    }
+
+    savePidSettings =  (req: Request, res: Response, next: NextFunction): void => {
+        store.dispatch<any>(savePidSettings(req.body as IPidSettings));
         res.sendStatus(HttpStatus.OK);
     }
 

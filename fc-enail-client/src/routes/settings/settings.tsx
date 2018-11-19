@@ -32,8 +32,45 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         super(props);
 
         this.state = {
-            presets: {}
+            presets: {},
+            p: this.props.p,
+            i: this.props.i,
+            d: this.props.d,
+            start: {
+                p: this.props.p,
+                i: this.props.i,
+                d: this.props.d
+            }
         };
+    }
+
+    static getDerivedStateFromProps(nextProps: SettingsProps.IProps, prevState: SettingsProps.IState) {
+        let newState = {};
+
+        if (nextProps.p !== prevState.start.p) {
+            newState = {
+                ...newState,
+                p: nextProps.p
+            };
+        }
+        if (nextProps.i !== prevState.start.i) {
+            newState = {
+                ...newState,
+                i: nextProps.i
+            };
+        }
+        if (nextProps.d !== prevState.start.d) {
+            newState = {
+                ...newState,
+                d: nextProps.d
+            };
+        }
+
+        if (newState === {}) {
+            return null;
+        } else {
+            return newState;
+        }
     }
 
     handlePresetChange = (index: number, value: number | string) => {
@@ -80,6 +117,38 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         });
     }
 
+    savePidSettings = (e: React.FormEvent) => {
+        e.preventDefault();
+        this.props.savePidSettings({
+            p: this.state.p,
+            i: this.state.i,
+            d: this.state.d
+        });
+        // this.props.
+    }
+
+    autoTune = (e: React.FormEvent) => {
+        e.preventDefault();
+        this.props.toggleTuning();
+    }
+
+    handlePidValueChange = (type: 'P'|'I'|'D', value: number) => {
+        switch (type) {
+            case 'P': {
+                this.setState({ p: value });
+                break;
+            }
+            case 'I': {
+                this.setState({ i: value });
+                break;
+            }
+            case 'D': {
+                this.setState({ d: value });
+                break;
+            }
+        }
+    }
+
     render() {
         return (
             <div className="settings">
@@ -91,10 +160,10 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                 <div className="settings-content">
                     {this.props.state
                     ? <div className="settings-content-container">
-                        <Form onSubmit={this.saveSettings}>
-                            <div className='settings-content-container-datarow'>
-                                <div className='settings-content-container-datarow-spaer' />
-                                <div className='settings-content-container-datarow-content'>
+                        <Form className="settings-content-container-presets" onSubmit={this.saveSettings}>
+                            <div className='settings-content-container-presets-datarow'>
+                                <div className='settings-content-container-presets-datarow-spacer' />
+                                <div className='settings-content-container-presets-datarow-content'>
                                     {this.props.presets.map((preset, index) => {
                                         return (
                                             <FormItem
@@ -114,15 +183,80 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                         );
                                     })}
                                 </div>
-                                <div className='settings-content-container-datarow-spaer' />
+                                <div className='settings-content-container-presets-datarow-spacer' />
                             </div>
-                            <FormItem className="settings-content-container-buttonrow">
+                            <FormItem className="settings-content-container-presets-buttonrow">
                                 <Button
                                     type="primary"
                                     htmlType="submit"
                                     disabled={!this.isValid()}
                                 >
                                     Save
+                                </Button>
+                            </FormItem>
+                        </Form>                    
+                        <Form className="settings-content-container-pid" onSubmit={this.savePidSettings}>
+                            <div className='settings-content-container-pid-datarow'>
+                                <div className='settings-content-container-pid-datarow-spacer' />
+                                <div className='settings-content-container-pid-datarow-content'>
+                                    <FormItem
+                                        label={`Propertional Band`}
+                                    >
+                                        <InputNumber
+                                            min={0.1}
+                                            max={999.9}
+                                            defaultValue={this.props.p}
+                                            value={this.state.p}
+                                            // tslint:disable-next-line:jsx-no-lambda
+                                            onChange={(value) => { this.handlePidValueChange('P', value as number); }}
+                                        />
+                                    </FormItem>
+                                    <FormItem
+                                        label={`Integral Time`}
+                                    >
+                                        <InputNumber
+                                            min={0}
+                                            max={9999}
+                                            defaultValue={this.props.i}
+                                            value={this.state.i}
+                                            // tslint:disable-next-line:jsx-no-lambda
+                                            onChange={(value) => { this.handlePidValueChange('I', value as number); }}
+                                        />
+                                    </FormItem>
+                                    <FormItem
+                                        label={`Derivative Time`}
+                                    >
+                                        <InputNumber
+                                            min={0}
+                                            max={9999}
+                                            defaultValue={this.props.d}
+                                            value={this.state.d}
+                                            // tslint:disable-next-line:jsx-no-lambda
+                                            onChange={(value) => { this.handlePidValueChange('D', value as number); }}
+                                        />
+                                    </FormItem>
+                                </div>
+                                <div className='settings-content-container-pid-datarow-spacer' />
+                            </div>
+                            <FormItem className="settings-content-container-pid-buttonrow">
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    disabled={
+                                        ((this.state.p === this.state.start.p) && (this.state.i === this.state.start.i) && (this.state.d === this.state.start.d))
+                                        || this.props.state.tuning
+                                    }
+                                >
+                                    Save
+                                </Button>
+                                &nbsp;&nbsp;
+                                <Button
+                                    type="primary"
+                                    htmlType="button"
+                                    onClick={this.autoTune}
+                                    disabled={!this.props.state.running}
+                                >
+                                    {this.props.state.tuning ? 'Cancel Tuning' : 'Auto-Tune'}
                                 </Button>
                             </FormItem>
                         </Form>                    

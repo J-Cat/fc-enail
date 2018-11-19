@@ -20,6 +20,7 @@ import { IStep } from './IStep';
     readonly setPoint: number;
     readonly presentValue: number;
     readonly running: boolean;
+    readonly tuning: boolean;
     readonly connected: boolean;
     readonly ready: boolean;
     readonly stepSize: number;
@@ -39,6 +40,9 @@ import { IStep } from './IStep';
     readonly passphrase: string;
     readonly icon: string;
     readonly flashRate: number;
+    readonly p: number;
+    readonly i: number;
+    readonly d: number;
 }
 
 export enum Direction {

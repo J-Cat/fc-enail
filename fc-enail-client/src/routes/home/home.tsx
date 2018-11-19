@@ -17,7 +17,7 @@ import * as React from 'react';
 import './home.less';
 
 import { HomeProps } from './container';
-import { Grid, Slider, Modal, Toast, Switch } from 'antd-mobile';
+import { Badge, Grid, Slider, Modal, Toast, Switch } from 'antd-mobile';
 import { Button } from 'antd';
 import { Action } from 'antd-mobile/lib/modal/PropsType';
 
@@ -180,6 +180,10 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                 <div className="home-content-body1-right">
                                     <div className='home-content-body1-right-spacer' />
                                     <Switch className="home-content-body1-right-switch" onChange={this.toggleState} checked={this.props.state.running} disabled={this.props.state === undefined} color="#A00000"  />
+                                    {this.props.state.tuning
+                                        ? <Badge text="TUNE" className="home-content-body1-right-badge" />
+                                        : ''
+                                    }
                                     <div className='home-content-body1-right-spacer' />
                                 </div>
                             </div>

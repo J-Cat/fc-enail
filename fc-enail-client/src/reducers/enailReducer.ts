@@ -9,6 +9,7 @@ import * as Constants from '../models/constants';
 import { IEnailEmitState } from 'src/models/IEnailEmitState';
 import { IEnailScript } from '../models/IEnailScript';
 import { IVerifyTokenResponse } from '../models/IVerifyTokenResponse';
+import { IPidSettings } from '../models/IPidSettings';
 
 const initialState: IEnailState = {
     serviceFound: false,
@@ -211,6 +212,42 @@ export const toggleState = () => {
     }
 }
 
+export const toggleTuning = () => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/autotune`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.AUTOTUNE_REQUEST,
+                Constants.AUTOTUNE_RESPONSE,
+                Constants.AUTOTUNE_ERROR
+            ]
+        }
+    }
+}
+
+export const savePidSettings = (pidSettings: IPidSettings) => {
+    alert(JSON.stringify(pidSettings));
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/savepid`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pidSettings),
+            types: [
+                Constants.SAVEPID_REQUEST,
+                Constants.SAVEPID_RESPONSE,
+                Constants.SAVEPID_ERROR
+            ]
+        }
+    };
+}
+
 export const runScript = () => {
     return {
         [RSAA]: {
@@ -406,7 +443,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
         case Constants.SET_SCRIPT_REQUEST: case Constants.LOAD_SAVED_STATE_REQUEST: 
         case Constants.PERSIST_SAVED_STATE_REQUEST: case Constants.PASSPHRASE_GENERATE_REQUEST: 
-        case Constants.PASSPHRASE_VERIFY_REQUEST: {
+        case Constants.PASSPHRASE_VERIFY_REQUEST: case Constants.AUTOTUNE_REQUEST: 
+        case Constants.SAVEPID_REQUEST: {
             return {
                 ...state,
                 requesting: true,
@@ -416,7 +454,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
         case Constants.SETSP_RESPONSE: case Constants.TOGGLE_STATE_RESPONSE: 
         case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: 
-        case Constants.SET_SCRIPT_RESPONSE: case Constants.PASSPHRASE_GENERATE_RESPONSE: {
+        case Constants.SET_SCRIPT_RESPONSE: case Constants.PASSPHRASE_GENERATE_RESPONSE: 
+        case Constants.AUTOTUNE_RESPONSE: case Constants.SAVEPID_RESPONSE: {
             return {
                 ...state,
                 requesting: false,
@@ -427,7 +466,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
         case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
         case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR:
-        case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: {
+        case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: 
+        case Constants.AUTOTUNE_ERROR: case Constants.SAVEPID_ERROR: {
             return {
                 ...state,
                 requesting: false,

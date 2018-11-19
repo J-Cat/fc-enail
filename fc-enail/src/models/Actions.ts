@@ -18,8 +18,9 @@ import { Direction } from './IEnailState';
 import { ISavedState } from './ISavedState';
 import { IWpaCliStatus, IWpaScanResult } from 'wireless-tools';
 import { IOledState } from './IOledState';
+import { IPidSettings } from './IPidSettings';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction | IUpdatePidSettingsAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
@@ -28,7 +29,12 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IE5CCUpdateStateAction extends Action<string> {
-    payload?: { pv: number, sp: number, isRunning: boolean }
+    payload?: { 
+        pv: number;
+        sp: number; 
+        isRunning: boolean;
+        isTuning: boolean; 
+    }
 }
 
 export interface IUserStateAction extends Action<string> {
@@ -56,6 +62,10 @@ export interface ISetIconAction extends Action<string> {
         icon: string;
         flashRate: number;
     }
+}
+
+export interface IUpdatePidSettingsAction extends Action<string> {
+    payload?: IPidSettings;
 }
 
 export interface ISocketConnectAction extends Action<string> {
