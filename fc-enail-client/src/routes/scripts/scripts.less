@@ -17,6 +17,35 @@
     height: 100%;
     width: 100%;
 
+    .step-panel-bar {
+        display: flex;
+        flex-direction: row;
+        &-label {
+            flex: 1 0 auto;
+        }
+        &-buttons {
+            flex: 0 1 auto;
+            display: flex;
+            flex-direction: row;
+            .ant-btn {
+                font-weight: bold !important;
+                svg {
+                    height: 12px;
+                    width: 12px;
+                }
+            }
+            div {
+                .ant-btn {
+                    font-weight: bold !important;
+                    svg {
+                        height: 14px;
+                        width: 14px;
+                    }
+                }
+            }
+        }
+    }
+
     .ant-form-item {
         .ant-input-number {
             min-width: 140px;

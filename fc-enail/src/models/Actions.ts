@@ -20,8 +20,9 @@ import { IWpaCliStatus, IWpaScanResult } from 'wireless-tools';
 import { IOledState } from './IOledState';
 import { IPidSettings } from './IPidSettings';
 import { ISavedProfiles } from './ISavedProfiles';
+import { IEnailScript } from './IEnailScript';
 
-export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction | IUpdatePidSettingsAction | IProfileAction;
+export type EnailAction = IErrorAction | IBasicAction | ISocketConnectAction | IE5CCUpdateStateAction | IUserStateAction | INetworkInfoAction | IWiFiScanAction | IUpdateOLEDAction | ISetIconAction | IUpdatePidSettingsAction | IProfileAction | ISaveScriptAction;
 
 export interface IErrorAction extends Action<string> {
     payload?: { name: string, validationErrors: any, message: string };
@@ -76,4 +77,8 @@ export interface IUpdatePidSettingsAction extends Action<string> {
 export interface ISocketConnectAction extends Action<string> {
     payload?: SocketIO.Server;
     meta?: string;
+}
+
+export interface ISaveScriptAction extends Action<string> {
+    payload?: IEnailScript;
 }

@@ -147,6 +147,13 @@ export const deleteProfile = (profile: string) => {
     }
 }
 
+export const deleteScript = (title: string) => {
+    return {
+        type: Constants.DELETE_SCRIPT,
+        payload: title
+    }
+}
+
 export const updateP = (value: number) => {
     return {
         type: Constants.E5CC_UPDATE_P,
@@ -336,6 +343,13 @@ export const persistSavedState = (savedState: ISavedState) => {
                 });
             }
         });
+    };
+}
+
+export const saveScript = (script: IEnailScript) => {
+    return {
+        type: Constants.SAVE_SCRIPT,
+        payload: script
     };
 }
 
@@ -610,6 +624,37 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.SAVE_SCRIPT: {
+            const script = action.payload as IEnailScript;
+            if (!state.scripts) {
+                return {
+                    ...state,
+                    scripts: [script]
+                };
+            }
+
+            const index = state.scripts.findIndex(s => s.title === script.title);
+            return {
+                ...state,
+                scripts: index >= 0
+                    ? [
+                        ...state.scripts.slice(0, index),
+                        script,
+                        ...state.scripts.slice(index+1)
+                    ].map((s, i) => ({
+                        ...s,
+                        index: i
+                    }))
+                    : [
+                        ...state.scripts,
+                        {
+                            ...script,
+                            index: state.scripts.length
+                        }
+                    ]
+            };
+        }
+
         case Constants.LOAD_SAVED_PROFILES: {
             const profiles = action.payload as ISavedProfiles;
 
@@ -710,6 +755,26 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                     currentProfile: state.profiles.currentProfile ? state.profiles.currentProfile === profile ? undefined : state.profiles.currentProfile : undefined,
                     profiles: newProfiles
                 }
+            };
+        }
+
+        case Constants.DELETE_SCRIPT: {
+            if (!state.scripts) {
+                return state;
+            }
+            const title = action.payload as string;
+            const index = state.scripts.findIndex(s => s.title === title);
+            if (index < 0) {
+                return state;
+            }
+            const newScripts = [
+                ...state.scripts.slice(0, index),
+                ...state.scripts.slice(index+1)
+            ];
+            return {
+                ...state,
+                scripts: newScripts,
+                currentScript: newScripts.length > 0 ? newScripts[0] : undefined
             };
         }
 

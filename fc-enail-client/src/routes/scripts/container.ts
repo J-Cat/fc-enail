@@ -20,6 +20,7 @@ import { FormComponentProps } from 'antd/lib/form';
 import { IEnailStore } from '../../models/IEnailStore';
 import { IEnailScript } from '../../models/IEnailScript';
 import Scripts from './scripts';
+import { saveScript, deleteScript } from '../../reducers/enailReducer';
 
 export namespace ScriptsProps {
     export interface IStateProps {
@@ -28,6 +29,8 @@ export namespace ScriptsProps {
     }
 
     export interface IDispatchProps {
+        readonly saveScript: (script: IEnailScript) => void;
+        readonly deleteScript: (title: string) => void;
     }
 
     export interface IOwnProps {
@@ -38,6 +41,8 @@ export namespace ScriptsProps {
 
     export interface IState {
         readonly script: IEnailScript;
+        readonly changed: boolean;
+        readonly saved: boolean;
     }
 }
 
@@ -52,6 +57,8 @@ function mapStateToProps(state: IEnailStore, ownProps: ScriptsProps.IOwnProps) {
 
 function mapDispatchToProps(dispatch: (...args: any)=> void) {
     return {
+        saveScript: (script: IEnailScript) => dispatch(saveScript(script)),
+        deleteScript: (title: string) => dispatch(deleteScript(title))
     };
 }
 

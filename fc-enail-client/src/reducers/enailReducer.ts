@@ -66,6 +66,25 @@ export const getScripts = () => {
     }
 }
 
+export const saveScript = (script: IEnailScript) => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/script`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.SAVE_SCRIPT_REQUEST,
+                { type: Constants.SAVE_SCRIPT_RESPONSE, payload: script },
+                Constants.SAVE_SCRIPT_ERROR
+            ],
+            body: JSON.stringify(script)
+        }
+    };
+}
+
+
 export const getProfiles = () => {
     return {
         [RSAA]: {
@@ -100,6 +119,25 @@ export const deleteProfile = (profile: string) => {
         }
     };
 }
+
+export const deleteScript = (title: string) => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/script/delete`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title }),
+            types: [
+                { type: Constants.DELETE_SCRIPT_REQUEST, payload: title },
+                Constants.DELETE_SCRIPT_RESPONSE,
+                Constants.DELETE_SCRIPT_ERROR
+            ]
+        }
+    };
+}
+
 
 export const reconnect = (retry: boolean, ignoreCache: boolean = false) => {
     return async (dispatch: Dispatch<EnailAction>) => {
@@ -477,7 +515,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.PERSIST_SAVED_STATE_REQUEST: case Constants.PASSPHRASE_GENERATE_REQUEST: 
         case Constants.PASSPHRASE_VERIFY_REQUEST: case Constants.AUTOTUNE_REQUEST: 
         case Constants.SAVEPID_REQUEST: case Constants.PROFILES_ERROR:
-        case Constants.PROFILES_REQUEST: case Constants.SCRIPTS_REQUEST: {
+        case Constants.PROFILES_REQUEST: case Constants.SCRIPTS_REQUEST:
+        case Constants.SAVE_SCRIPT_REQUEST: {
             return {
                 ...state,
                 requesting: true,
@@ -500,7 +539,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
         case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR:
         case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: 
-        case Constants.AUTOTUNE_ERROR: case Constants.SAVEPID_ERROR: case Constants.DELETE_PROFILE_ERROR: {
+        case Constants.AUTOTUNE_ERROR: case Constants.SAVEPID_ERROR: case Constants.DELETE_PROFILE_ERROR: 
+        case Constants.SAVE_SCRIPT_ERROR: {
             return {
                 ...state,
                 requesting: false,
@@ -569,6 +609,26 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             };
         }
 
+        case Constants.DELETE_SCRIPT_REQUEST: {
+            if (!state.scripts) {
+                return state;
+            }
+            
+            const title = action.payload as string;
+            const index = state.scripts.findIndex(s => s.title === title);
+            if (index < 0) {
+                return state;
+            }
+
+            return {
+                ...state,
+                scripts: [
+                    ...state.scripts.slice(0, index),
+                    ...state.scripts.slice(index+1)
+                ]
+            };
+        }
+
         case Constants.PERSIST_SAVED_STATE_RESPONSE: {
             return {
                 ...state,
@@ -576,6 +636,42 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 error: false,
                 presets: (action.meta as ISavedState).presets
             }
+        }
+
+        case Constants.SAVE_SCRIPT_RESPONSE: {
+            const script = action.payload as IEnailScript;
+            if (!state.scripts) {
+                return {
+                    ...state,
+                    scripts: [{
+                        ...script,
+                        index: 0
+                    }]
+                };
+            }
+
+            const index = state.scripts.findIndex(s => s.title === script.title);
+            return {
+                ...state,
+                requesting: false,
+                error: false,
+                scripts: index >= 0
+                    ? [
+                        ...state.scripts.slice(0, index),
+                        script,
+                        ...state.scripts.slice(index+1)
+                    ].map((s, i) => ({
+                        ...s,
+                        index: i
+                    }))
+                    : [
+                        ...state.scripts,
+                        {
+                            ...script,
+                            index: state.scripts.length
+                        }
+                    ]
+            };
         }
 
         case Constants.PASSPHRASE_VERIFY_RESPONSE: {

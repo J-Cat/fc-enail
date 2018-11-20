@@ -14,6 +14,8 @@ export class EnailRoute {
         this.router.post('/state', this.controller.toggleState);
         this.router.post('/autotune', this.controller.toggleTune);
         this.router.get('/scripts', this.controller.getScripts);
+        this.router.post('/script/delete', this.controller.deleteScript);
+        this.router.post('/script', this.controller.saveScript);
         this.router.post('/script/set/:index', this.controller.setScript);
         this.router.post('/script/run', this.controller.runScript);
         this.router.post('/script/end', this.controller.endScript);

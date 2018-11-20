@@ -13,19 +13,20 @@
  * -----
  * Copyright (c) 2018
  */
+import * as fs from 'fs';
 import { IEnailStore } from '../models/IEnailStore';
 import { Store, Dispatch } from 'redux';
 import { EnailAction } from '../models/Actions';
-
 import * as Constants from '../models/constants';
 import { IEnailState, EnailMode } from '../models/IEnailState';
-import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp, endScript, setSP, setIcon } from '../reducers/enailReducer';
+import { nextStep, stepFeedback, runStep, stepTimer, stepMoveTemp, stepWaitTemp, endScript, setSP, setIcon, persistProfiles } from '../reducers/enailReducer';
 import { IMoveTempStep } from '../models/IMoveTempStep';
 import { IFeedbackStep } from '../models/IFeedbackStep';
 import { ITimerStep } from '../models/ITimerStep';
 import { IWaitTempStep } from '../models/IWatiTempStep';
 import led from '../ui/led';
 import aplay from '../aplay';
+import { config } from '../config';
 
 import Debug from 'debug';
 const debug = Debug("fc-enail:script");
@@ -66,6 +67,26 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
             });
             aplay.play("complete");
             store.dispatch<any>(setSP(state.scriptStartSP!));
+            break;
+        }
+
+        case Constants.SAVE_SCRIPT: {
+            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+                debug(err);
+            });
+            break;
+        }
+
+        case Constants.DELETE_PROFILE: {
+            store.dispatch<any>(persistProfiles(store.getState().enail.profiles));
+            break;
+        }
+
+        case Constants.DELETE_SCRIPT: {
+            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+                debug(err);
+            });
+            break;
         }
     }
 

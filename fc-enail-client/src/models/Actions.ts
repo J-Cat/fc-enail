@@ -16,7 +16,7 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IBasicAction extends Action<string> {
-    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings | ISavedProfiles | IStepAction;
+    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings | ISavedProfiles | IStepAction | IEnailScript;
     meta?: string;
 }
 

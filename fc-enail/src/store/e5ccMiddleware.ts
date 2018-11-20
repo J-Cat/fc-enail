@@ -99,11 +99,6 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             store.dispatch<any>(persistProfiles(store.getState().enail.profiles));
             break;
         }
-
-        case Constants.DELETE_PROFILE: {
-            store.dispatch<any>(persistProfiles(store.getState().enail.profiles));
-            break;
-        }
     }
 
     return result;
