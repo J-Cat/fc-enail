@@ -31,8 +31,22 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
 ### Installing
 
+#### Device
+* install Raspbian
+* install NodeJS
 * npm install
 * node_modules\.bin\tsc
+
+#### Client
+* can be hosted on a web server like any other ReactJS application (could probably setup on NGINX on the device itself)
+* can be installed on Android devices or iOS devices (Mac is required for iOS)
+* npm install (installs dependencies)
+* npm run build (builds typescript project)
+* ln -s build www (link www to build folder for Cordova as Cordova wants the build in the www folder)
+* cordova run ios --device --debug (or --release)
+* cordova run android --device --debug (or --release)
+* cordova build ios --device --debug (or --release) - builds IPA for distribution
+* cordova build android --device --debug (or --release) - builds APK for distribution
 
 ## Deployment
 
