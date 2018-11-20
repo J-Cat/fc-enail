@@ -15,6 +15,8 @@ class App extends React.Component<RouteComponentProps<{}>, {}> {
     let selectedPath = "home";
     if (this.props.location.pathname.indexOf('settings')>=0) {
       selectedPath = "settings";
+    } else if (this.props.location.pathname.indexOf('scripts')>=0) {
+      selectedPath = "scripts";
     }
     
     return (

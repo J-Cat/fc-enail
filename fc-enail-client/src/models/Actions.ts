@@ -16,11 +16,20 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IBasicAction extends Action<string> {
-    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings | ISavedProfiles;
+    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings | ISavedProfiles | IStepAction;
     meta?: string;
 }
 
 export interface IEnailEmitStateAction extends Action<string> {
     payload?: IEnailEmitState,
     meta?: string
+}
+
+export interface IStepAction extends Action<string> {
+    payload?: {
+        key: string;
+        destinationKey: string;
+        destinationIndex: number;
+    };
+    meta?: string;
 }

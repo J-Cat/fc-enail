@@ -67,3 +67,13 @@ export const SAVEPID_ERROR = 'ENAIL/SAVEPID/ERROR';
 
 export const LOAD_TOKEN = 'ENAIL/TOKEN/LOAD';
 export const TOKEN_LOADED = 'ENAIL/TOKEN/LOADED';
+
+export const MOVE_STEP = 'ENAIL/STEP/MOVE';
+
+export const STEP_PARALLEL = 'parallel';
+export const STEP_LOOP = 'loop';
+export const STEP_FEEDBACK = 'feedback';
+export const STEP_MOVETEMP = 'movetemp';
+export const STEP_WAITTEMP = 'waittemp';
+export const STEP_TIMER = 'timer';
+export const STEP_SEQUENTIAL = 'sequential';

@@ -437,6 +437,17 @@ export const tokenLoaded = () => {
     }
 }
 
+export const moveStep = (key: string, destinationKey: string, destinationIndex: number) => {
+    return {
+        type: Constants.MOVE_STEP,
+        payload: {
+            key,
+            destinationKey,
+            destinationIndex
+        }
+    }
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.SOCKET_CONNECTED: {
@@ -525,6 +536,9 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         
         case Constants.PROFILES_RESPONSE: {
             const savedProfiles = action.payload as ISavedProfiles;
+            if (!savedProfiles) {
+                return state;
+            }
             return {
                 ...state,
                 requesting: false,
@@ -612,6 +626,13 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 reconnect: true
             };
+        }
+
+        case Constants.MOVE_STEP: {
+            return {
+                ...state
+            };
+
         }
 
         default: {
