@@ -10,10 +10,10 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Save/Load profiles (PID settings) for different devices (can use auto-tune to generate)
 * Run scripts for fancy up-temp procedures and the like
 * Full mobile access including:
-** Remotely start, adjust temperatures, and monitor
-** Run scripts
-** Manage/create/edit scripts with the script editor (drag/drop GUI)
-** Manage profiles and launch auto-tune to generate
+  * Remotely start, adjust temperatures, and monitor
+  * Run scripts
+  * Manage/create/edit scripts with the script editor (drag/drop GUI)
+  * Manage profiles and launch auto-tune to generate
 * Ability to connect device to WiFi network through device UI
 * Automatic discovery of device on local networks, but ability to configure if not found or on different subnets
 
