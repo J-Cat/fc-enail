@@ -23,8 +23,8 @@ import * as Constants from '../models/constants';
 
 const debug = Debug('fc-enail:rotary');
 
-const ROTATION_THROTTLE = 10;
-const MESSAGE_THROTTLE = 50;
+const ROTATION_THROTTLE = 100;
+const MESSAGE_THROTTLE = 100;
 
 export class RotaryDial {
     private lastA: number = 0;
@@ -75,17 +75,22 @@ export class RotaryDial {
                 if ((Date.now() - this.lastInternalUpdate) > ROTATION_THROTTLE) {
                     this.offset += 1;
                     this.lastInternalUpdate = Date.now();
+                } else {
+                    return;
                 }
             } else if (a === 1 && b === 0 || a === 0 && b === 1 || a === 2 && b === 0) { 
                 if ((Date.now() - this.lastInternalUpdate) > ROTATION_THROTTLE) {
                     //this._onChange.dispatch(this, -1);
                     this.offset -= 1;
                     this.lastInternalUpdate = Date.now();
+                } else {
+                    return;
                 }
             }  
         });
 
         const elapsed = Date.now() - this.lastUpdate;
+        debug(`${this.offset}, ${this.step}`);
         if (elapsed > (this.mode === EnailMode.Home ? MESSAGE_THROTTLE : 0)) {
             this.dispatchPromise = new Promise(resolve => {
                 if (this.offset !== 0) {

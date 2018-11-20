@@ -33,7 +33,8 @@
         },
         "files": {
             "scripts": "/home/pi/enail-scripts.json",
-            "savedState": "/home/pi/saved-state.json"
+            "savedState": "/home/pi/saved-state.json",
+            "savedProfiles": "/home/pi/saved-profiles.json"
         },
         "security": {
             "tokenTitle": "FC E-Nail",

@@ -1,0 +1,122 @@
+/*
+ * File: c:\fc-enail\fc-enail-client\src\routes\scripts\scripts.less
+ * Project: c:\fc-enail\fc-enail-client
+ * Created Date: Tuesday November 13th 2018
+ * Author: J-Cat
+ * -----
+ * Last Modified:
+ * Modified By:
+ * -----
+ * License: 
+ *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
+ *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
+ * -----
+ * Copyright (c) 2018
+ */
+.scripts {
+    height: 100%;
+    width: 100%;
+
+    .ant-form-item {
+        .ant-input-number {
+            min-width: 140px;
+        }
+        &-label {
+            display: inline-block;
+            width: auto;
+            min-width: 90px;
+        }
+        &-control-wrapper {
+            display: inline-block;
+            width: auto;
+            min-width: 140px;
+        }
+    }
+
+    .ant-collapse {
+        background-color: unset;
+        border: unset;
+        &-content {
+            background-color: unset;
+            border: unset;
+            &-box {
+                padding: 0px 10px 0px 20px;
+            }
+        }
+        &-item {
+            border: unset;
+        }
+    }
+
+    .step-droppable {
+        .step-droppable {
+            .step-droppable {
+                padding: 8px;
+                width: 100%;
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;   
+                border: 1px solid @border-color-base;
+                border-collapse: collapse;    
+                &-dragging {
+                    background-color: @border-color-base;
+                }
+                &-title {
+                    font-weight: bold;
+                    padding: 2px 4px 2px 2px;
+                }
+            }
+        }
+    
+        .step-draggable {
+            user-select: none;
+            padding: 0px 2px 0px 2px;
+            margin: 4px;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid @border-color-base;
+            border-collapse: collapse;
+            &-dragging {
+                background-color: @border-color-base;
+            }
+            &-title {
+                font-weight: bold;
+                padding: 2px 4px 4px 4px;
+            }
+        }    
+    }
+
+    .version-label {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        font-size: .8em;
+        opacity: 0.4;
+        @media @landscape {
+            display: none;
+        }
+    }
+    
+    &-content {
+        height: 100%;
+        form {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: hidden;
+        }
+        &-datarow {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            overflow-y: auto ;
+        }
+        &-buttonrow {
+            flex: 0 1 0;
+            margin: 20px !important;
+            text-align: center;
+        }
+    }
+}

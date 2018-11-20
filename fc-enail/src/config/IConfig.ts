@@ -27,6 +27,7 @@ export interface IConfig {
     readonly files: {
         readonly scripts: string;
         readonly savedState: string;
+        readonly savedProfiles: string;
     };
     readonly security: {
         readonly tokenTitle: string;

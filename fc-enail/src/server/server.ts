@@ -123,7 +123,8 @@ export class Server {
             mode: state.mode,
             p: state.p,
             i: state.i,
-            d: state.d
+            d: state.d,
+            profile: state.profiles.currentProfile
         };
 
         this.io.emit(Constants.EMIT_STATE, emitState);

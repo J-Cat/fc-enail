@@ -4,6 +4,7 @@ import { IEnailScript } from './IEnailScript';
 import { ISavedState } from './ISavedState';
 import { IVerifyTokenResponse } from './IVerifyTokenResponse';
 import { IPidSettings } from './IPidSettings';
+import { ISavedProfiles } from './ISavedProfiles';
 
 export type EnailAction = IErrorAction | IBasicAction | IEnailEmitStateAction;
 
@@ -15,11 +16,20 @@ export interface IErrorAction extends Action<string> {
 }
 
 export interface IBasicAction extends Action<string> {
-    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings;
+    payload?: string | number | boolean | IEnailScript[] | ISavedState | IVerifyTokenResponse | IPidSettings | ISavedProfiles | IStepAction;
     meta?: string;
 }
 
 export interface IEnailEmitStateAction extends Action<string> {
     payload?: IEnailEmitState,
     meta?: string
+}
+
+export interface IStepAction extends Action<string> {
+    payload?: {
+        key: string;
+        destinationKey: string;
+        destinationIndex: number;
+    };
+    meta?: string;
 }

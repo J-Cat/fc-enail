@@ -7,6 +7,14 @@ export const SCRIPTS_REQUEST = 'ENAIL/SCRIPTS/REQUEST';
 export const SCRIPTS_RESPONSE = 'ENAIL/SCRIPTS/RESPONSE';
 export const SCRIPTS_ERROR = 'ENAIL/SCRIPTS/ERROR';
 
+export const PROFILES_REQUEST = 'ENAIL/PROFILES/REQUEST';
+export const PROFILES_RESPONSE = 'ENAIL/PROFILES/RESPONSE';
+export const PROFILES_ERROR = 'ENAIL/PROFILES/ERROR';
+
+export const DELETE_PROFILE_REQUEST = 'ENAIL/PROFILE/DELETE/REQUEST';
+export const DELETE_PROFILE_RESPONSE = 'ENAIL/PROFILE/DELETE/RESPONSE';
+export const DELETE_PROFILE_ERROR = 'ENAIL/PROFILE/DELETE/ERROR';
+
 export const SETSP_REQUEST = 'ENAIL/SETSP/REQUEST';
 export const SETSP_RESPONSE = 'ENAIL/SETSP/RESPONSE';
 export const SETSP_ERROR = 'ENAIL/SETSP/ERROR';
@@ -59,3 +67,13 @@ export const SAVEPID_ERROR = 'ENAIL/SAVEPID/ERROR';
 
 export const LOAD_TOKEN = 'ENAIL/TOKEN/LOAD';
 export const TOKEN_LOADED = 'ENAIL/TOKEN/LOADED';
+
+export const MOVE_STEP = 'ENAIL/STEP/MOVE';
+
+export const STEP_PARALLEL = 'parallel';
+export const STEP_LOOP = 'loop';
+export const STEP_FEEDBACK = 'feedback';
+export const STEP_MOVETEMP = 'movetemp';
+export const STEP_WAITTEMP = 'waittemp';
+export const STEP_TIMER = 'timer';
+export const STEP_SEQUENTIAL = 'sequential';

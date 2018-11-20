@@ -10,6 +10,7 @@ import { IEnailEmitState } from 'src/models/IEnailEmitState';
 import { IEnailScript } from '../models/IEnailScript';
 import { IVerifyTokenResponse } from '../models/IVerifyTokenResponse';
 import { IPidSettings } from '../models/IPidSettings';
+import { ISavedProfiles } from '../models/ISavedProfiles';
 
 const initialState: IEnailState = {
     serviceFound: false,
@@ -17,7 +18,10 @@ const initialState: IEnailState = {
     requesting: false,
     reconnect: false,
     presets: [],
-    token: ''
+    token: '',
+    profiles: {
+        profiles: {}
+    }
 };
 
 export const connectSocket = () => {
@@ -60,6 +64,41 @@ export const getScripts = () => {
             ]
         }
     }
+}
+
+export const getProfiles = () => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/profiles`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            types: [
+                Constants.PROFILES_REQUEST,
+                Constants.PROFILES_RESPONSE,
+                Constants.PROFILES_ERROR
+            ]
+        }
+    }
+}
+
+export const deleteProfile = (profile: string) => {
+    return {
+        [RSAA]: {
+            endpoint: `${getServiceUrl()}/profile/delete`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ profile }),
+            types: [
+                { type: Constants.DELETE_PROFILE_REQUEST, payload: profile },
+                Constants.DELETE_PROFILE_RESPONSE,
+                Constants.DELETE_PROFILE_ERROR
+            ]
+        }
+    };
 }
 
 export const reconnect = (retry: boolean, ignoreCache: boolean = false) => {
@@ -230,7 +269,6 @@ export const toggleTuning = () => {
 }
 
 export const savePidSettings = (pidSettings: IPidSettings) => {
-    alert(JSON.stringify(pidSettings));
     return {
         [RSAA]: {
             endpoint: `${getServiceUrl()}/savepid`,
@@ -241,7 +279,7 @@ export const savePidSettings = (pidSettings: IPidSettings) => {
             body: JSON.stringify(pidSettings),
             types: [
                 Constants.SAVEPID_REQUEST,
-                Constants.SAVEPID_RESPONSE,
+                { type: Constants.SAVEPID_RESPONSE, payload: pidSettings },
                 Constants.SAVEPID_ERROR
             ]
         }
@@ -399,6 +437,17 @@ export const tokenLoaded = () => {
     }
 }
 
+export const moveStep = (key: string, destinationKey: string, destinationIndex: number) => {
+    return {
+        type: Constants.MOVE_STEP,
+        payload: {
+            key,
+            destinationKey,
+            destinationIndex
+        }
+    }
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
         case Constants.SOCKET_CONNECTED: {
@@ -422,11 +471,41 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             };
         }
 
-        case Constants.SCRIPTS_REQUEST: {
+        case Constants.SETSP_REQUEST: case Constants.TOGGLE_STATE_REQUEST: 
+        case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
+        case Constants.SET_SCRIPT_REQUEST: case Constants.LOAD_SAVED_STATE_REQUEST: 
+        case Constants.PERSIST_SAVED_STATE_REQUEST: case Constants.PASSPHRASE_GENERATE_REQUEST: 
+        case Constants.PASSPHRASE_VERIFY_REQUEST: case Constants.AUTOTUNE_REQUEST: 
+        case Constants.SAVEPID_REQUEST: case Constants.PROFILES_ERROR:
+        case Constants.PROFILES_REQUEST: case Constants.SCRIPTS_REQUEST: {
             return {
                 ...state,
                 requesting: true,
                 error: false
+            };
+        }
+
+        case Constants.SETSP_RESPONSE: case Constants.TOGGLE_STATE_RESPONSE: 
+        case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: 
+        case Constants.SET_SCRIPT_RESPONSE: case Constants.PASSPHRASE_GENERATE_RESPONSE: 
+        case Constants.AUTOTUNE_RESPONSE: case Constants.DELETE_PROFILE_RESPONSE: {
+            return {
+                ...state,
+                requesting: false,
+                error: false
+            };
+        }
+
+        case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
+        case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
+        case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR:
+        case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: 
+        case Constants.AUTOTUNE_ERROR: case Constants.SAVEPID_ERROR: case Constants.DELETE_PROFILE_ERROR: {
+            return {
+                ...state,
+                requesting: false,
+                error: true,
+                message: !action.payload ? undefined : (action as IErrorAction).payload!.message
             };
         }
 
@@ -439,40 +518,54 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             };
         }
 
-        case Constants.SETSP_REQUEST: case Constants.TOGGLE_STATE_REQUEST: 
-        case Constants.RUN_SCRIPT_REQUEST: case Constants.END_SCRIPT_REQUEST: 
-        case Constants.SET_SCRIPT_REQUEST: case Constants.LOAD_SAVED_STATE_REQUEST: 
-        case Constants.PERSIST_SAVED_STATE_REQUEST: case Constants.PASSPHRASE_GENERATE_REQUEST: 
-        case Constants.PASSPHRASE_VERIFY_REQUEST: case Constants.AUTOTUNE_REQUEST: 
-        case Constants.SAVEPID_REQUEST: {
-            return {
-                ...state,
-                requesting: true,
-                error: false
-            };
-        }
-
-        case Constants.SETSP_RESPONSE: case Constants.TOGGLE_STATE_RESPONSE: 
-        case Constants.RUN_SCRIPT_RESPONSE: case Constants.RUN_SCRIPT_RESPONSE: 
-        case Constants.SET_SCRIPT_RESPONSE: case Constants.PASSPHRASE_GENERATE_RESPONSE: 
-        case Constants.AUTOTUNE_RESPONSE: case Constants.SAVEPID_RESPONSE: {
+        case Constants.SAVEPID_RESPONSE: {
+            const profile = action.payload as IPidSettings;
             return {
                 ...state,
                 requesting: false,
-                error: false
+                error: false,
+                profiles: {
+                    currentProfile: profile.title,
+                    profiles: {
+                        ...state.profiles.profiles,
+                        [profile.title]: profile
+                    }
+                }
             };
         }
-
-        case Constants.SCRIPTS_ERROR: case Constants.SETSP_ERROR: case Constants.TOGGLE_STATE_ERROR: 
-        case Constants.RUN_SCRIPT_ERROR: case Constants.END_SCRIPT_ERROR: 
-        case Constants.SET_SCRIPT_ERROR: case Constants.PERSIST_SAVED_STATE_ERROR:
-        case Constants.PASSPHRASE_GENERATE_ERROR: case Constants.PASSPHRASE_VERIFY_ERROR: 
-        case Constants.AUTOTUNE_ERROR: case Constants.SAVEPID_ERROR: {
+        
+        case Constants.PROFILES_RESPONSE: {
+            const savedProfiles = action.payload as ISavedProfiles;
+            if (!savedProfiles) {
+                return state;
+            }
             return {
                 ...state,
                 requesting: false,
-                error: true,
-                message: !action.payload ? undefined : (action as IErrorAction).payload!.message
+                error: false,
+                profiles: {
+                    currentProfile: savedProfiles.currentProfile,
+                    profiles: {
+                        ...savedProfiles.profiles
+                    }
+                }
+            };
+        }
+
+        case Constants.DELETE_PROFILE_REQUEST: {
+            if (!state.profiles) {
+                return state;
+            }
+            const profile = action.payload as string;
+            const { [profile]: removedValue, ...newProfiles } = state.profiles.profiles;
+            return {
+                ...state,
+                profiles: {
+                    currentProfile: state.profiles.currentProfile ? state.profiles.currentProfile === profile ? undefined : state.profiles.currentProfile : undefined,
+                    profiles: {
+                        ...newProfiles
+                    }
+                }
             };
         }
 
@@ -533,6 +626,13 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 reconnect: true
             };
+        }
+
+        case Constants.MOVE_STEP: {
+            return {
+                ...state
+            };
+
         }
 
         default: {

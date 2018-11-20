@@ -15,7 +15,7 @@
  */
 import aplay from './aplay';
 import store from './store/createStore';
-import { toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase, setSP, stepMoveTemp, updateAllState, moveSetPoint } from './reducers/enailReducer';
+import { toggleState, runScript, endScript, setMode, increaseCurrentScript, decreaseCurrentScript, loadSavedState, clearPassphrase, loadProfiles, moveSetPoint } from './reducers/enailReducer';
 import led from './ui/led';
 import consoleUi from './ui/consoleUi';
 import { EnailMode } from './models/IEnailState';
@@ -261,6 +261,7 @@ consoleUi.init();
 //store.dispatch<any>(connect());
 store.dispatch<any>(loadSavedState());
 store.dispatch<any>(getNetworkInfo());
+store.dispatch<any>(loadProfiles());
 
 initInput();
 

@@ -37,7 +37,7 @@ export class Button {
     }
 
     init = (gpioNumber: number) => {    
-        this.button = new Gpio(gpioNumber, 'in', 'both', {debounceTimeout: 10, activeLow: true});
+        this.button = new Gpio(gpioNumber, 'in', 'both', {debounceTimeout: 5, activeLow: true});
         
         this.button.watch(async (err: Error, value: number) => {
             if (err) {

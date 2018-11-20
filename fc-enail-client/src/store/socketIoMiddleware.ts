@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { 
     connectSocket, socketConnected, socketDisconnected, 
     receiveEnailState, 
-    getScripts, getSavedState,  
+    getScripts, getSavedState, getProfiles,
     generatePassphrase, 
     loadToken, tokenLoaded
 } from '../reducers/enailReducer';
@@ -69,6 +69,7 @@ export const socketIoMiddleware = (store: Store<IEnailStore>) => <A extends Enai
 
         case Constants.TOKEN_LOADED: {
             store.dispatch<any>(getScripts());
+            store.dispatch<any>(getProfiles());
             store.dispatch<any>(getSavedState());
             store.dispatch<any>(connectSocket());
             break;

@@ -15,6 +15,7 @@
  */
 import { IEnailScript } from './IEnailScript';
 import { IStep } from './IStep';
+import { ISavedProfiles } from './ISavedProfiles';
 
  export interface IEnailState {
     readonly setPoint: number;
@@ -43,6 +44,7 @@ import { IStep } from './IStep';
     readonly p: number;
     readonly i: number;
     readonly d: number;
+    readonly profiles: ISavedProfiles;
 }
 
 export enum Direction {
