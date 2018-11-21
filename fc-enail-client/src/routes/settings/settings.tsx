@@ -46,6 +46,11 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
             },
             profile: this.props.profile
         };
+
+        this.deleteProfile.bind(this);
+        this.savePidSettings.bind(this);
+        this.saveSettings.bind(this);
+        this.autoTune.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps: SettingsProps.IProps, prevState: SettingsProps.IState) {
@@ -170,7 +175,13 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
             onPress: (value: string) => {
                 return new Promise<string>((resolve, reject) => {
                     Toast.info(`Saving ${value}`, 1);
-                    setTimeout(() => {
+                    setTimeout((() => {
+                        this.props.savePidSettings({
+                            title: value,
+                            p: this.state.p,
+                            i: this.state.i,
+                            d: this.state.d
+                        });
                         this.setState({
                             profile: value,
                             start: {
@@ -180,18 +191,9 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                 profile: value
                             }
                         });
-                        this.props.savePidSettings({
-                            title: value,
-                            p: this.state.p,
-                            i: this.state.i,
-                            d: this.state.d
-                        });
-                        this.setState({
-
-                        })
                         resolve(value);
                         modal.close();
-                    }, 1000);
+                    }).bind(this), 1000);
                 });
             },
         }, {
@@ -199,10 +201,10 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
             onPress: () => { 
                 return new Promise<string>((resolve, reject) => {
                     Toast.info('Cancelled', 1);
-                    setTimeout(() => {
+                    setTimeout((() => {
                         reject();
                         modal.close();
-                    }, 1000);
+                    }).bind(this), 1000);
                 })},
             },
         ] as Array<Action<string>>, 'default', this.state.profile, ['profile name']);  
