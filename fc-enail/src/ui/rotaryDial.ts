@@ -23,8 +23,12 @@ import * as Constants from '../models/constants';
 
 const debug = Debug('fc-enail:rotary');
 
-const ROTATION_THROTTLE = 100;
-const MESSAGE_THROTTLE = 100;
+const ROTATION_THROTTLE = config.options.hardware.dial.rotationThrottle || 100;
+const ROTATION_ACCELERATION_EXPIRES = config.options.hardware.dial.rotationAccelerationExpires || 750;
+const MESSAGE_THROTTLE = config.options.hardware.dial.messageThrottle || 100;
+const ROTATION_ACCELERERATION_THRESHOLD = config.options.hardware.dial.rotationAccelerationThreshold || 250;
+const ROTATION_MAX_STEP = config.options.hardware.dial.rotationMaxStep || 10;
+const ROTATION_FIXED_STEP = config.options.hardware.dial.rotationFixedStep || 0;
 
 export class RotaryDial {
     private lastA: number = 0;
@@ -94,20 +98,28 @@ export class RotaryDial {
         if (elapsed > (this.mode === EnailMode.Home ? MESSAGE_THROTTLE : 0)) {
             this.dispatchPromise = new Promise(resolve => {
                 if (this.offset !== 0) {
-                    if (elapsed > 750) {
-                        this.step = 1;
+                    if (ROTATION_FIXED_STEP !== 0) {
+                        this.step = ROTATION_FIXED_STEP;
                     } else {
-                        if (this.offset > 0) {
-                            if (this.lastOffset > 0 && this.step <= 10 && elapsed < 250) {
-                                this.step += 1;
-                            } else if (this.step > 1) {
-                              this.step -= 1;
-                            }
+                        if (elapsed > ROTATION_ACCELERATION_EXPIRES) {
+                            this.step = 1;
                         } else {
-                            if (this.lastOffset < 0 && this.step <= 10 && elapsed < 250) {
-                                this.step += 1;
-                            } else if (this.step > 1) {
-                                this.step -= 1;
+                            if (this.offset > 0) {
+                                if (this.lastOffset > 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
+                                    this.step += 1;
+                                } else if (this.step > 2) {
+                                this.step -= 2;
+                                } else if (this.step > 1) {
+                                    this.step -= 1;
+                                }
+                            } else {
+                                if (this.lastOffset < 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
+                                    this.step += 1;
+                                } else if (this.step > 2) {
+                                    this.step -= 2;
+                                } else if (this.step > 1) {
+                                    this.step -= 1;
+                                }
                             }
                         }
                     }
@@ -124,8 +136,8 @@ export class RotaryDial {
     }
 
     init = (gpioA: number, gpioB: number, gpioButton: number) => {   
-        this.inputA = new Gpio(gpioA, 'in', 'both', { debounceTimeout: 20 });
-        this.inputB = new Gpio(gpioB, 'in', 'both', { debounceTimeout: 20 });
+        this.inputA = new Gpio(gpioA, 'in', 'both', { debounceTimeout: 40 });
+        this.inputB = new Gpio(gpioB, 'in', 'both', { debounceTimeout: 40 });
         this.button = new Gpio(gpioButton, 'in', 'rising', { activeLow: true, debounceTimeout: 20 });
 
         this.inputA.watch((err: Error, value: number) => {

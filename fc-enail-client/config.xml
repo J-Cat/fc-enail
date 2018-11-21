@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.jcat.fcenailclient" version="0.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.jcat.fcenailclient" version="1.0.0-beta.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>FC E-Nail</name>
     <description>
-        FC Community E-Nail - A better E-Nail!
+        FC E-Nail by JCat - A better E-Nail!
     </description>
     <author email="joe@cataford.com" href="https://github.com/J-Cat">
         JCat (FC)

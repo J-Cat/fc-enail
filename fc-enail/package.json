@@ -1,7 +1,7 @@
 {
   "name": "fc-enail",
-  "version": "1.0.0",
-  "description": "Software to control the e-Nail Hardware I'm working on for the FC community.",
+  "version": "1.0.0-beta.2",
+  "description": "FC E-Nail by JCat - a better e-Nail!",
   "main": "app.js",
   "scripts": {},
   "author": "J-Cat",

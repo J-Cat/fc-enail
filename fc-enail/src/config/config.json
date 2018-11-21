@@ -18,7 +18,13 @@
                 "dial": {
                     "A": 22,
                     "B": 23,
-                    "C": 24
+                    "C": 24,
+                    "messageThrottle": 250,
+                    "rotationThrottle": 250,
+                    "rotationAccelerationExpires": 750,
+                    "rotationAccelerationThreshold": 250,
+                    "rotationMaxStep": 10,
+                    "rotationFixedStep": 0
                 }
             },
             "e5cc": {    

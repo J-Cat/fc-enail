@@ -20,6 +20,12 @@ export interface IConfig {
                 readonly A: number;
                 readonly B: number;
                 readonly C: number;
+                readonly messageThrottle: number;
+                readonly rotationThrottle: number;
+                readonly rotationAccelerationExpires: number;
+                readonly rotationAccelerationThreshold: number;
+                readonly rotationMaxStep: number;
+                readonly rotationFixedStep: number;
             }
         };
         readonly e5cc: IE5CCOptions;

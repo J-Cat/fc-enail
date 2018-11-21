@@ -230,7 +230,6 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                 when={(this.props.form.isFieldsTouched() || this.state.changed) && !this.state.saved}
                 message='You have unsaved changes to your script, are you sure you want to leave?'
             />
-            {/* Component JSX */}
         </React.Fragment>            
         <div className="version-label">{this.props.version}</div>
             <div className="scripts-content">
@@ -349,7 +348,8 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
         const newRoot = remapScript(addItem(
             this.state.script.step, {
                 type,
-                steps: type === Constants.STEP_LOOP ? [] : undefined
+                ...this.getNewStep(type),
+                steps: []
             },
             step.key!,
             step.steps!.length
@@ -361,6 +361,30 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                 step: newRoot
             }
         });
+    }
+
+    getNewStep = (type: string) => {
+        switch (type) {
+            case Constants.STEP_LOOP: {
+                return {
+                    count: 1
+                } as ILoopStep;
+            }
+            case Constants.STEP_MOVETEMP: {
+                return {
+                    value: 20
+                } as IMoveTempStep;
+            }
+            case Constants.STEP_TIMER: {
+                return {
+                    timeout: 5
+                } as ITimerStep;
+            }
+            default: {
+                return {
+                };
+            }
+        }
     }
     
     delItemInternal = (e: React.FormEvent, step: IStep) => {
