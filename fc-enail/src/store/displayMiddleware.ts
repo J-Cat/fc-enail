@@ -32,7 +32,7 @@ export const displayMiddleware = (store: Store<IEnailStore>) => <A extends Enail
         menuTop: state.menu.top,
         mode: state.enail.mode,
         networkInfo: state.menu.networkInfo,
-        passphrase: state.menu.passphrase,
+        passphrase: state.enail.passphrase,
         scriptRunning: state.enail.scriptRunning,
         scriptStartTime: state.enail.scriptStartTime,
         scriptTitle: state.enail.currentScript ? state.enail.currentScript.title : '',

@@ -328,7 +328,7 @@ export class OledUi {
             this.scrollDone = [this.state.mode === EnailMode.Settings, false, false, false];
         }
 
-        if (changed || this.state.flashRate > 0) {
+        if (changed || this.state.flashRate > 0 || this.state.passphrase) {
             // render
             this.flashStatus = !this.flashStatus;
 
