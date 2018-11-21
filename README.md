@@ -1,16 +1,25 @@
 # fc-enail
 
-This project is inspired by the FC Community and a desire to have a better E-Nail product, with ease of use and advanced features.
+This project is inspired by the FC Community and a desire to have a better E-Nail product, with ease of use, advanced features, and wireless connectivity.
 
 ## Highlights
 
-* rotary control of the temperature for quick adjustments
-* easy on/off of heater
-* ability to run scripts for up-temp and down-temp procedures and the like
-* ability to save/load custom settings (PID) for different nails (profiles)
-* mobile app to control advanced features more easily, etc.
+* Easy temperature adjustments with rotary dial
+* Easy on/off of heater both on device and remotely
+* Quick temps from mobile screen to go to a temperature with 1-click
+* Save/Load profiles (PID settings) for different devices (can use auto-tune to generate)
+* Run scripts for fancy up-temp procedures and the like
+* Full mobile access including:
+  * Remotely start, adjust temperatures, and monitor
+  * Run scripts
+  * Manage/create/edit scripts with the script editor (drag/drop GUI)
+  * Manage profiles and launch auto-tune to generate
+* Ability to connect device to WiFi network through device UI
+* Automatic discovery of device on local networks, but ability to configure if not found or on different subnets
 
-![Hardware](https://raw.githubusercontent.com/J-Cat/fc-enail/master/hardware.jpg)
+![Device](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device1.jpg)
+
+![Mobile App - Home Screen](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile1.png) ![Mobile App - Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile2.png) ![Mobile App - Script Editor](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile3.png) ![Mobile App - Script Editor 2](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile4.png)
 
 ## Getting Started
 
@@ -22,8 +31,22 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
 ### Installing
 
+#### Device
+* install Raspbian
+* install NodeJS
 * npm install
 * node_modules\.bin\tsc
+
+#### Client
+* can be hosted on a web server like any other ReactJS application (could probably setup on NGINX on the device itself)
+* can be installed on Android devices or iOS devices (Mac is required for iOS)
+* npm install (installs dependencies)
+* npm run build (builds typescript project)
+* ln -s build www (link www to build folder for Cordova as Cordova wants the build in the www folder)
+* cordova run ios --device --debug (or --release)
+* cordova run android --device --debug (or --release)
+* cordova build ios --device --debug (or --release) - builds IPA for distribution
+* cordova build android --device --debug (or --release) - builds APK for distribution
 
 ## Deployment
 
@@ -34,10 +57,9 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 ## Built With
 
 * Typescript
-* Redux
+* ReactJS/Redux
 * Raspberry Pi
 * Omron E5CC-QX2ASM-802
-
 
 ## Authors
 
