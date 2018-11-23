@@ -24,6 +24,10 @@ const taskQueue = new SequentialTaskQueue({
 
 const _client = new ModbusRtu();
 
+const cachedResults: {
+    [address: number]: number
+} = {};
+
 const connect = (options?: IE5CCOptions): Promise<void> => {
     return new Promise<void>(resolve => {
         if (options !== undefined) {
@@ -52,12 +56,16 @@ export const read = async (address: number, retry: number = 3, args: any = {}): 
     let result = undefined;
     try {
         result = await executeRead(address, retry, 0, args);
+        if (result !== undefined) {
+            cachedResults[address] = result;
+        } else if (cachedResults[address] !== undefined) {
+            result = cachedResults[address];
+        }
     } catch (e) {
         debug(e);
     }
     debug(`Read Result, ${address} = ${result}`);
     if (send) {
-        debug(`Sending, ${address} = ${result}`);
         send({
             type: 'READCOMPLETE',
             address,

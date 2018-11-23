@@ -182,15 +182,15 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                             i: this.state.i,
                             d: this.state.d
                         });
-                        this.setState({
-                            profile: value,
-                            start: {
-                                p: this.state.p,
-                                i: this.state.i,
-                                d: this.state.d,
-                                profile: value
-                            }
-                        });
+                        // this.setState({
+                        //     profile: value,
+                        //     start: {
+                        //         p: this.state.p,
+                        //         i: this.state.i,
+                        //         d: this.state.d,
+                        //         profile: value
+                        //     }
+                        // });
                         resolve(value);
                         modal.close();
                     }).bind(this), 1000);

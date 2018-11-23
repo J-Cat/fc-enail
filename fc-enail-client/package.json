@@ -1,7 +1,7 @@
 {
   "name": "fc-enail-client",
   "homepage": "./",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "private": true,
   "dependencies": {
     "antd": "^3.10.7",
