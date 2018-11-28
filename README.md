@@ -35,7 +35,7 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * install Raspbian
 * install NodeJS
 * npm install
-* node_modules\.bin\tsc
+* node_modules\\.bin\tsc
 
 #### Client
 * can be hosted on a web server like any other ReactJS application (could probably setup on NGINX on the device itself)
