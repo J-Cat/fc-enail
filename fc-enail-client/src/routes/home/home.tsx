@@ -33,14 +33,17 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
 
         this.state = {
             changing: false,
-            sliderValue: this.props.state ? this.props.state.sp : 0
+            sliderValue: this.props.state ? this.props.state.sp : 0,
+            startingValue: this.props.state ? this.props.state.sp : 0
         };
     }
 
     static getDerivedStateFromProps(nextProps: HomeProps.IProps, prevState: HomeProps.IState) {
-        if (nextProps.state && nextProps.state.sp !== prevState.sliderValue && (!prevState.changing)) {
+        if (nextProps.state && (nextProps.state.sp !== prevState.sliderValue) && (!prevState.changing)
+            && (prevState.startingValue !== nextProps.state.sp)) {
             return {
-                sliderValue: nextProps.state.sp
+                sliderValue: nextProps.state.sp,
+                startingValue: nextProps.state.sp
             };
         }
         return null;

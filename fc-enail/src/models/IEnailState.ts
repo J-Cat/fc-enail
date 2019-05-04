@@ -19,6 +19,7 @@ import { ISavedProfiles } from './ISavedProfiles';
 
  export interface IEnailState {
     readonly setPoint: number;
+    readonly setPointChanging: boolean;
     readonly presentValue: number;
     readonly running: boolean;
     readonly tuning: boolean;

@@ -64,11 +64,12 @@ const scripts = enailScripts.map((script, index) => {
 
 const initialState: IEnailState = {
     setPoint: 0,
+    setPointChanging: false,
     presentValue: 0,
     running: false,
     tuning: false,
     connected: false,
-    ready: false,
+    ready: true,
     lastDirection: Direction.None,
     lastUpdate: 0,
     stepSize: 1,
@@ -443,7 +444,9 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             return {
                 ...state,
                 setPoint: state.setPoint + (action.payload as number),
-                ready: true
+                setPointChanging: true,
+                lastUpdate: Date.now(),
+                ready: false
             }
         }
 
@@ -478,7 +481,6 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.E5CC_READY: {
             return {
                 ...state,
-                lastUpdate: Date.now(),
                 ready: true
             }
         }
@@ -553,6 +555,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
 
             return {
                 ...state,
+                ready: true,
                 currentStep: getNextStep(state),
                 currentStepPos: getNextStepPos(state)
             }

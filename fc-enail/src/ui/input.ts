@@ -52,7 +52,7 @@ process.on('message', m => {
     }
 })
 
-button.init(config.options.hardware.button);
+button.init(config.options.hardware.button.pin);
 
 dial.init(
     config.options.hardware.dial.A, 

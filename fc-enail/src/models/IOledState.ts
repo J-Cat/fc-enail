@@ -22,4 +22,7 @@ export interface IOledState {
     readonly networkInfo?: IWpaCliStatus;
     readonly availableNetworks: string[]; 
     readonly menu: IMenuItem;
+    readonly lastUpdated: number;
+    readonly setPoint: number;
+    readonly presentValue: number;
 }

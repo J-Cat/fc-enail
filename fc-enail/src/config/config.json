@@ -14,7 +14,10 @@
                 "oled": {
                     "address": 60
                 },
-                "button": 25,
+                "button": {
+                    "pin": 25,
+                    "debounce": 20
+                },
                 "dial": {
                     "A": 22,
                     "B": 23,
@@ -24,7 +27,9 @@
                     "rotationAccelerationExpires": 750,
                     "rotationAccelerationThreshold": 250,
                     "rotationMaxStep": 10,
-                    "rotationFixedStep": 0
+                    "rotationFixedStep": 0,
+                    "rotationDebounce": 40,
+                    "buttonDebounce": 20
                 }
             },
             "e5cc": {    

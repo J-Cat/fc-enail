@@ -142,55 +142,55 @@ const processClick = () => {
         return;
     }
 
-    switch (state.mode) {
-        case EnailMode.Home: {
-            store.dispatch<any>(toggleState());
-            break;
-        }
-
-        case EnailMode.Script: {
-            if (state.scriptRunning) {
-                store.dispatch<any>(endScript());
-            } else {
-                store.dispatch<any>(runScript());
+    if (state.scriptRunning) {
+        store.dispatch<any>(endScript());
+    } else {
+        switch (state.mode) {
+            case EnailMode.Home: {
+                store.dispatch<any>(toggleState());
+                break;
             }
-            break;
-        }
 
-        case EnailMode.Settings: {
-            store.dispatch<any>(settingSelect());
-            break;
+            case EnailMode.Script: {
+                store.dispatch<any>(runScript());
+                break;
+            }
+
+            case EnailMode.Settings: {
+                store.dispatch<any>(settingSelect());
+                break;
+            }
         }
     }
 }
 
 const processMediumClick = () => {
-        if (processExitRunning) {
+    if (processExitRunning) {
         processExitRunning = false;
         return;
     }
 
     const state = store.getState();
-    switch (state.enail.mode) {
-        case EnailMode.Script: {
-            store.dispatch<any>(toggleState());
-            break;
-        }
-
-        case EnailMode.Home: {
-            if (state.enail.scriptRunning) {
-                store.dispatch<any>(endScript());
-            } else {
-                store.dispatch<any>(runScript());
+    if (state.enail.scriptRunning) {
+        store.dispatch<any>(endScript());
+    } else {
+        switch (state.enail.mode) {
+            case EnailMode.Script: {
+                store.dispatch<any>(toggleState());
+                break;
             }
-            break;
-        }
 
-        case EnailMode.Settings: {
-            if ((state.menu.currentMenu === Constants.MENU.SETTINGS.NETWORK.CONNECT.KEY)
-                && (state.menu.actionStep === 1)
-            ) {
-                store.dispatch<any>(connectWiFiNetwork(state.menu.scan![state.menu.currentIndex].ssid, state.menu.passphrase));
+            case EnailMode.Home: {
+                store.dispatch<any>(runScript());
+                break;
+            }
+
+            case EnailMode.Settings: {
+                if ((state.menu.currentMenu === Constants.MENU.SETTINGS.NETWORK.CONNECT.KEY)
+                    && (state.menu.actionStep === 1)
+                ) {
+                    store.dispatch<any>(connectWiFiNetwork(state.menu.scan![state.menu.currentIndex].ssid, state.menu.passphrase));
+                }
             }
         }
     }

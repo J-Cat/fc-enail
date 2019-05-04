@@ -15,7 +15,10 @@ export interface IConfig {
             readonly oled: {
                 readonly address: number;
             }
-            readonly button: number;
+            readonly button: {
+                readonly pin: number;
+                readonly debounce: number;
+            }
             readonly dial: {
                 readonly A: number;
                 readonly B: number;
@@ -26,6 +29,8 @@ export interface IConfig {
                 readonly rotationAccelerationThreshold: number;
                 readonly rotationMaxStep: number;
                 readonly rotationFixedStep: number;
+                readonly rotationDebounce: number;
+                readonly buttonDebounce: number;
             }
         };
         readonly e5cc: IE5CCOptions;

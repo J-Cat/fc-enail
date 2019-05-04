@@ -266,28 +266,33 @@ export class OledUi {
         if (this.state.isPassphrase) {
             lines = [Constants.APPLICATION_TITLE, this.state.passphrase];            
         } else {
-            switch (this.state.mode) {
-                case EnailMode.Script: {
-                    lines = [
-                        this.state.scriptTitle
-                    ];
-                    break;
-                }
-                case EnailMode.Settings: {
-                    lines = this.getSettingsItems();
-                    break;
-                }
-                default: {
-                    if (this.state.scriptRunning) {
-                        const elapsed = Date.now() - this.state.scriptStartTime;
-                        const m = Math.floor(elapsed / 60000);
-                        const s = Math.floor((elapsed % 60000) / 1000);
-                        const d = `${m}:${s.toString().length === 1 ? '0' : ''}${s}`;
-                        lines = [this.state.scriptTitle, this.state.stepMessage || d];
-                    } else {
-                        lines = [Constants.APPLICATION_TITLE];
+            if (Date.now() - this.state.lastUpdated < 750) {
+                lines = [
+                    this.state.scriptRunning ? this.state.scriptTitle : Constants.APPLICATION_TITLE,
+                    this.state.setPoint.toString()
+                ];
+            } else if (this.state.scriptRunning) {
+                const elapsed = Date.now() - this.state.scriptStartTime;
+                const m = Math.floor(elapsed / 60000);
+                const s = Math.floor((elapsed % 60000) / 1000);
+                const d = `${m}:${s.toString().length === 1 ? '0' : ''}${s}`;
+                lines = [this.state.scriptTitle, this.state.stepMessage || d];
+            } else {
+                switch (this.state.mode) {
+                    case EnailMode.Script: {
+                        lines = [
+                            this.state.scriptTitle
+                        ];
+                        break;
                     }
-                    break;
+                    case EnailMode.Settings: {
+                        lines = this.getSettingsItems();
+                        break;
+                    }
+                    default: {
+                        lines = [Constants.APPLICATION_TITLE];
+                        break;
+                    }
                 }
             }
 

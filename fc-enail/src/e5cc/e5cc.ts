@@ -18,6 +18,7 @@ import store from '../store/createStore';
 import { updateAllState, setReady, nextStep, updateP, updateD, updateI, getPidSettings } from '../reducers/enailReducer';
 import { fork, ChildProcess } from 'child_process';
 import * as Constants from '../models/constants';
+import { stat } from 'fs';
 const debug = Debug('fc-enail:e5cc');
 
 class E5CC {  
@@ -35,16 +36,21 @@ class E5CC {
         this.e5ccService = fork(`${__dirname}/service.js`);
 
         this.e5ccService.on('message', m => {
+            const state = store.getState().enail;
             debug(m);
             switch (m.type) {
                 case 'DATA': {
+                    if (!state.ready) {
+                        break;
+                    }
+                    
                     if (this.isTuning !== m.isTuning) {
                         store.dispatch(getPidSettings(true));
                     }
                     
                     this.pv = m.pv as number;
-                    this.sp = m.sp as number;
-                    this.isRunning = m.isRunning as boolean
+                    this.sp = Date.now() - state.lastUpdate > 5000 ? m.sp as number : state.setPoint;
+                    this.isRunning = m.isRunning as boolean;
                     this.isTuning = m.isTuning;
                     this.started = true;
                     store.dispatch(updateAllState(m.pv, m.sp, m.isRunning, m.isTuning));        
@@ -182,6 +188,15 @@ class E5CC {
             args 
         });
     }
+
+    // moveSP = (value: number, retry: number = 0, args: any = {}) => {
+    //     this.e5ccService.send({ 
+    //         type: 'MOVESP', 
+    //         value, 
+    //         retry, 
+    //         args 
+    //     });
+    // }
 
     // toggleUnit = async (): Promise<boolean> => {
     //     if (await run(0x0700)) {

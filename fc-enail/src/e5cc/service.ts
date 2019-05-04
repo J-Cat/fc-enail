@@ -1,5 +1,6 @@
 import * as ModbusRtu from 'modbus-serial';
 import { send } from 'process';
+import * as AsyncLock from 'async-lock';
 import { IE5CCOptions } from './IE5ccOptions';
 
 import Debug from 'debug';
@@ -97,13 +98,23 @@ const executeRead = async (address: number, retry: number, retryCount: number = 
 
 export const write = async (address: number, value: number, retry: number = 3, args: any = {}): Promise<boolean> => {
     try {
+        let result: boolean = false;
+        let newValue = value;
         debug(`${address}, ${value}`);
-        const result = await executeWrite(address, value, retry) || false;
+        if (address === Constants.VARIABLES.SETPOINT) {
+            lock.acquire('SP', async () => {
+                if (newSP !== undefined) {
+                    newValue = newSP;
+                    newSP = undefined;
+                }
+            });
+        }
+        result = await executeWrite(address, newValue, retry) || false;
         if (send) {
             send({
                 type: 'WRITECOMPLETE',
                 address,
-                value,
+                value: newValue,
                 result,
                 ...args
             });
@@ -169,7 +180,8 @@ const executeRun = async (command: number, retry: number, retryCount: number = 0
     }
 }
 
-const getE5CCState = () => {
+const getE5CCState = async () => {
+    await taskQueue.wait();
     taskQueue.push(() => {
         new Promise(async (resolve, reject) => {
             debug('Start');
@@ -249,11 +261,55 @@ connect(_options).then(async () => {
     getE5CCState();
 });
 
+const lock: AsyncLock = new AsyncLock();
+let newSP: number | undefined;
+// let offset: number = 0;
+
 process.on('message', async m => {
+    // lock.acquire('READWRITE', async () => {
+    //     switch (m.type) {
+    //         case 'READ': {
+    //             const value = await read(m.address as number, m.retry as number, m.args)
+    //             break;
+    //         }
+    
+    //         case 'READBATCH': {
+    //             for (let address of m.addressList) {
+    //                 await read(address as number, m.retry as number, m.args);
+    //             }
+    //             break;
+    //         }
+    
+    //         case 'WRITE': {
+    //             const value = await write(m.address as number, m.value as number, m.retry as number, m.args);
+    //             break;
+    //         }
+    
+    //         case 'WRITEBATCH': {
+    //             for (let value of m.data) {
+    //                 await write(value.address as number, value.value as number, m.retry as number, m.args);
+    //             }
+    //             break;
+    //         }
+    
+    //         case 'RUN': {
+    //             const value = await run(m.command as number, m.retry as number, m.args);
+    //             break;
+    //         }
+
+    //         // case 'MOVESP': {
+    //         //     lock.acquire('SP', () => {
+    //         //         offset += m.value as number;
+    //         //     }).catch(reason => {
+            
+    //         //     });            
+    //         // }
+    //     }    
+    // });
     taskQueue.push(async () => {
         switch (m.type) {
             case 'READ': {
-                const value = await read(m.address as number, m.retry as number, m.args)
+                await read(m.address as number, m.retry as number, m.args)
                 break;
             }
     
@@ -265,7 +321,12 @@ process.on('message', async m => {
             }
     
             case 'WRITE': {
-                const value = await write(m.address as number, m.value as number, m.retry as number, m.args);
+                if (m.address === Constants.VARIABLES.SETPOINT) {
+                    lock.acquire('SP', async () => {
+                        newSP = m.value as number;
+                    });
+                }
+                await write(m.address as number, m.value as number, m.retry as number, m.args);
                 break;
             }
     
@@ -277,9 +338,17 @@ process.on('message', async m => {
             }
     
             case 'RUN': {
-                const value = await run(m.command as number, m.retry as number, m.args);
+                await run(m.command as number, m.retry as number, m.args);
                 break;
             }
+
+            // case 'MOVESP': {
+            //     lock.acquire('SP', () => {
+            //         offset += m.value as number;
+            //     }).catch(reason => {
+            
+            //     });            
+            // }
         }    
     })
 });

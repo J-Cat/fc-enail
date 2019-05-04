@@ -1,6 +1,6 @@
 {
   "name": "fc-enail",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "FC E-Nail by JCat - a better e-Nail!",
   "main": "app.js",
   "scripts": {},
@@ -8,6 +8,7 @@
   "license": "CC-BY-NC-4.0",
   "dependencies": {
     "async": "^2.6.1",
+    "async-lock": "^1.1.3",
     "bonjour": "^3.5.0",
     "cors": "^2.8.5",
     "date-fns": "^1.29.0",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@types/async": "^2.0.50",
+    "@types/async-lock": "^1.1.0",
     "@types/bonjour": "^3.5.5",
     "@types/cors": "^2.8.4",
     "@types/date-fns": "^2.6.0",

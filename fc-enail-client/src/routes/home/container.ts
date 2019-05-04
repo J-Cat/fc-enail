@@ -47,6 +47,7 @@ export namespace HomeProps {
     export interface IState {
         readonly changing: boolean;
         readonly sliderValue: number;
+        readonly startingValue: number;
     }
 }
 

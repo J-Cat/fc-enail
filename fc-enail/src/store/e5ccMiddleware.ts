@@ -14,17 +14,22 @@
  * Copyright (c) 2018
  */
 import { Dispatch, Store } from 'redux';
+import * as AsyncLock from 'async-lock';
 
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { nextStep, persistProfiles } from '../reducers/enailReducer';
+import { nextStep, persistProfiles, setSP } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import led from '../ui/led';
 import server from '../server/server';
 import { IPidSettings } from '../models/IPidSettings';
 
+const lock: AsyncLock = new AsyncLock();
+let moveSpTimeout: NodeJS.Timeout | undefined;
+
 export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
+    const initState = store.getState().enail;
     const result = next(action);
     const state = store.getState().enail;
 
@@ -61,12 +66,24 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
 
         case Constants.E5CC_SET_SETPOINT: {
 //            store.dispatch(moveSP(Direction.None));
-            e5cc.setSP(action.payload as number);
+            e5cc.setSP(action.payload as number, 3);
             break;
         }
 
         case Constants.E5CC_MOVE_SETPOINT: {
-            e5cc.setSP(state.setPoint + (result.payload as number));
+            e5cc.setSP(state.setPoint, 2);
+            // lock.acquire('MOVESP', () => {
+            //     if (moveSpTimeout !== undefined) {
+            //         clearTimeout(moveSpTimeout);
+            //     }
+            //     moveSpTimeout = setTimeout(((setPoint: number) => {
+            //         lock.acquire('MOVESP', () => {
+            //             store.dispatch(setSP(setPoint));
+            //             //                    e5cc.setSP(setPoint);
+            //             moveSpTimeout = undefined;                        
+            //         })
+            //     }).bind(null, state.setPoint + (result.payload as number)), 500);
+            // });
             break;
         }
 

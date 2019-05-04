@@ -37,7 +37,7 @@ export class Button {
     }
 
     init = (gpioNumber: number) => {    
-        this.button = new Gpio(gpioNumber, 'in', 'both', {debounceTimeout: 5, activeLow: true});
+        this.button = new Gpio(gpioNumber, 'in', 'both', {debounceTimeout: config.options.hardware.button.debounce, activeLow: true});
         
         this.button.watch(async (err: Error, value: number) => {
             if (err) {
@@ -96,4 +96,4 @@ button.onReallyLongLick.subscribe(() => {
     }
 });
 
-button.init(config.options.hardware.button);
+button.init(config.options.hardware.button.pin);
