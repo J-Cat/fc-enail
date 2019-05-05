@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.jcat.fcenailclient" version="1.0.0-beta.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.jcat.fcenailclient" version="1.0.1-beta" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>FC E-Nail</name>
     <description>
         FC E-Nail by JCat - A better E-Nail!
@@ -19,22 +19,22 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="APP_SECRET" value="b734f548-0e0a-4556-92c4-a07ec20c0c16" />
+        <preference name="CodePushDeploymentKey" value="vqLGSry42dswc1K8EJh27Kn41bDwBJxQ6P3iE" />
+        <preference name="APPCENTER_ANALYTICS_ENABLE_IN_JS" value="true" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
+        <preference name="APP_SECRET" value="bad3e26b-be23-4cdd-8d09-578c731552c5" />
+        <preference name="CodePushDeploymentKey" value="HXwPZQ_bjeqg9xiRcehIpPWPQiKmSJK6OPns4" />
+        <preference name="APPCENTER_ANALYTICS_ENABLE_IN_JS" value="true" />
     </platform>
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="StatusBarBackgroundColor" value="#000000" />
     <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="AndroidLaunchMode" value="singleTask" />
-    <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
-    <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
-    <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
-    <plugin name="cordova-plugin-zeroconf" spec="^1.3.3" />
-    <plugin name="cordova-plugin-add-swift-support" spec="^1.7.2" />
-    <engine name="android" spec="^7.1.2" />
-    <engine name="browser" spec="^5.0.4" />
-    <engine name="ios" spec="^4.5.5" />
+    <icon src="icon.png" />
+    <splash src="splash.png" />
 </widget>

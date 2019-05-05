@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux';
 import { RSAA } from 'redux-api-middleware';
-import { Zeroconf } from '@ionic-native/zeroconf';
 
 import { IEnailState } from '../models/IEnailState';
 import { ISavedState } from '../models/ISavedState';
@@ -11,6 +10,7 @@ import { IEnailScript } from '../models/IEnailScript';
 import { IVerifyTokenResponse } from '../models/IVerifyTokenResponse';
 import { IPidSettings } from '../models/IPidSettings';
 import { ISavedProfiles } from '../models/ISavedProfiles';
+import { Zeroconf } from '@ionic-native/zeroconf';
 
 const initialState: IEnailState = {
     serviceFound: false,
@@ -215,12 +215,11 @@ const fetchServiceUrl = (ignoreCache: boolean): Promise<string> => {
             return;
         }
 
-        const zeroconf = new Zeroconf();
         const timeout2 = setTimeout(() => {
             reject();
         }, 5000);
 
-        zeroconf.watch('_fc-enail._tcp.', 'local.').subscribe((result: { action: string, service: any }) => {
+        Zeroconf.watch('_fc-enail._tcp.', 'local.').subscribe((result: { action: string, service: any }) => {
             switch (result.action) {
                 case 'resolved': {
                     clearTimeout(timeout2);
@@ -243,7 +242,7 @@ const fetchServiceUrl = (ignoreCache: boolean): Promise<string> => {
                         reject();
                     });
 
-                    zeroconf.unwatch('_fc-enail._tcp.', 'local.');
+                    Zeroconf.unwatch('_fc-enail._tcp.', 'local.');
                     break;
                 }
             }
@@ -412,8 +411,7 @@ export const verifyPassphrase = (passphrase: string) => {
 
 export const findEnailService = () => {
     return (dispatch: Dispatch<EnailAction>) => {
-        const zeroconf = (cordova.plugins as any).zeroconf;
-        zeroconf.watch('_fc-enail._tcp.', 'local.', (result: { action: string, service: any }) => {
+        Zeroconf.watch('_fc-enail._tcp.', 'local.').subscribe((result: { action: string, service: any }) => {
             switch (result.action) {
                 case 'added': case 'resolved': {
                     dispatch({

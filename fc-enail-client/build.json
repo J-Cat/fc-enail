@@ -20,16 +20,16 @@
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "development",
-            "provisioningProfile": "ee7eb916-8c70-4ade-bfa0-dc0c6863bf73",
+            "provisioningProfile": "7d640a1e-416c-4b09-8471-12ce804314fa",
             "buildFlag": [
                 "-UseModernBuildSystem=0"
             ]
         },
         "release": {
-            "codeSignIdentity": "iPhone Developer",
+            "codeSignIdentity": "iPhone Distribution",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "enterprise",
-            "automaticProvisioning": true,
+            "provisioningProfile": "8507a189-4166-4142-b9af-e9dc41c40e3b",
             "buildFlag": [
                 "-UseModernBuildSystem=0"
             ]

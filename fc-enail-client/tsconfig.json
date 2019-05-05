@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true
+    //"skipLibCheck": true
   },
   "exclude": [
     "node_modules",
@@ -27,6 +28,8 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "platforms",
+    "plugins"
   ]
 }

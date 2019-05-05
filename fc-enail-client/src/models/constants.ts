@@ -85,3 +85,5 @@ export const STEP_MOVETEMP = 'movetemp';
 export const STEP_WAITTEMP = 'waittemp';
 export const STEP_TIMER = 'timer';
 export const STEP_SEQUENTIAL = 'sequential';
+
+export const UPDATE_VERSION = 'ENAIL/VERSION/UPDATE';
