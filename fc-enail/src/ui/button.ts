@@ -21,7 +21,7 @@ export class Button {
         return this._onClick.asEvent();
     }
 
-    protected _onMediumClick: SimpleEventDispatcher<Button> = new SimpleEventDispatcher<Button>();
+    protected _onMediumClick: SimpleEventDispatcher<Button>  = new SimpleEventDispatcher<Button>();
     get onMediumClick(): ISimpleEvent<Button> {
         return this._onMediumClick.asEvent();
     }

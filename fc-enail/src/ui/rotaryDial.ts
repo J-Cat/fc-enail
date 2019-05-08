@@ -75,63 +75,54 @@ export class RotaryDial {
         const a = this.lastA;
         const b = this.lastB;
 
-        this.dispatchPromise.then(() => {
-            if (a === 0 && b === 0 || a === 1 && b === 1) {
-                //this._onChange.dispatch(this, 1);
-                if ((Date.now() - this.lastInternalUpdate) > ROTATION_THROTTLE) {
-                    this.offset += 1;
-                    this.lastInternalUpdate = Date.now();
-                } else {
-                    return;
-                }
-            } else if (a === 1 && b === 0 || a === 0 && b === 1 || a === 2 && b === 0) { 
-                if ((Date.now() - this.lastInternalUpdate) > ROTATION_THROTTLE) {
-                    //this._onChange.dispatch(this, -1);
-                    this.offset -= 1;
-                    this.lastInternalUpdate = Date.now();
-                } else {
-                    return;
-                }
-            }  
-        });
+        if (a === 0 && b === 0 || a === 1 && b === 1) {
+            //this._onChange.dispatch(this, 1);
+            if ((Date.now() - this.lastInternalUpdate) < ROTATION_THROTTLE) {
+                return;
+            } else {
+                this.offset = 1;
+            }
+        } else if (a === 1 && b === 0 || a === 0 && b === 1 || a === 2 && b === 0) { 
+            if ((Date.now() - this.lastInternalUpdate) < ROTATION_THROTTLE) {
+                return;
+            } else {
+                this.offset = -1;
+            }
+        }  
 
         const elapsed = Date.now() - this.lastUpdate;
-        debug(`${this.offset}, ${this.step}`);
         if (elapsed > (this.mode === EnailMode.Home ? MESSAGE_THROTTLE : 0)) {
-            this.dispatchPromise = new Promise(resolve => {
-                if (this.offset !== 0) {
-                    if (ROTATION_FIXED_STEP !== 0) {
-                        this.step = ROTATION_FIXED_STEP;
+            new Promise(resolve => {
+                if (ROTATION_FIXED_STEP !== 0) {
+                    this.step = ROTATION_FIXED_STEP;
+                } else {
+                    if (elapsed > ROTATION_ACCELERATION_EXPIRES) {
+                        this.step = 1;
                     } else {
-                        if (elapsed > ROTATION_ACCELERATION_EXPIRES) {
-                            this.step = 1;
-                        } else {
-                            if (this.offset > 0) {
-                                if (this.lastOffset > 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
-                                    this.step += 1;
-                                } else if (this.step > 2) {
-                                    this.step -= 2;
-                                } else if (this.step > 1) {
-                                    this.step -= 1;
-                                }
+                        if (this.offset > 0) {
+                            if (this.lastOffset > 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
+                                this.step += 1;
                             } else {
-                                if (this.lastOffset < 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
-                                    this.step += 1;
-                                } else if (this.step > 2) {
-                                    this.step -= 2;
-                                } else if (this.step > 1) {
-                                    this.step -= 1;
-                                }
+                                this.step = 1;
+                            }
+                        } else if (this.offset < 0) {
+                            if (this.lastOffset < 0 && this.step <= ROTATION_MAX_STEP && elapsed < ROTATION_ACCELERERATION_THRESHOLD) {
+                                this.step += 1;
+                            } else {
+                                this.step = 1;
                             }
                         }
                     }
                     // debug(`Offset = ${this.offset}, Last = ${this.lastOffset}, Step = ${this.step}`);
-                    this._onChange.dispatch(this, { offset: this.offset, step: this.step });
-                    this.lastOffset = this.offset;
-                    this.offset = 0;
                 }
-                this.lastUpdate = Date.now();
                 resolve();
+            }).then(() => {
+                debug(`${this.offset}, ${this.step}`);
+                this._onChange.dispatch(this, { offset: this.offset, step: this.step });
+                this.lastOffset = this.offset;
+                this.offset = 0;
+                this.lastUpdate = Date.now();
+                this.lastInternalUpdate = Date.now();
             });
         }
 

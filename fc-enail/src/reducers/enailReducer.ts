@@ -67,6 +67,7 @@ const initialState: IEnailState = {
     setPointChanging: false,
     presentValue: 0,
     running: false,
+    runningSince: 0,
     tuning: false,
     connected: false,
     ready: true,
@@ -436,6 +437,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             return {
                 ...state,
                 setPoint: action.payload as number,
+                setPointChanging: false,
+                lastUpdate: Date.now(),
                 ready: false
             };
         }
@@ -450,10 +453,21 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
         }
 
+        case Constants.E5CC_TOGGLE_STATE: {
+            return {
+                ...state,
+                running: !state.running,
+                runningSince: state.running ? 0 : Date.now()
+            }
+        }
+
         case Constants.E5CC_UPDATE_STATE: {
             return {
                 ...state,
-                running: action.payload as boolean
+                running: action.payload as boolean,
+                runningSince: !state.running && (action.payload as boolean) ? Date.now() : (
+                    state.running && !(action.payload as boolean) ? 0 : state.runningSince
+                )
             }
         }
 
@@ -609,7 +623,10 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 presentValue: (action as IE5CCUpdateStateAction).payload!.pv,
                 setPoint: state.setPoint === 0 || state.ready ? (action as IE5CCUpdateStateAction).payload!.sp : state.setPoint,
                 running: (action as IE5CCUpdateStateAction).payload!.isRunning,
-                tuning: (action as IE5CCUpdateStateAction).payload!.isTuning
+                tuning: (action as IE5CCUpdateStateAction).payload!.isTuning,
+                runningSince: !state.running && (action as IE5CCUpdateStateAction).payload!.isRunning ? Date.now() : (
+                    state.running && !(action as IE5CCUpdateStateAction).payload!.isRunning ? 0 : state.runningSince
+                )
             };
         }
 

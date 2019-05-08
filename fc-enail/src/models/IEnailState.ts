@@ -22,6 +22,7 @@ import { ISavedProfiles } from './ISavedProfiles';
     readonly setPointChanging: boolean;
     readonly presentValue: number;
     readonly running: boolean;
+    readonly runningSince: number;
     readonly tuning: boolean;
     readonly connected: boolean;
     readonly ready: boolean;

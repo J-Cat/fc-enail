@@ -1,6 +1,7 @@
 {
     "default": {
         "options": {
+            "autoShutoff": 1,
             "monitorCycleTime": 1000,
             "displayRefreshRate": 1000,
             "click": {

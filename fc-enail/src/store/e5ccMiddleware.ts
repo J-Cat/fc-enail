@@ -19,11 +19,12 @@ import * as AsyncLock from 'async-lock';
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { nextStep, persistProfiles, setSP } from '../reducers/enailReducer';
+import { nextStep, persistProfiles, setSP, updateState, toggleState } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
 import led from '../ui/led';
 import server from '../server/server';
 import { IPidSettings } from '../models/IPidSettings';
+import { config } from '../config';
 
 const lock: AsyncLock = new AsyncLock();
 let moveSpTimeout: NodeJS.Timeout | undefined;
@@ -56,6 +57,9 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
         case Constants.E5CC_UPDATE_ALL_STATE: {
             if ((action as IE5CCUpdateStateAction).payload!.isRunning) {
                 led.on();
+                if (state.runningSince !== 0 && (Date.now() - state.runningSince > (config.options.autoShutoff * 60000))) {
+                    store.dispatch(toggleState());
+                }
             } else {
                 led.off();
             }
@@ -71,19 +75,19 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
         }
 
         case Constants.E5CC_MOVE_SETPOINT: {
-            e5cc.setSP(state.setPoint, 2);
-            // lock.acquire('MOVESP', () => {
-            //     if (moveSpTimeout !== undefined) {
-            //         clearTimeout(moveSpTimeout);
-            //     }
-            //     moveSpTimeout = setTimeout(((setPoint: number) => {
-            //         lock.acquire('MOVESP', () => {
-            //             store.dispatch(setSP(setPoint));
-            //             //                    e5cc.setSP(setPoint);
-            //             moveSpTimeout = undefined;                        
-            //         })
-            //     }).bind(null, state.setPoint + (result.payload as number)), 500);
-            // });
+            //e5cc.setSP(state.setPoint, 2);
+            lock.acquire('MOVESP', () => {
+                if (moveSpTimeout !== undefined) {
+                    clearTimeout(moveSpTimeout);
+                }
+                moveSpTimeout = setTimeout(((setPoint: number) => {
+                    lock.acquire('MOVESP', () => {
+                        store.dispatch(setSP(setPoint));
+                        //                    e5cc.setSP(setPoint);
+                        moveSpTimeout = undefined;                        
+                    })
+                }).bind(null, state.setPoint), 750);
+            });
             break;
         }
 

@@ -34,8 +34,6 @@ export class OledUi {
     private icon: Uint8Array = home;
     private lines: string[] = ["", ""];
     private lastLines: string[] = ["", ""];
-    private lastUpdate: number = 0;
-    private timeout?: NodeJS.Timeout;
     private scrollPos: number[] = [0, 0, 0, 0];
     private scrollDone: boolean[] = [true, false, false, false];
     private characterOn: number = 1;
@@ -187,6 +185,9 @@ export class OledUi {
 
 
     private getLineCoordinates = (index: number): { x: number, y: number } => {
+        if (this.lines.length === 1) {
+            return { x: 18, y: 8 };   
+        }
         if ((this.lines.length === 2) && (index === 1)) {
             if (this.state && !this.state.scriptRunning) {
                 return { x: 4, y: 45 };
@@ -262,13 +263,13 @@ export class OledUi {
 
         let lines = this.lines;
         let flashStatus = this.flashStatus;
-
+        let displaySetPoint = false;
         if (this.state.isPassphrase) {
             lines = [Constants.APPLICATION_TITLE, this.state.passphrase];            
         } else {
             if (Date.now() - this.state.lastUpdated < 750) {
+                displaySetPoint = true;
                 lines = [
-                    this.state.scriptRunning ? this.state.scriptTitle : Constants.APPLICATION_TITLE,
                     this.state.setPoint.toString()
                 ];
             } else if (this.state.scriptRunning) {
@@ -296,7 +297,7 @@ export class OledUi {
                 }
             }
 
-            if (lines.length === 1) {
+            if (lines.length === 1 && !displaySetPoint) {
                 lines.push(`${format(Date.now(), 'h:mm')}`);
             }
 
@@ -339,14 +340,19 @@ export class OledUi {
 
             // Clear display buffer
             display.clearScreen();
-            
-            display.setFont(Font.UbuntuMono_8ptFontInfo);
+    
+            if (this.lines.length === 1) {
+                display.setFont(Font.UbuntuMono_24ptFontInfo);
+            } else {
+                display.setFont(Font.UbuntuMono_8ptFontInfo);
+            }
     
             this.drawLines();
     
             if (
                 (this.flashStatus || this.state.flashRate === 0) 
                 && (this.lines.length < 3) 
+                && (this.lines.length > 1)
                 && (!this.state.isPassphrase)
                 && (!(
                     this.state.currentMenu === Constants.MENU.SETTINGS.NETWORK.CONNECT.KEY 
@@ -356,7 +362,6 @@ export class OledUi {
                 this.drawIcon();
             }
     
-            this.lastUpdate = Date.now();
             display.refresh();           
         }
     }

@@ -18,7 +18,6 @@ import store from '../store/createStore';
 import { updateAllState, setReady, nextStep, updateP, updateD, updateI, getPidSettings } from '../reducers/enailReducer';
 import { fork, ChildProcess } from 'child_process';
 import * as Constants from '../models/constants';
-import { stat } from 'fs';
 const debug = Debug('fc-enail:e5cc');
 
 class E5CC {  

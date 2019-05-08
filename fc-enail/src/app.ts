@@ -33,6 +33,7 @@ let input: ChildProcess;
 let button: ChildProcess;
 let lastRotation = 0;
 
+
 const initInput = () => {
     let env = process.env;
     delete env.NODE_OPTIONS;
