@@ -1,3 +1,4 @@
 export interface ISavedState {
-    presets: number[]
+    presets: number[];
+    autoShutoff: number;
 }

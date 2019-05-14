@@ -2,7 +2,6 @@ import { IE5CCOptions } from '../e5cc/IE5ccOptions';
 
 export interface IConfig {
     readonly options: {
-        readonly autoShutoff: number;
         readonly monitorCycleTime: number;
         readonly displayRefreshRate: number;
         readonly click: {

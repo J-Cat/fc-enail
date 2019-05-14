@@ -25,4 +25,7 @@ export interface IOledState {
     readonly lastUpdated: number;
     readonly setPoint: number;
     readonly presentValue: number;
+    readonly running: boolean;
+    readonly runningSince: number;
+    readonly autoShutoff: number;
 }

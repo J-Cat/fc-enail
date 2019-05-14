@@ -4,6 +4,7 @@ export interface IEnailEmitState {
     readonly pv: number;
     readonly sp: number;
     readonly running: boolean;
+    readonly runningSince: number;
     readonly tuning: boolean;
     readonly scriptRunning: boolean;
     readonly currentScript?: number;

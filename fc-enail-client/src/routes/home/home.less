@@ -92,16 +92,17 @@
             margin: 5px 10px 5px 10px;
             border: 1px solid @border-color-base;
             border-collapse: collapse;
+            height: 140px;
             @media @landscape {
                 width: 50%;
-                height: 100%;
             }
             &-left {
                 flex: 2;
                 display: flex;
                 flex-direction: column;
+                height: 140px;
                 &-pv {
-                    font-size: 4em;
+                    font-size: 3.5em;
                     font-weight: bold;
                     margin: 0px;
                     background-color: #AAA;
@@ -134,6 +135,7 @@
                 flex-direction: column;
                 border: 1px solid @border-color-base;
                 border-collapse: collapse;
+                height: 140px;
             
                 &-spacer {
                     flex: 0;
@@ -175,6 +177,13 @@
                         }
                     }
                 }
+                &-time {
+                    .am-badge-text {
+                        background-color: #AAA;
+                        font-weight: bold;
+                        font-size: 1.1em;
+                    }
+                }
             }
         }
 
@@ -182,11 +191,12 @@
             border: 1px solid @border-color-base;
             margin: 5px 10px 5px 10px;
             flex: 1 0 0;
-            height: 140px;
+            height: 100px;
             @media @landscape {
                 bottom: 0px;
                 top: 0px;
                 width: 50%;
+                height: 140px;
             }
     
             &-scripts { 
@@ -214,11 +224,11 @@
                             flex: 0;
                             &-button {
                                 position: relative;
-                                top: -10px;
+                                top: 0px;
                                 padding: 0px !important;
                                 margin: 0px 40px 0px 40px;
-                                width: 72px !important;
-                                height: 72px !important;
+                                width: 48px !important;
+                                height: 48px !important;
                                 color: #000;
                                 background-color: #AAA !important;
                                 height: 100%;
@@ -228,10 +238,10 @@
                                     top: 0px;
                                     right: 0px;
                                     bottom: 0px;
-                                    height: 52px;
-                                    width: 52px;
+                                    height: 38px;
+                                    width: 38px;
                                     margin: 0xp;
-                                    padding: 0px;
+                                    padding: 2px 0px 0px 0px;
                                 }
                             }
                         }

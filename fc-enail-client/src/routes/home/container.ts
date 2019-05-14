@@ -28,6 +28,7 @@ export namespace HomeProps {
         readonly state?: IEnailEmitState;
         readonly scripts: IEnailScript[];
         readonly presets: number[];
+        readonly autoShutoff: number;
     }
 
     export interface IDispatchProps {
@@ -56,7 +57,8 @@ function mapStateToProps(state: IEnailStore, ownProps: HomeProps.IOwnProps) {
         version: state.version.version,
         state: state.enail.emitState,
         scripts: state.enail.scripts || [],
-        presets: state.enail.presets
+        presets: state.enail.presets,
+        autoShutoff: state.enail.autoShutoff
     };
 }
 

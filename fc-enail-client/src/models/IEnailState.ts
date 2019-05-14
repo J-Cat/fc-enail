@@ -10,6 +10,7 @@ export interface IEnailState {
     readonly serviceFound: boolean;
     readonly scripts?: IEnailScript[];
     readonly presets: number[];
+    readonly autoShutoff: number;
     readonly error?: boolean;
     readonly message?: string;
     readonly token: string;

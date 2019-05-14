@@ -18,6 +18,7 @@ const initialState: IEnailState = {
     requesting: false,
     reconnect: false,
     presets: [],
+    autoShutoff: 45,
     token: '',
     profiles: {
         profiles: {}
@@ -632,7 +633,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 requesting: false,
                 error: false,
-                presets: (action.meta as ISavedState).presets
+                presets: (action.meta as ISavedState).presets,
+                autoShutoff: (action.meta as ISavedState).autoShutoff
             }
         }
 
@@ -693,7 +695,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 requesting: false,
                 error: false,
-                presets: (action.payload as ISavedState).presets
+                presets: (action.payload as ISavedState).presets,
+                autoShutoff: (action.payload as ISavedState).autoShutoff
             };
         }
 
@@ -703,7 +706,8 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 requesting: false,
                 error: true,
                 message: !action.payload ? undefined : (action as IErrorAction).payload!.message,
-                presets: []
+                presets: [],
+                autoShutoff: 45
             };
         }
 

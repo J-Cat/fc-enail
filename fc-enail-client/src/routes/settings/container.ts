@@ -29,6 +29,7 @@ export namespace SettingsProps {
         readonly version: string;
         readonly state?: IEnailEmitState;
         readonly presets: number[];
+        readonly autoShutoff: number;
         readonly p: number;
         readonly i: number;
         readonly d: number;
@@ -59,6 +60,7 @@ export namespace SettingsProps {
                 errorMsg: string|undefined;    
             }
         };
+        readonly autoShutoff: number;
         readonly p: number;
         readonly i: number;
         readonly d: number;
@@ -80,6 +82,7 @@ function mapStateToProps(state: IEnailStore, ownProps: SettingsProps.IOwnProps) 
         i: state.enail.emitState ? state.enail.emitState.i : 0,
         d: state.enail.emitState ? state.enail.emitState.d : 0,
         presets: state.enail.presets,
+        autoShutoff: state.enail.autoShutoff,
         profile: state.enail.emitState ? state.enail.emitState.profile || '' : state.enail.profiles.currentProfile || '',
         profiles: state.enail.profiles.profiles
     };

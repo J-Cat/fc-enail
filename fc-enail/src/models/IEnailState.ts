@@ -39,6 +39,7 @@ import { ISavedProfiles } from './ISavedProfiles';
     readonly scriptStartSP?: number;
     readonly mode: EnailMode;
     readonly presets: number[];
+    readonly autoShutoff: number;
     readonly scriptStartTime: number;
     readonly passphrase: string;
     readonly icon: string;

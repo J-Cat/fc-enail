@@ -55,7 +55,10 @@ export class EnailController {
     }
 
     getSavedState = (req: Request, res: Response, next: NextFunction): void => {
-        res.status(HttpStatus.OK).send({presets: store.getState().enail.presets});
+        res.status(HttpStatus.OK).send({
+            presets: store.getState().enail.presets,
+            autoShutoff: store.getState().enail.autoShutoff
+        });
     }
 
     persistSavedState = (req: Request, res: Response, next: NextFunction): void => {

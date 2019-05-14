@@ -20,6 +20,7 @@ import { HomeProps } from './container';
 import { Badge, Grid, Slider, Modal, Toast, Switch } from 'antd-mobile';
 import { Button } from 'antd';
 import { Action } from 'antd-mobile/lib/modal/PropsType';
+import { format } from 'date-fns';
 
 import { IEnailScript } from '../../models/IEnailScript';
 
@@ -185,6 +186,10 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                     <Switch className="home-content-body1-right-switch" onChange={this.toggleState} checked={this.props.state.running} disabled={this.props.state === undefined} color="#A00000"  />
                                     {this.props.state.tuning
                                         ? <Badge text="TUNE" className="home-content-body1-right-badge" />
+                                        : ''
+                                    }
+                                    {this.props.state.running
+                                        ? <Badge text={format((this.props.autoShutoff * 60000) - (Date.now() - this.props.state.runningSince), 'm:ss')} className="home-content-body1-right-time" />
                                         : ''
                                     }
                                     <div className='home-content-body1-right-spacer' />

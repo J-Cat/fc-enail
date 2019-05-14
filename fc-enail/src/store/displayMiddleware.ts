@@ -40,7 +40,10 @@ export const displayMiddleware = (store: Store<IEnailStore>) => <A extends Enail
         stepMessage: state.enail.currentStep ? state.enail.currentStep.message : '',
         lastUpdated: state.enail.lastUpdate,
         setPoint: state.enail.setPoint,
-        presentValue: state.enail.presentValue
+        presentValue: state.enail.presentValue,
+        running: state.enail.running,
+        runningSince: state.enail.runningSince,
+        autoShutoff: state.enail.autoShutoff
     };
 
     oledUi.send(oledState);

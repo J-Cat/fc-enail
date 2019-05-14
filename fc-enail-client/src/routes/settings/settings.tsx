@@ -35,6 +35,7 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
 
         this.state = {
             presets: {},
+            autoShutoff: this.props.autoShutoff,
             p: this.props.p,
             i: this.props.i,
             d: this.props.d,
@@ -130,6 +131,14 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
         }
     }
 
+    handleAutoShutoffChange = (value: number | string) => {
+        if (typeof(value) === 'number') {
+            this.setState({
+                autoShutoff: value
+            });
+        }
+    }
+
     handleProfileChange = (value: string) => {
         const prof = this.props.profiles[value];
         if (prof) {
@@ -163,7 +172,8 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
             this.state.presets[index] ? this.state.presets[index].value : value
         ));
         this.props.persistSavedState({ 
-            presets
+            presets,
+            autoShutoff: this.state.autoShutoff
         });
     }
 
@@ -281,6 +291,25 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                             </FormItem>
                                         );
                                     })}
+                                </div>
+                                <div className='settings-content-container-presets-datarow-spacer' />
+                            </div>
+                            <div className='settings-content-container-presets-datarow'>
+                                <div className='settings-content-container-presets-datarow-content'>
+                                    <FormItem
+                                        key={`autoShutoff`}
+                                        label={`Auto Shutoff (in Minutes)`}
+                                        validateStatus={this.state.autoShutoff >= 0 ? 'success' : 'error'}
+                                        help={this.state.autoShutoff >= 0 ? '' : 'Auto Shutoff Value must be >= 0.'}
+                                    >
+                                        <InputNumber
+                                            min={0}
+                                            max={1440}
+                                            defaultValue={this.props.autoShutoff}
+                                            // tslint:disable-next-line:jsx-no-lambda
+                                            onChange={(value) => this.handleAutoShutoffChange(value as string|number)}
+                                        />
+                                    </FormItem>
                                 </div>
                                 <div className='settings-content-container-presets-datarow-spacer' />
                             </div>

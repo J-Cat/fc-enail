@@ -83,6 +83,7 @@ const initialState: IEnailState = {
     currentScript: scripts.length > 0 ? scripts[0] : undefined,
     currentStep: scripts.length > 0 ? scripts[0].step : undefined,
     presets: [],
+    autoShutoff: 45,
     profiles: {
         profiles: {}
     },
@@ -633,14 +634,16 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.LOAD_SAVED_STATE: {
             return {
                 ...state,
-                presets: (action.payload as ISavedState).presets
+                presets: (action.payload as ISavedState).presets,
+                autoShutoff: (action.payload as ISavedState).autoShutoff || 45
             };
         }
 
         case Constants.PERSIST_SAVED_STATE: {
             return {
                 ...state,
-                presets: (action.payload as ISavedState).presets
+                presets: (action.payload as ISavedState).presets,
+                autoShutoff: (action.payload as ISavedState).autoShutoff || 45              
             }
         }
 

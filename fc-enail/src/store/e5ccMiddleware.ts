@@ -57,7 +57,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
         case Constants.E5CC_UPDATE_ALL_STATE: {
             if ((action as IE5CCUpdateStateAction).payload!.isRunning) {
                 led.on();
-                if (state.runningSince !== 0 && (Date.now() - state.runningSince > (config.options.autoShutoff * 60000))) {
+                if (state.runningSince !== 0 && (Date.now() - state.runningSince > (state.autoShutoff * 60000))) {
                     store.dispatch(toggleState());
                 }
             } else {

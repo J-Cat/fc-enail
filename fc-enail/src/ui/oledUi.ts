@@ -298,7 +298,11 @@ export class OledUi {
             }
 
             if (lines.length === 1 && !displaySetPoint) {
-                lines.push(`${format(Date.now(), 'h:mm')}`);
+                if (this.state.running) {
+                    lines.push(`${format((this.state.autoShutoff * 60000) - (Date.now() - this.state.runningSince), 'm:ss')}`);
+                } else {
+                    lines.push(`${format(Date.now(), 'h:mm')}`);
+                }
             }
 
             this.icon = getIconByName(this.state.icon);

@@ -115,6 +115,7 @@ export class Server {
             pv: state.presentValue,
             sp: state.setPoint,
             running: state.running,
+            runningSince: state.runningSince,
             tuning: state.tuning,
             scriptRunning: state.scriptRunning,
             currentScript: state.currentScript ? state.currentScript.index : undefined,
