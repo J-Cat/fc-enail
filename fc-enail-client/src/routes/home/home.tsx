@@ -35,16 +35,21 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
         this.state = {
             changing: false,
             sliderValue: this.props.state ? this.props.state.sp : 0,
-            startingValue: this.props.state ? this.props.state.sp : 0
+            startingValue: this.props.state ? this.props.state.sp : 0,
+            setPoint: this.props.state ? this.props.state.sp : 0,
+            running: this.props.state ? this.props.state.running : false,
+            scriptRunning: this.props.state ? this.props.state.scriptRunning : false
         };
     }
 
     static getDerivedStateFromProps(nextProps: HomeProps.IProps, prevState: HomeProps.IState) {
-        if (nextProps.state && (nextProps.state.sp !== prevState.sliderValue) && (!prevState.changing)
-            && (prevState.startingValue !== nextProps.state.sp)) {
+        if (nextProps.state && prevState.setPoint === 0) {
             return {
                 sliderValue: nextProps.state.sp,
-                startingValue: nextProps.state.sp
+                startingValue: nextProps.state.sp,
+                setPoint: nextProps.state.sp,
+                running: nextProps.state.running,
+                scriptRunning: nextProps.state.scriptRunning
             };
         }
         return null;
@@ -65,7 +70,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             setTimeout((() => {
                 this.setState({
                     changing: false,
-                    sliderValue: value
+                    sliderValue: value,
+                    setPoint: value
                 });
             }).bind(this), 500);
         } else {
@@ -111,7 +117,11 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     }
 
     toggleState = () => {
-        this.props.toggleState();
+        this.setState({
+            running: !this.state.running
+        }, () => {
+            this.props.toggleState();
+        });
     }
 
     runEndScript = () => {
@@ -119,11 +129,16 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             return;
         }
 
-        if (this.props.state.scriptRunning) {
-            this.props.endScript();
-        } else {
-            this.props.runScript();
-        }
+        const isScriptRunning = this.state.scriptRunning;
+        this.setState({
+            scriptRunning: !isScriptRunning
+        }, () => {
+            if (isScriptRunning) {
+                this.props.endScript();
+            } else {
+                this.props.runScript();
+            }    
+        });
     }
 
     scriptAfterChange = (to: number) => {
@@ -134,7 +149,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     setQuickTemp = (value: number) => {
         this.props.setSP(value);
         this.setState({
-            sliderValue: value
+            sliderValue: value,
+            setPoint: value
         });
     }
 
@@ -146,7 +162,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                     {script.title}
                 </div>
                 <div className="home-content-body2-scripts-item-content-right">
-                    <Button className="home-content-body2-scripts-item-content-right-button" onClick={this.runEndScript} icon={this.props.state!.scriptRunning ? 'pause-circle' : 'play-circle'} style={{color: this.props.state!.scriptRunning ? '#A00000' : 'black' }} />
+                    <Button className="home-content-body2-scripts-item-content-right-button" onClick={this.runEndScript} icon={this.state.scriptRunning ? 'pause-circle' : 'play-circle'} style={{color: this.state.scriptRunning ? '#A00000' : 'black' }} />
                 </div>
             </div>
             <div className="home-content-body2-scripts-item-spacer" />
@@ -179,11 +195,11 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                             <div className="home-content-body1">
                                 <div className="home-content-body1-left">
                                     <div className="home-content-body1-left-pv">{this.props.state.pv}</div>
-                                    <div className="home-content-body1-left-sp" onClick={this.getSPDialog}>{this.state.changing ? this.state.sliderValue : this.props.state ? this.props.state.sp : '-'}</div>
+                                    <div className="home-content-body1-left-sp" onClick={this.getSPDialog}>{this.state.changing ? this.state.sliderValue : this.props.state ? this.props.state.sp : this.state.setPoint}</div>
                                 </div>
                                 <div className="home-content-body1-right">
                                     <div className='home-content-body1-right-spacer' />
-                                    <Switch className="home-content-body1-right-switch" onChange={this.toggleState} checked={this.props.state.running} disabled={this.props.state === undefined} color="#A00000"  />
+                                    <Switch className="home-content-body1-right-switch" onChange={this.toggleState} checked={this.state.running} disabled={this.props.state === undefined} color="#A00000"  />
                                     {this.props.state.tuning
                                         ? <Badge text="TUNE" className="home-content-body1-right-badge" />
                                         : ''
@@ -206,7 +222,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                     return (
                                         <Button 
                                             key={`preset_button_${index}`} 
-                                            className={preset === this.props.state!.sp ? "home-content-body3-content-quicktemp-selected" : "home-content-body3-content-quicktemp"}
+                                            className={preset === this.state.setPoint ? "home-content-body3-content-quicktemp-selected" : "home-content-body3-content-quicktemp"}
                                             // tslint:disable-next-line:jsx-no-lambda
                                             onClick={() => this.setQuickTemp(preset)}
                                         >

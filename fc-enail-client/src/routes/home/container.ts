@@ -49,6 +49,9 @@ export namespace HomeProps {
         readonly changing: boolean;
         readonly sliderValue: number;
         readonly startingValue: number;
+        readonly setPoint: number;
+        readonly running: boolean;
+        readonly scriptRunning: boolean;
     }
 }
 
