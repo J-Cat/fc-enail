@@ -19,7 +19,7 @@ import { Form, Button, Dropdown, InputNumber, Select, Menu, Collapse } from 'ant
 import { Modal, Toast } from 'antd-mobile';
 import { Action } from 'antd-mobile/lib/modal/PropsType';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
-import { ScriptsProps } from './container';
+import * as ScriptsProps from './container';
 import { IStep } from '../../models/IStep';
 import { IEnailScript } from '../../models/IEnailScript';
 import { moveStep, remapScript, addItem, deleteKey } from '../../helpers/stepHelper';
@@ -268,7 +268,6 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                     </div>
                     <FormItem className="scripts-content-buttonrow">
                         <Button
-                            type="primary"
                             htmlType="submit"
                         >
                             Save
@@ -276,7 +275,6 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                         &nbsp;&nbsp;
                         <Dropdown overlay={this.overlay(this.state.script.step)}>
                             <Button
-                                type="primary"
                                 htmlType="button"
                             >
                                 Add Step
@@ -284,7 +282,6 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                         </Dropdown>
                         &nbsp;&nbsp;
                         <Button
-                            type="primary"
                             htmlType="button"
                             onClick={this.createNew}
                         >
@@ -292,7 +289,6 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
                         </Button>
                         &nbsp;&nbsp;
                         <Button
-                            type="primary"
                             htmlType="button"
                             onClick={this.deleteScript}
                         >
@@ -653,4 +649,4 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
 
 const ScriptsForm = Form.create()(Scripts);
 
-export default ScriptsForm;
+export default ScriptsForm as any;

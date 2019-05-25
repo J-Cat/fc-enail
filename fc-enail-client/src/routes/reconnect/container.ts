@@ -21,26 +21,24 @@ import { IEnailStore } from '../../models/IEnailStore';
 import Reconnect from './reconnect';
 import { connectManual } from '../../reducers/enailReducer';
 
-export namespace ReconnectProps {
-    export interface IStateProps {
-        readonly version: string;
-    }
-
-    export interface IDispatchProps {
-        connectManual: (serviceUrl: string) => void;
-    }
-
-    export interface IOwnProps {
-    }
-
-    export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
-    }
-
-    export interface IState {
-    }
+export interface IStateProps {
+    readonly version: string;
 }
 
-function mapStateToProps(state: IEnailStore, ownProps: ReconnectProps.IOwnProps) {
+export interface IDispatchProps {
+    connectManual: (serviceUrl: string) => void;
+}
+
+export interface IOwnProps {
+}
+
+export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+}
+
+export interface IState {
+}
+
+function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     return {
         version: state.version.version
     };

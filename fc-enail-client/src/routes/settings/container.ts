@@ -24,57 +24,55 @@ import { ISavedState } from '../../models/ISavedState';
 import { persistSavedState, toggleTuning, savePidSettings, deleteProfile } from '../../reducers/enailReducer';
 import { IPidSettings } from '../../models/IPidSettings';
 
-export namespace SettingsProps {
-    export interface IStateProps {
-        readonly version: string;
-        readonly state?: IEnailEmitState;
-        readonly presets: number[];
-        readonly autoShutoff: number;
-        readonly p: number;
-        readonly i: number;
-        readonly d: number;
-        readonly profile: string;
-        readonly profiles: {
-            [profile: string]: IPidSettings;
-        };
-    }
-
-    export interface IDispatchProps {
-        persistSavedState: (savedState: ISavedState) => void;
-        toggleTuning: () => void;
-        savePidSettings: (settings: IPidSettings) => void;
-        deleteProfile: (profile: string) => void;
-    }
-
-    export interface IOwnProps {
-    }
-
-    export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
-    }
-
-    export interface IState {
-        readonly presets: {
-            [index: number]: {
-                value: number;
-                validationStatus: 'success'|'warning'|'error'|'validating'|undefined;
-                errorMsg: string|undefined;    
-            }
-        };
-        readonly autoShutoff: number;
-        readonly p: number;
-        readonly i: number;
-        readonly d: number;
-        readonly start: {
-            readonly p: number;
-            readonly i: number;
-            readonly d: number;
-            readonly profile: string;
-        }
-        readonly profile: string;
-    }
+export interface IStateProps {
+    readonly version: string;
+    readonly state?: IEnailEmitState;
+    readonly presets: number[];
+    readonly autoShutoff: number;
+    readonly p: number;
+    readonly i: number;
+    readonly d: number;
+    readonly profile: string;
+    readonly profiles: {
+        [profile: string]: IPidSettings;
+    };
 }
 
-function mapStateToProps(state: IEnailStore, ownProps: SettingsProps.IOwnProps) {
+export interface IDispatchProps {
+    persistSavedState: (savedState: ISavedState) => void;
+    toggleTuning: () => void;
+    savePidSettings: (settings: IPidSettings) => void;
+    deleteProfile: (profile: string) => void;
+}
+
+export interface IOwnProps {
+}
+
+export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+}
+
+export interface IState {
+    readonly presets: {
+        [index: number]: {
+            value: number;
+            validationStatus: 'success'|'warning'|'error'|'validating'|undefined;
+            errorMsg: string|undefined;    
+        }
+    };
+    readonly autoShutoff: number;
+    readonly p: number;
+    readonly i: number;
+    readonly d: number;
+    readonly start: {
+        readonly p: number;
+        readonly i: number;
+        readonly d: number;
+        readonly profile: string;
+    }
+    readonly profile: string;
+}
+
+function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     return {
         version: state.version.version,
         state: state.enail.emitState,

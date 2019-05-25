@@ -5,7 +5,7 @@ import { IEnailState } from '../models/IEnailState';
 import { ISavedState } from '../models/ISavedState';
 import { EnailAction, IErrorAction } from '../models/Actions';
 import * as Constants from '../models/constants';
-import { IEnailEmitState } from 'src/models/IEnailEmitState';
+import { IEnailEmitState } from '../models/IEnailEmitState';
 import { IEnailScript } from '../models/IEnailScript';
 import { IVerifyTokenResponse } from '../models/IVerifyTokenResponse';
 import { IPidSettings } from '../models/IPidSettings';

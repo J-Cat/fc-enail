@@ -15,7 +15,7 @@
  */
 import { IVersionState } from "../models/IVersionState";
 import * as Constants from '../models/constants';
-import { IBasicAction } from 'src/models/Actions';
+import { IBasicAction } from '../models/Actions';
 
 const pjson: { version: string } = require('../../package.json');
 

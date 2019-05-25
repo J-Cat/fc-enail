@@ -16,7 +16,7 @@
 import * as React from 'react';
 import { Form, Input, Button } from 'antd';
 
-import { ReconnectProps } from './container';
+import * as ReconnectProps from './container';
 import * as Constants from '../../models/constants';
 import config from '../../config';
 
@@ -81,7 +81,6 @@ export class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectP
                             </div>
                             <FormItem className="reconnect-content-container-buttonrow">
                                 <Button
-                                    type="primary"
                                     htmlType="submit"
                                 >
                                     Connect
@@ -98,4 +97,4 @@ export class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectP
 
 const ReconnectForm = Form.create()(Reconnect);
 
-export default ReconnectForm;
+export default ReconnectForm as any;

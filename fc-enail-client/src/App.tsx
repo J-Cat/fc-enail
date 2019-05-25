@@ -1,66 +1,54 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router';
-import { TabBar } from 'antd-mobile';
-import { Icon } from 'antd';
+import { withRouter, RouteComponentProps, Route } from 'react-router';
+import { IonApp, IonTabBar, IonTabButton, IonLabel, IonIcon, IonTabs, IonRouterOutlet, IonPage } from '@ionic/react';
 
 import './App.less';
-import Routes from './routes';
+import { Home } from './routes/home';
+import { Scripts } from './routes/scripts';
+import { Settings } from './routes/settings';
+import { Reconnect } from './routes/reconnect';
+import { SignIn } from './routes/signin';
 
 class App extends React.Component<RouteComponentProps<{}>, {}> {
   constructor(props: RouteComponentProps<{}>) {
     super(props);
   }
-  
+
   render() {
-    let selectedPath = "home";
-    if (this.props.location.pathname.indexOf('settings')>=0) {
-      selectedPath = "settings";
-    } else if (this.props.location.pathname.indexOf('scripts')>=0) {
-      selectedPath = "scripts";
-    }
-    
     return (
-      <TabBar className="App" tintColor="rgb(67, 104, 67)">
-        <TabBar.Item title="Home" 
-          icon={<Icon type="home" />} 
-          selectedIcon={<Icon type="home" />} 
-          selected={selectedPath==='home'}
-          onPress={
-            // tslint:disable-next-line:jsx-no-lambda
-            () => this.navigate('home')
-          }
-        >
-          <Routes />
-        </TabBar.Item>
-        <TabBar.Item title="Scripts" 
-          icon={<Icon type="code" />} 
-          selectedIcon={<Icon type="code" />} 
-          selected={selectedPath==='scripts'}
-          onPress={
-            // tslint:disable-next-line:jsx-no-lambda
-            () => this.navigate('scripts')
-          }
-        >
-          <Routes />
-        </TabBar.Item>
-        <TabBar.Item title="Settings" 
-          icon={<Icon type="setting" />} 
-          selectedIcon={<Icon type="setting" />} 
-          selected={selectedPath==='settings'}
-          onPress={
-            // tslint:disable-next-line:jsx-no-lambda
-            () => this.navigate('settings')
-          }
-        >
-          <Routes />
-        </TabBar.Item>
-      </TabBar>
+      <IonApp class="app">
+        <IonPage className="app-page">
+          <IonTabs>
+            <IonRouterOutlet>
+                <Route path="/:tab(home)" component={Home} exact={true} />
+                <Route path="/:tab(scripts)" component={Scripts} exact={true} />
+                <Route path="/:tab(settings)" component={Settings} />
+                <Route path="/connect" component={Reconnect} />
+                <Route path="/signin" component={SignIn} />
+            </IonRouterOutlet>
+            <IonTabBar slot="bottom">
+              <IonTabButton tab="home" href="/home">
+                <IonLabel>Home</IonLabel>
+                <IonIcon name="home" />
+              </IonTabButton>
+              <IonTabButton tab="scripts" href="/scripts">
+                <IonLabel>Scripts</IonLabel>
+                <IonIcon name="code" />
+              </IonTabButton>
+              <IonTabButton tab="settings" href="/settings">
+                <IonLabel>Settings</IonLabel>
+                <IonIcon name="settings" />
+              </IonTabButton>
+            </IonTabBar>
+          </IonTabs>
+        </IonPage>
+      </IonApp>
     );
   }
 
-  private navigate = (destination: string) => {
-    this.props.history.push(destination);
-  }
+  // private navigate = (destination: string) => {
+  //   this.props.history.push(destination);
+  // }
 }
 
 export default withRouter(App);

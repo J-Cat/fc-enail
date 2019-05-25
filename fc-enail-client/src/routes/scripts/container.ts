@@ -22,31 +22,29 @@ import { IEnailScript } from '../../models/IEnailScript';
 import Scripts from './scripts';
 import { saveScript, deleteScript } from '../../reducers/enailReducer';
 
-export namespace ScriptsProps {
-    export interface IStateProps {
-        readonly version: string;
-        readonly script?: IEnailScript;
-    }
-
-    export interface IDispatchProps {
-        readonly saveScript: (script: IEnailScript) => void;
-        readonly deleteScript: (title: string) => void;
-    }
-
-    export interface IOwnProps {
-    }
-
-    export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
-    }
-
-    export interface IState {
-        readonly script: IEnailScript;
-        readonly changed: boolean;
-        readonly saved: boolean;
-    }
+export interface IStateProps {
+    readonly version: string;
+    readonly script?: IEnailScript;
 }
 
-function mapStateToProps(state: IEnailStore, ownProps: ScriptsProps.IOwnProps) {
+export interface IDispatchProps {
+    readonly saveScript: (script: IEnailScript) => void;
+    readonly deleteScript: (title: string) => void;
+}
+
+export interface IOwnProps {
+}
+
+export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+}
+
+export interface IState {
+    readonly script: IEnailScript;
+    readonly changed: boolean;
+    readonly saved: boolean;
+}
+
+function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     const script = state.enail.emitState && state.enail.scripts && (state.enail.emitState.currentScript !== undefined)
         ? state.enail.scripts[state.enail.emitState.currentScript] : undefined;
     return {

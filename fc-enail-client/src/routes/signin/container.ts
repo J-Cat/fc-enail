@@ -21,26 +21,24 @@ import { IEnailStore } from '../../models/IEnailStore';
 import SignIn from './signin';
 import { verifyPassphrase } from '../../reducers/enailReducer';
 
-export namespace SignInProps {
-    export interface IStateProps {
-        readonly version: string;
-    }
-
-    export interface IDispatchProps {
-        verifyPassphrase: (passphrase: string) => void;
-    }
-
-    export interface IOwnProps {
-    }
-
-    export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
-    }
-
-    export interface IState {
-    }
+export interface IStateProps {
+    readonly version: string;
 }
 
-function mapStateToProps(state: IEnailStore, ownProps: SignInProps.IOwnProps) {
+export interface IDispatchProps {
+    verifyPassphrase: (passphrase: string) => void;
+}
+
+export interface IOwnProps {
+}
+
+export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+}
+
+export interface IState {
+}
+
+function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     return {
         version: state.version.version
     };

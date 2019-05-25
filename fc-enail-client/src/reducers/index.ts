@@ -1,5 +1,5 @@
 import { combineReducers, Reducer } from 'redux';
-import { IEnailStore } from 'src/models/IEnailStore';
+import { IEnailStore } from '../models/IEnailStore';
 import { enailReducer } from './enailReducer';
 import { versionReducer } from './versionReducer';
 

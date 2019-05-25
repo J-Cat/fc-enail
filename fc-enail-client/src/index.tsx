@@ -6,6 +6,11 @@ import { Store } from 'redux';
 import { CodePush, InstallMode } from '@ionic-native/code-push';
 
 import App from './App';
+
+import '@ionic/core/css/core.css';
+import '@ionic/core/css/ionic.bundle.css';
+
+import './styles/theme.css';
 import './index.less';
 
 import history from './history';
@@ -15,10 +20,13 @@ import { configureStore } from './store/createStore';
 import { IEnailStore } from './models/IEnailStore';
 import { EnailAction } from './models/Actions';
 import { updateVersion } from './reducers/versionReducer';
+// import { registerIonic } from '@ionic/react';
 
 const startApp = () => {
   const initialState = (window as any).__INITIAL_STATE__;
   const store: Store<IEnailStore, EnailAction> = configureStore(initialState);
+
+  // registerIonic();
 
   ReactDOM.render(
     <Provider store={store}>

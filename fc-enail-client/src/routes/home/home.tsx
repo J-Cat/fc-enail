@@ -1,30 +1,12 @@
-/*
- * File: c:\fc-enail\fc-enail-client\src\routes\home\home.tsx
- * Project: c:\fc-enail\fc-enail-client
- * Created Date: Sunday November 11th 2018
- * Author: J-Cat
- * -----
- * Last Modified:
- * Modified By:
- * -----
- * License: 
- *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
- *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
- * -----
- * Copyright (c) 2018
- */
 import * as React from 'react';
 import './home.less';
 
-import { HomeProps } from './container';
-import { Badge, Grid, Slider, Modal, Toast, Switch } from 'antd-mobile';
-import { Button } from 'antd';
-import { Action } from 'antd-mobile/lib/modal/PropsType';
+import * as HomeProps from './container';
 import { format } from 'date-fns';
 
 import { IEnailScript } from '../../models/IEnailScript';
-
-const fcLogo = require('../../assets/fclogo.png');
+import { IonContent, IonLabel, IonHeader, IonGrid, IonRow, IonCol, IonToggle, IonBadge, IonSlides, IonSlide, IonItem, IonButton, IonIcon, IonSegment, IonSegmentButton, IonRange, IonText, IonAlert } from '@ionic/react';
+import { RangeChangeEventDetail } from '@ionic/core';
 
 const MAX_TEMP = 1000;
 
@@ -38,30 +20,66 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             startingValue: this.props.state ? this.props.state.sp : 0,
             setPoint: this.props.state ? this.props.state.sp : 0,
             running: this.props.state ? this.props.state.running : false,
-            scriptRunning: this.props.state ? this.props.state.scriptRunning : false
+            scriptRunning: this.props.state ? this.props.state.scriptRunning : false,
+            currentScript: this.props.state ? this.props.state.currentScript || 0 : 0,
+            scriptChanging: true,
+            showSPDialog: false
         };
+
+        this.scriptAfterChange = this.scriptAfterChange.bind(this);
+        this.onSetPointBeginChange = this.onSetPointBeginChange.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps: HomeProps.IProps, prevState: HomeProps.IState) {
-        if (nextProps.state && prevState.setPoint === 0) {
+        if (!nextProps.state) {
+            return null;
+        }
+
+        if (prevState.setPoint === 0) {
             return {
                 sliderValue: nextProps.state.sp,
                 startingValue: nextProps.state.sp,
                 setPoint: nextProps.state.sp,
                 running: nextProps.state.running,
-                scriptRunning: nextProps.state.scriptRunning
+                scriptRunning: nextProps.state.scriptRunning,
+                currentScript: nextProps.state.currentScript || prevState.currentScript
+            };
+        } else if (nextProps.state.sp !== prevState.setPoint && !prevState.changing) {
+            return {
+                setPoint: nextProps.state.sp,
+                sliderValue: nextProps.state.sp
+            };
+        } else if (nextProps.state && nextProps.state.currentScript !== undefined && prevState.currentScript !== nextProps.state.currentScript && prevState.scriptChanging) {
+            return {
+                currentScript: nextProps.state.currentScript,
+                scriptChanging: false
             };
         }
+
         return null;
     }
 
-    onSetPointBeginChange = (value?: number) => {
-        if (value) {
-            this.setState({
-                changing: true,
-                sliderValue: value
-            });
+    private timeout?: number = undefined;
+
+    onSetPointBeginChange = (event: CustomEvent<RangeChangeEventDetail>) => {
+        const value = event.detail.value as number;
+        this.setState({
+            changing: true,
+            sliderValue: value
+        });
+
+        if (this.timeout) {
+            clearTimeout(this.timeout);
         }
+
+        this.timeout = setTimeout(() => {
+            this.props.setSP(value);
+            this.setState({
+                changing: false,
+                sliderValue: value,
+                setPoint: value
+            });
+        }, 500) as any;
     }
 
     onSetPointChange = (value?: number) => {
@@ -80,40 +98,6 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             });
         }
 
-    }
-
-    getSPDialog = () => {
-        const modal = Modal.prompt('Set Point', 'Please enter the desired set point temperature.', [{
-            text: 'Ok',
-            onPress: (value: string) => {
-                return new Promise<number>((resolve, reject) => {
-                    Toast.info(`Setting temperature to ${value}`, 1);
-                    setTimeout(() => {
-                        const v = parseFloat(value);
-                        if (!isNaN(v)) {
-                            this.props.setSP(v);
-                            resolve(v);
-                        } else {
-                            reject();
-                        }
-                        modal.close();
-                    }, 1000);
-                })
-            },
-        }, {
-            text: 'Cancel',
-            onPress: () => { 
-                return new Promise<string>((resolve, reject) => {
-                    Toast.info('Cancelled', 1);
-                    setTimeout(() => {
-                        reject();
-                        modal.close();
-                    }, 1000);
-                })},
-            },
-        ] as Array<Action<string>>, 
-        'default', 
-        this.props.state ? this.props.state.sp.toString() : '', ['input your name']);
     }
 
     toggleState = () => {
@@ -137,13 +121,24 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                 this.props.endScript();
             } else {
                 this.props.runScript();
-            }    
+            }
         });
     }
 
-    scriptAfterChange = (to: number) => {
-        this.props.setScript(to);
-        return;
+    scriptAfterChange = () => {
+        if (!this.slider && !this.state.scriptChanging) {
+            return;
+        }
+
+        this.slider.getActiveIndex().then((index: number) => {
+            if (this.state && this.state.currentScript !== (index)) {
+                this.props.setScript(index);
+            } else {
+                this.setState({
+                    scriptChanging: false
+                });
+            }
+        });
     }
 
     setQuickTemp = (value: number) => {
@@ -155,100 +150,148 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     }
 
     renderScriptItem = (script: IEnailScript) => {
-        return (<div className="home-content-body2-scripts-item">
-            <div className="home-content-body2-scripts-item-spacer" />
-            <div className="home-content-body2-scripts-item-content">
-                <div className="home-content-body2-scripts-item-content-left">
-                    {script.title}
-                </div>
-                <div className="home-content-body2-scripts-item-content-right">
-                    <Button className="home-content-body2-scripts-item-content-right-button" onClick={this.runEndScript} icon={this.state.scriptRunning ? 'pause-circle' : 'play-circle'} style={{color: this.state.scriptRunning ? '#A00000' : 'black' }} />
-                </div>
-            </div>
-            <div className="home-content-body2-scripts-item-spacer" />
-        </div>);
+        return <IonItem>
+            <IonLabel>{script.title}</IonLabel>
+            <IonButton slot="end" onClick={this.runEndScript}>
+                <IonIcon name={this.state.scriptRunning ? 'square' : 'play'} style={{
+                    color: this.state.scriptRunning ? 'red' : 'unset'
+                }} />
+            </IonButton>
+        </IonItem>;
+    }
+
+    slider: any;
+
+    componentDidUpdate(prevProps: HomeProps.IProps, prevState: HomeProps.IState) {
+        if (this.slider && !this.state.scriptChanging) {
+            const p = this.slider.getActiveIndex();
+            if (p !== undefined) {
+                (p as Promise<number>).then(index => {
+                    if (index !== this.state.currentScript) {
+                        this.slider.swiper.slideTo(this.state.currentScript);
+                    }
+                });
+            }
+        }
     }
 
     render() {
-        const gridProps = {
-            data: this.props.scripts,
-            isCarousel: true,
-            columnNum: 1,
-            carouselMaxRow: 1,
-            afterChange: this.scriptAfterChange,
-            className: 'home-content-body2-scripts',
-            renderItem: this.renderScriptItem,
-            selectedIndex: this.props.state ? this.props.state.currentScript || 0 : 0
-        };
-
         return (
-            <div className="home">
-                <div className="version-label">{this.props.version}</div>
-                <div className="home-header">
-                    <img src={fcLogo} alt="FC" className="home-header-logo" />
-                </div>
-                <div className="home-halfspacer" />
-                <div className="home-content">
-                    {this.props.state
-                    ? <div className="home-content-container">
-                        <div className="home-content-container-body1body2">
-                            <div className="home-content-body1">
-                                <div className="home-content-body1-left">
-                                    <div className="home-content-body1-left-pv">{this.props.state.pv}</div>
-                                    <div className="home-content-body1-left-sp" onClick={this.getSPDialog}>{this.state.changing ? this.state.sliderValue : this.props.state ? this.props.state.sp : this.state.setPoint}</div>
-                                </div>
-                                <div className="home-content-body1-right">
-                                    <div className='home-content-body1-right-spacer' />
-                                    <Switch className="home-content-body1-right-switch" onChange={this.toggleState} checked={this.state.running} disabled={this.props.state === undefined} color="#A00000"  />
+            <IonContent class="home" scrollY={false}>
+                <IonLabel class="version-label">{this.props.version}</IonLabel>
+                <IonHeader class="home-header">
+                    <IonText>FC E-Nail</IonText>
+                </IonHeader>
+                {this.props.state ?
+                    <IonGrid class="home-content">
+                        <IonRow>
+                            <IonCol size="8" class="home-content-temp">
+                                <IonRow>
+                                    <IonLabel>{this.props.state.pv}</IonLabel>
+                                </IonRow>
+                                <IonRow onClick={() => {
+                                    this.setState({
+                                        showSPDialog: true
+                                    });
+                                }}>
+                                    <IonLabel>{this.state.sliderValue}</IonLabel>
+                                </IonRow>
+                            </IonCol>
+                            <IonCol size="4" class="home-content-switch">
+                                <IonRow>
+                                    <IonToggle onClick={this.toggleState} checked={this.state.running} disabled={this.props.state === undefined} />
+                                </IonRow>
+                                <IonRow>
                                     {this.props.state.tuning
-                                        ? <Badge text="TUNE" className="home-content-body1-right-badge" />
+                                        ? <IonBadge>TUNE</IonBadge>
                                         : ''
                                     }
                                     {this.props.state.running
-                                        ? <Badge text={format((this.props.autoShutoff * 60000) - (Date.now() - this.props.state.runningSince), 'm:ss')} className="home-content-body1-right-time" />
+                                        ? <IonBadge>{format((this.props.autoShutoff * 60000) - (Date.now() - this.props.state.runningSince), 'm:ss')}</IonBadge>
                                         : ''
                                     }
-                                    <div className='home-content-body1-right-spacer' />
-                                </div>
-                            </div>
-                            <div className="home-content-body2">
-                                <Grid {...gridProps} />                
-                            </div>
-                        </div>
-                        <div className="home-content-body3">
-                            <div className="home-content-body3-spacer" />
-                            <div className="home-content-body3-content">
-                                {this.props.presets.map((preset, index) => {
-                                    return (
-                                        <Button 
-                                            key={`preset_button_${index}`} 
-                                            className={preset === this.state.setPoint ? "home-content-body3-content-quicktemp-selected" : "home-content-body3-content-quicktemp"}
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                            onClick={() => this.setQuickTemp(preset)}
-                                        >
-                                            {preset}
-                                        </Button>
-                                    );
-                                })}
-                            </div>
-                            <div className="home-content-body3-spacer" />
-                        </div>
-                        <div className="home-content-body4">
-                            <div className="home-content-body4-spacer" />
-                            <div className="home-content-body4-slider">
-                                <Slider trackStyle={{ height: '20px' }} railStyle={{height: '20px' }} handleStyle={{top: '9px'}} onChange={this.onSetPointBeginChange} onAfterChange={this.onSetPointChange} value={this.state.sliderValue} max={MAX_TEMP} min={0} />
-                            </div>
-                            <div className="home-content-body4-spacer" />
-                        </div>
-                    </div> : "Loading ..."
-                    }
-                </div>
-                <div className="home-footer" />
-            </div>
+                                </IonRow>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow class="home-content-scripts">
+                            <IonCol>
+                                <IonSlides pager={true} {...this.state.currentScript}
+                                    ref={(ref) => {
+                                        this.slider = ref;
+                                    }}
+                                    options={{
+                                        initialSlide: this.state.currentScript
+                                    }}
+                                    onIonSlideDidChange={this.scriptAfterChange}
+                                    onIonSlideTouchStart={() => {
+                                        this.setState({
+                                            scriptChanging: true
+                                        });
+                                    }}
+                                >
+                                    {this.props.scripts.map(script => {
+                                        return <IonSlide key={script.index}>
+                                            {this.renderScriptItem(script)}
+                                        </IonSlide>;
+                                    })}
+                                </IonSlides>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow class="home-content-presets">
+                            <IonCol>
+                                <IonSegment>
+                                    {this.props.presets.map(preset => {
+                                        // tslint:disable-next-line:jsx-no-lambda
+                                        return <IonSegmentButton key={`preset-button-${preset}`} onClick={() => this.setQuickTemp(preset)} checked={this.state.setPoint === preset}>{preset}</IonSegmentButton>;
+                                    })}
+                                </IonSegment>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow class="home-content-slider">
+                            <IonCol>
+                                <IonRange
+                                    onIonChange={this.onSetPointBeginChange}
+                                    value={this.state.sliderValue}
+                                    max={MAX_TEMP}
+                                    min={0}
+                                    step={5}
+                                />
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
+                    : ''}
+                <IonAlert
+                    isOpen={this.state.showSPDialog}
+                    onDidDismiss={() => this.setState(() => ({ showSPDialog: false }))}
+                    header={'Change Set Point'}
+                    message={'Please enter a new set point.'}
+                    inputs={[{
+                        name: 'setPoint',
+                        type: 'number',
+                        value: this.state.sliderValue,
+                        placeholder: 'Set Point'
+                    }]}
+                    buttons={[
+                        {
+                            text: 'Cancel',
+                            role: 'cancel',
+                            cssClass: 'secondary'
+                        }, {
+                            text: 'Okay',
+                            handler: (value) => {
+                                this.props.setSP(value.setPoint);
+                                setTimeout((() => {
+                                    this.setState({
+                                        changing: false,
+                                        sliderValue: value.setPoint,
+                                        setPoint: value.setPoint
+                                    });
+                                }).bind(this), 500);
+                            }
+                        }
+                    ]}
+                />
+            </IonContent>
         );
     }
 }
-
-
-
-

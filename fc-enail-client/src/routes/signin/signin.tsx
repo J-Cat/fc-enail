@@ -15,12 +15,10 @@
  */
 import * as React from 'react';
 import { Form, Input, Button } from 'antd';
-
-const FormItem = Form.Item;
-
+import * as SignInProps from './container';
 import './signin.less';
 
-import { SignInProps } from './container';
+const FormItem = Form.Item;
 
 const fcLogo = require('../../assets/fclogo.png');
 
@@ -72,7 +70,6 @@ export class SignIn extends React.Component<SignInProps.IProps, SignInProps.ISta
                             </div>
                             <FormItem className="signin-content-container-buttonrow">
                                 <Button
-                                    type="primary"
                                     htmlType="submit"
                                 >
                                     Verify
@@ -89,4 +86,4 @@ export class SignIn extends React.Component<SignInProps.IProps, SignInProps.ISta
 
 const SignInForm = Form.create()(SignIn);
 
-export default SignInForm;
+export default SignInForm as any;

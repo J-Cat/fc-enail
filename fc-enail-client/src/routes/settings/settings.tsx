@@ -17,13 +17,11 @@ import * as React from 'react';
 import { Form, InputNumber, Button, Select } from 'antd';
 import { Modal, Toast } from 'antd-mobile';
 import { Action } from 'antd-mobile/lib/modal/PropsType';
+import * as SettingsProps from './container';
+import './settings.less';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
-
-import './settings.less';
-
-import { SettingsProps } from './container';
 
 const MIN_PRESET = 0;
 const MAX_PRESET = 1000;
@@ -315,7 +313,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                             </div>
                             <FormItem className="settings-content-container-presets-buttonrow">
                                 <Button
-                                    type="primary"
                                     htmlType="submit"
                                     disabled={!this.isValid()}
                                 >
@@ -383,7 +380,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                             </div>
                             <FormItem className="settings-content-container-pid-buttonrow">
                                 <Button
-                                    type="primary"
                                     htmlType="submit"
                                     disabled={
                                         (((this.state.p === this.state.start.p) && (this.state.i === this.state.start.i) && (this.state.d === this.state.start.d))
@@ -394,7 +390,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                 </Button>
                                 &nbsp;&nbsp;
                                 <Button
-                                    type="primary"
                                     htmlType="button"
                                     disabled={this.state.profile === ''}
                                     onClick={this.deleteProfile}
@@ -403,7 +398,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                                 </Button>
                                 &nbsp;&nbsp;
                                 <Button
-                                    type="primary"
                                     htmlType="button"
                                     onClick={this.autoTune}
                                     disabled={!this.props.state.running}
@@ -422,4 +416,4 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
 
 const SettingsForm = Form.create()(Settings);
 
-export default SettingsForm;
+export default SettingsForm as any;

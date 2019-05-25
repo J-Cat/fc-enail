@@ -21,41 +21,41 @@ import { Home } from './home';
 import { IEnailEmitState } from '../../models/IEnailEmitState';
 import { IEnailScript } from '../../models/IEnailScript';
 import { setSP, toggleState, runScript, endScript, setScript } from '../../reducers/enailReducer';
-
-export namespace HomeProps {
-    export interface IStateProps {
-        readonly version: string;
-        readonly state?: IEnailEmitState;
-        readonly scripts: IEnailScript[];
-        readonly presets: number[];
-        readonly autoShutoff: number;
-    }
-
-    export interface IDispatchProps {
-        setSP: (value: number) => void;
-        toggleState: () => void;
-        runScript: () => void;
-        endScript: () => void;
-        setScript: (index: number) => void;
-    }
-
-    export interface IOwnProps {
-    }
-
-    export interface IProps extends RouteComponentProps<any>, IStateProps, IDispatchProps, IOwnProps {
-    }
-
-    export interface IState {
-        readonly changing: boolean;
-        readonly sliderValue: number;
-        readonly startingValue: number;
-        readonly setPoint: number;
-        readonly running: boolean;
-        readonly scriptRunning: boolean;
-    }
+export interface IStateProps {
+    readonly version: string;
+    readonly state?: IEnailEmitState;
+    readonly scripts: IEnailScript[];
+    readonly presets: number[];
+    readonly autoShutoff: number;
 }
 
-function mapStateToProps(state: IEnailStore, ownProps: HomeProps.IOwnProps) {
+export interface IDispatchProps {
+    setSP: (value: number) => void;
+    toggleState: () => void;
+    runScript: () => void;
+    endScript: () => void;
+    setScript: (index: number) => void;
+}
+
+export interface IOwnProps {
+}
+
+export interface IProps extends RouteComponentProps<any, any>, IStateProps, IDispatchProps, IOwnProps {
+}
+
+export interface IState {
+    readonly changing: boolean;
+    readonly sliderValue: number;
+    readonly startingValue: number;
+    readonly setPoint: number;
+    readonly running: boolean;
+    readonly scriptRunning: boolean;
+    readonly currentScript: number;
+    readonly scriptChanging: boolean;
+    readonly showSPDialog: boolean;
+}
+
+function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     return {
         version: state.version.version,
         state: state.enail.emitState,
