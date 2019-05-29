@@ -237,11 +237,15 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
         return (
             <IonContent class="home" scrollY={false}>
                 <IonLabel class="version-label">{this.props.version}</IonLabel>
-                <IonHeader class="home-header">
-                    <IonText>FC E-Nail</IonText>
-                </IonHeader>
                 {this.props.state ?
                     <IonGrid class="home-content">
+                        <IonRow class="home-content-header">
+                            <IonCol size="12">
+                                <IonHeader>
+                                    <IonText>FC E-Nail</IonText>
+                                </IonHeader>
+                            </IonCol>
+                        </IonRow>
                         <IonRow>
                             <IonCol size="8" class="home-content-temp">
                                 <IonRow>
@@ -257,7 +261,12 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                             </IonCol>
                             <IonCol size="4" class="home-content-switch">
                                 <IonRow>
-                                    <IonToggle onClick={this.toggleState} checked={this.state.running} disabled={this.props.state === undefined} />
+                                    <IonToggle 
+                                        color="warning"
+                                        onClick={this.toggleState} 
+                                        checked={this.state.running} 
+                                        disabled={this.props.state === undefined} 
+                                    />
                                 </IonRow>
                                 <IonRow>
                                     {this.props.state.tuning
@@ -301,7 +310,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                             </IonCol>
                         </IonRow>
                         <IonRow class="home-content-presets">
-                            <IonCol>
+                            <IonCol class="home-content-presets-col">
                                 <IonSegment>
                                     {this.props.presets.map(preset => {
                                         // tslint:disable-next-line:jsx-no-lambda
@@ -313,6 +322,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                         <IonRow class="home-content-slider">
                             <IonCol>
                                 <IonRange
+                                    class="home-content-slider-range"
                                     onIonChange={this.onSetPointBeginChange}
                                     value={this.state.sliderValue}
                                     max={MAX_TEMP}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { withRouter, RouteComponentProps, Route } from 'react-router';
+import { withRouter, RouteComponentProps, Route, Redirect } from 'react-router';
 import { IonApp, IonTabBar, IonTabButton, IonLabel, IonIcon, IonTabs, IonRouterOutlet, IonPage } from '@ionic/react';
 
 import './App.less';
@@ -12,6 +12,10 @@ import { SignIn } from './routes/signin';
 class App extends React.Component<RouteComponentProps<{}>, {}> {
   constructor(props: RouteComponentProps<{}>) {
     super(props);
+
+    if (this.props.location.pathname === '/') {
+      this.props.history.push('/home');
+    }
   }
 
   render() {
@@ -26,7 +30,7 @@ class App extends React.Component<RouteComponentProps<{}>, {}> {
                 <Route path="/connect" component={Reconnect} />
                 <Route path="/signin" component={SignIn} />
             </IonRouterOutlet>
-            <IonTabBar slot="bottom">
+            <IonTabBar slot="bottom" class="app-page-tabbar">
               <IonTabButton tab="home" href="/home">
                 <IonLabel>Home</IonLabel>
                 <IonIcon name="home" />
