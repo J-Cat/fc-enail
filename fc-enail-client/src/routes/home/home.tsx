@@ -78,50 +78,49 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             return {
                 running: nextProps.state.running
             };
+        } else if (nextProps.state && nextProps.state.running === prevState.running && prevState.runningChanging) {
+            return {
+                runningChanging: false
+            };
         }
 
         return null;
     }
 
-    private timeout?: number = undefined;
+    checkSP = () => {
+        setTimeout((() => {
+            console.log(`check sp: ${this.state.sliderValue}, ${this.state.startingValue}, ${this.state.changing}`);
+            if ((this.state.sliderValue === this.state.startingValue) && this.state.changing) {
+                console.log(`set sp: ${this.state.sliderValue}`);
+                this.props.setSP(this.state.sliderValue);
+                this.setState({
+                    changing: false
+                })
+            } else {
+                if (this.state.changing) {
+                    this.setState({
+                        startingValue: this.state.sliderValue
+                    });
+                    this.checkSP();
+                }
+            }
+        }).bind(this), 500);
+    }
 
     onSetPointBeginChange = (event: CustomEvent<RangeChangeEventDetail>) => {
         const value = event.detail.value as number;
-        this.setState({
-            changing: true,
-            sliderValue: value
-        });
-
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-        }
-
-        this.timeout = setTimeout(() => {
-            this.props.setSP(value);
+        if (this.props.state && !this.state.changing && value !== this.props.state.sp) {
             this.setState({
-                changing: false,
-                sliderValue: value,
-                setPoint: value
+                changing: true,
+                startingValue: this.state.setPoint,
+                sliderValue: value
             });
-        }, 500) as any;
-    }
-
-    onSetPointChange = (value?: number) => {
-        if (value) {
-            this.props.setSP(value);
-            setTimeout((() => {
-                this.setState({
-                    changing: false,
-                    sliderValue: value,
-                    setPoint: value
-                });
-            }).bind(this), 500);
+            this.checkSP();
         } else {
             this.setState({
-                changing: false
+                sliderValue: value
             });
         }
-
     }
 
     toggleState = () => {
@@ -306,7 +305,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                 <IonSegment>
                                     {this.props.presets.map(preset => {
                                         // tslint:disable-next-line:jsx-no-lambda
-                                        return <IonSegmentButton key={`preset-button-${preset}`} onClick={() => this.setQuickTemp(preset)} checked={this.state.setPoint === preset}>{preset}</IonSegmentButton>;
+                                        return <IonSegmentButton key={`preset-button-${preset}`} onClick={() => this.setQuickTemp(preset)} checked={this.state.sliderValue === preset}>{preset}</IonSegmentButton>;
                                     })}
                                 </IonSegment>
                             </IonCol>

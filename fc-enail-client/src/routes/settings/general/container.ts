@@ -16,7 +16,6 @@ export interface IStateProps {
 
 export interface IDispatchProps {
     persistSavedState: (savedState: ISavedState) => void;
-    toggleTuning: () => void;
 }
 
 export interface IOwnProps {

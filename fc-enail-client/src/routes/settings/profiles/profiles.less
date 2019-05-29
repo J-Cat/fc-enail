@@ -1,35 +1,51 @@
 @import '../../../styles/vars.less';
 
-.profiles {
-    height: 100%;
-    width: 100%;
+ion-item-group.profiles {
+    border: none;
+    margin: auto;
     display: flex;
     flex-direction: column;
-
-    form {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    &-content {
-        flex: 1 0 auto;
-        color: var(--ion-text-color);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        &-datarow {
-            display: flex;
-            flex-direction: row;
+    ion-item.profiles-current {
+        --border-style: none;
+        --background: transparent;
+        font-size: .8em;
+        width: auto;
+        ion-select {
+            max-width: unset;
             width: 100%;
-            margin: auto auto 10px auto;
-            &-label {
-                margin: auto auto 10px auto;
+            &.new-profile {
+                color: var(--ion-color-danger);
+            }
+            &.current {
             }
         }
-        &-buttonrow {
-            margin: 10px auto auto auto;
-            text-align: center;
+    }
+    
+    ion-item {
+        --border-style: none;
+        --background: transparent;
+        font-size: .8em;
+        width: auto;
+        ion-label {
+            flex: 0 0 100x !important;
+            min-width: 100px !important;
         }
+        ion-select {
+            max-width: unset;
+        }
+    }
+}
+ion-item.profiles {
+    --border-style: none;
+    --background: transparent;
+    border: none;
+    font-size: .8em;
+    display: inline-block;
+    .profiles-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        ion-button {
+            margin: 15px 5px auto 5px;
+        }    
     }
 }

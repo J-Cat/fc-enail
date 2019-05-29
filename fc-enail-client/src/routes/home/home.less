@@ -85,7 +85,12 @@
 
             ion-row:last-child {
                 flex: 0;
+                display: flex;
+                flex-direction: column;
                 margin: var(--border-radius) auto auto auto;
+                ion-badge {
+                    margin: var(--border-radius) auto auto auto;                    
+                }
             }
         }
 

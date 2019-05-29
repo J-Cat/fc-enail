@@ -43,7 +43,7 @@ class E5CC {
                         break;
                     }
                     
-                    if (this.isTuning !== m.isTuning) {
+                    if (this.isTuning !== m.isTuning && !m.isTuning) {
                         store.dispatch(getPidSettings(true));
                     }
                     

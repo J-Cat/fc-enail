@@ -5,18 +5,30 @@ import { IEnailStore } from '../../../models/IEnailStore';
 import Profiles from './profiles';
 import { IEnailEmitState } from '../../../models/IEnailEmitState';
 import { ISavedState } from '../../../models/ISavedState';
-import { persistSavedState } from '../../../reducers/enailReducer';
+import { persistSavedState, toggleTuning, savePidSettings, deleteProfile } from '../../../reducers/enailReducer';
+import { IPidSettings } from '../../../models/IPidSettings';
 
 export interface IStateProps {
-    readonly version: string;
-    readonly state?: IEnailEmitState;
-    readonly presets: number[];
-    readonly autoShutoff: number;
+    readonly p: number;
+    readonly i: number;
+    readonly d: number;
+    readonly start: {
+        readonly p: number;
+        readonly i: number;
+        readonly d: number;
+        readonly profile: string;
+    }
+    readonly profile: string;
+    readonly profiles: {
+        [profile: string]: IPidSettings;
+    };
+    readonly tuning: boolean;
 }
 
 export interface IDispatchProps {
-    persistSavedState: (savedState: ISavedState) => void;
     toggleTuning: () => void;
+    savePidSettings: (settings: IPidSettings) => void;
+    deleteProfile: (profile: string) => void;
 }
 
 export interface IOwnProps {
@@ -26,28 +38,38 @@ export interface IProps extends RouteComponentProps<any>, IStateProps, IDispatch
 }
 
 export interface IState {
-    readonly presets: {
-        [index: number]: {
-            value: number;
-            validationStatus: 'success'|'warning'|'error'|'validating'|undefined;
-            errorMsg: string|undefined;    
-        }
-    };
-    readonly autoShutoff: number;
+    readonly p: number;
+    readonly i: number;
+    readonly d: number;
+    readonly start: {
+        readonly p: number;
+        readonly i: number;
+        readonly d: number;
+        readonly profile: string;
+    }
+    readonly profile: string;
+    readonly dirty: boolean;
+    readonly saveDialogOpen: boolean;
+    readonly deleteDialogOpen: boolean;
+    readonly tuning: boolean;
 }
 
 function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
     return {
-        version: state.version.version,
-        state: state.enail.emitState,
-        presets: state.enail.presets,
-        autoShutoff: state.enail.autoShutoff
+        p: state.enail.emitState ? state.enail.emitState.p : 0,
+        i: state.enail.emitState ? state.enail.emitState.i : 0,
+        d: state.enail.emitState ? state.enail.emitState.d : 0,
+        profile: state.enail.emitState ? state.enail.emitState.profile || '' : state.enail.profiles.currentProfile || '',
+        profiles: state.enail.profiles.profiles,
+        tuning: state.enail.emitState ? state.enail.emitState.tuning : false
     };
 }
 
 function mapDispatchToProps(dispatch: (...args: any[]) => void) {
     return {
-        persistSavedState: (savedState: ISavedState) => dispatch(persistSavedState(savedState)),
+        toggleTuning: () => dispatch(toggleTuning()),
+        savePidSettings: (settings: IPidSettings) => dispatch(savePidSettings(settings)),
+        deleteProfile: (profile: string) => dispatch(deleteProfile(profile))
     };
 }
 

@@ -690,15 +690,6 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.LOAD_SAVED_PROFILES: {
             const profiles = action.payload as ISavedProfiles;
 
-            // if (!profiles.currentProfile && profiles.profiles.length === 0) {
-            //     profiles.profiles.push({
-            //         title: '',
-            //         p: state.p,
-            //         i: state.i,
-            //         d: state.d
-            //     });
-            // }
-
             return {
                 ...state,
                 profiles
@@ -742,17 +733,17 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.E5CC_SAVE_PID_SETTINGS: {
             const pid = action.payload as IPidSettings;
             let profiles = state.profiles.profiles;
-            if (pid.title !== '') {
+            if (pid.key !== '') {
                 profiles = {
                     ...profiles,
-                    [pid.title]: pid
+                    [pid.key]: pid
                 };
             }
 
             return {
                 ...state,
                 profiles: {
-                    currentProfile: pid.title,
+                    currentProfile: pid.key,
                     profiles,
                 },
                 p: pid.p,
@@ -779,12 +770,12 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             if (!state.profiles) {
                 return state;
             }
-            const profile = action.payload as string;
-            const { [profile]: removedValue, ...newProfiles } = state.profiles.profiles;
+            const key = action.payload as string;
+            const { [key]: removedValue, ...newProfiles } = state.profiles.profiles;
             return {
                 ...state,
                 profiles: {
-                    currentProfile: state.profiles.currentProfile ? state.profiles.currentProfile === profile ? undefined : state.profiles.currentProfile : undefined,
+                    currentProfile: state.profiles.currentProfile ? state.profiles.currentProfile === key ? undefined : state.profiles.currentProfile : undefined,
                     profiles: newProfiles
                 }
             };
