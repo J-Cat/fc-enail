@@ -15,7 +15,6 @@
  */
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { FormComponentProps } from 'antd/lib/form';
 
 import { IEnailStore } from '../../models/IEnailStore';
 import Reconnect from './reconnect';
@@ -32,10 +31,11 @@ export interface IDispatchProps {
 export interface IOwnProps {
 }
 
-export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+export interface IProps extends RouteComponentProps<any>, IStateProps, IDispatchProps, IOwnProps {
 }
 
 export interface IState {
+    readonly serviceUrl: string;
 }
 
 function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {

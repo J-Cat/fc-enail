@@ -1,172 +1,20 @@
 @import '../../styles/vars.less';
 
-.settings {
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    align-content: space-around;
-    width: 100%;
-
-    &-halfspacer {
-        flex: 0;
-        flex-grow: 0.5;
-        flex-shrink: 1;
+.popover-wrapper {
+    .popover-arrow {
+        display: inline !important;
+        left: 17px !important;
+        top: 36px !important;
     }
-
-    &-spacer {
-        flex: 0;      
-        flex-grow: 1;
-        flex-shrink: 0;
+    .popover-content {
+        left: 0px !important;
+        top: 45px !important;
+        
     }
-
-    .version-label {
-        position: absolute;
-        bottom: 5px;
-        left: 5px;
-        font-size: .8em;
-        opacity: 0.4;
-        @media @landscape {
-            display: none;
-        }
-    }
-    
-    &-header {
-        flex: 0;
-        flex-grow: 0;
-        text-align: center;
-        vertical-align: top;
-        padding: 10px;
-        @media @landscape {
-            display: none;
-        }
-    }
-
-    &-footer {
-        flex: 0;      
-        flex-grow: 1;
-        flex-shrink: 0;
-        min-height: 20px;
-    }
-
-    &-content {
-        flex: 1 0 2;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        &-container {
-            flex: 1 0 2;
-            &-presets {
-                border: 1px solid @border-color-base;
-                border-collapse: collapse;
-                padding: 10px;
-                margin: 10px 10px 5px 10px;
-                &-datarow {
-                    display: flex;
-                    flex-direction: row;
-                    width: 100%;
-                    &-spacer {
-                        flex: 1 0 0;
-                    }
-                    &-content {
-                        flex: 0 1 auto;
-                        .ant-form-item {
-                            white-space: nowrap;
-                            display: inline-block;
-                            margin: 1px 5px 1px 5px;
-
-                            .ant-input-number {
-                                width: 70px;
-                                text-align: right;
-                            }
-
-                            &-label {
-                                margin: 0px 5px 0px 0px;
-                                display: inline-block;
-                                width: auto;
-                            }
-
-                            &-control-wrapper {
-                                margin: 0px 0px 0px 5px;
-                                display: inline-block;
-                                width: auto;
-                            }
-                        }
-                    }
-                }
-                &-buttonrow {
-                    margin: 20px !important;
-                    text-align: center;
-                }
-            }
-            &-pid {
-                border: 1px solid @border-color-base;
-                border-collapse: collapse;
-                padding: 10px;
-                margin: 5px 10px 10px 10px;
-                flex: 1 0 2;
-                &-datarow {
-                    display: flex;
-                    flex-direction: row;
-                    width: 100%;
-                    &-spacer {
-                        flex: 1 0 0;
-                    }
-                    &-header {
-                        flex: 0 1 auto;
-                        &-title {
-                            display: flex;
-                            flex-direction: row;
-                            .ant-form-item {
-                                white-space: nowrap;
-                                width: 100%;
-                                margin: 1px 5px 1px 5px;    
-                                &-control-wrapper {
-                                    width: 100%;
-                                }
-                                &-label {
-                                    padding: 0px;
-                                    margin: 5px 0px 0px 0px;
-                                    vertical-align: middle;
-                                    min-width: 80px;
-                                    display: inline-block;
-                                    width: auto;
-                                }
-                            }
-                        }
-                    }
-                    &-content {
-                        flex: 0 1 auto;
-                        .ant-form-item {
-                            white-space: nowrap;
-                            display: inline-block;
-                            margin: 1px 5px 1px 5px;
-
-                            .ant-input-number {
-                                width: 70px;
-                            }
-
-                            &-label {
-                                margin: 0px 5px 0px 0px;
-                                min-width: 110px;
-                                display: inline-block;
-                                width: auto;
-                            }
-
-                            &-control-wrapper {
-                                margin: 0px 0px 0px 5px;
-                                display: inline-block;
-                                width: auto;
-                            }
-                        }
-                    }
-                }
-                &-buttonrow {
-                    margin: 20px !important;
-                    text-align: center;
-                }
-            }
+    ion-list {
+        margin: 0px;
+        .item-inner {
+            border-bottom: none !important;
         }
     }
 }

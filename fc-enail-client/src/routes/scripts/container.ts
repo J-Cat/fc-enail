@@ -15,12 +15,11 @@
  */
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { FormComponentProps } from 'antd/lib/form';
 
 import { IEnailStore } from '../../models/IEnailStore';
 import { IEnailScript } from '../../models/IEnailScript';
 import Scripts from './scripts';
-import { saveScript, deleteScript } from '../../reducers/enailReducer';
+import { saveScript, deleteScript, setScript } from '../../reducers/enailReducer';
 
 export interface IStateProps {
     readonly version: string;
@@ -30,18 +29,26 @@ export interface IStateProps {
 export interface IDispatchProps {
     readonly saveScript: (script: IEnailScript) => void;
     readonly deleteScript: (title: string) => void;
+    readonly push: (location: string) => void;
+    readonly setScript: (index: number) => void;
 }
 
 export interface IOwnProps {
 }
 
-export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+export interface IProps extends RouteComponentProps<any>, IStateProps, IDispatchProps, IOwnProps {
 }
 
 export interface IState {
-    readonly script: IEnailScript;
+    readonly script?: IEnailScript;
     readonly changed: boolean;
     readonly saved: boolean;
+    readonly menuOpen: string[];
+    readonly menuVisible: boolean;
+    readonly confirmDeleteOpen: boolean;
+    readonly saveDialogOpen: boolean;
+    readonly addStepDialogOpen: boolean;
+    readonly currentStep: string;
 }
 
 function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
@@ -56,7 +63,8 @@ function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
 function mapDispatchToProps(dispatch: (...args: any)=> void) {
     return {
         saveScript: (script: IEnailScript) => dispatch(saveScript(script)),
-        deleteScript: (title: string) => dispatch(deleteScript(title))
+        deleteScript: (title: string) => dispatch(deleteScript(title)),
+        setScript: (index: number) => dispatch(setScript(index))
     };
 }
 

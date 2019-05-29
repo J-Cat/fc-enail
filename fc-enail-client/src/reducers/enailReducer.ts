@@ -17,6 +17,7 @@ const initialState: IEnailState = {
     connected: false,
     requesting: false,
     reconnect: false,
+    tokenError: false,
     presets: [],
     autoShutoff: 45,
     token: '',
@@ -614,16 +615,23 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             }
             
             const title = action.payload as string;
-            const index = state.scripts.findIndex(s => s.title === title);
+            const index = state.scripts.findIndex(s => s.key === title);
             if (index < 0) {
                 return state;
             }
 
             return {
                 ...state,
+                emitState: {
+                    ...state.emitState!,
+                    currentScript: 0
+                },
                 scripts: [
                     ...state.scripts.slice(0, index),
-                    ...state.scripts.slice(index+1)
+                    ...(index < state.scripts.length ? state.scripts.slice(index+1).map(s => ({
+                        ...s,
+                        index: s.index!-1
+                    })) : [])
                 ]
             };
         }
@@ -646,11 +654,15 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                     scripts: [{
                         ...script,
                         index: 0
-                    }]
+                    }],
+                    emitState: {
+                        ...state.emitState!,
+                        currentScript: 0
+                    }
                 };
             }
 
-            const index = state.scripts.findIndex(s => s.title === script.title);
+            const index = state.scripts.findIndex(s => s.key === script.key);
             return {
                 ...state,
                 requesting: false,
@@ -670,7 +682,11 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                             ...script,
                             index: state.scripts.length
                         }
-                    ]
+                    ],
+                emitState: {
+                    ...state.emitState!,
+                    currentScript: index >= 0 ? index : state.scripts.length
+                }
             };
         }
 
@@ -679,6 +695,7 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                 ...state,
                 requesting: false,
                 error: false,
+                tokenError: !(action.payload as IVerifyTokenResponse).success,
                 token: (action.payload as IVerifyTokenResponse).token
             };
         }

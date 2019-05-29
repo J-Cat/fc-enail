@@ -35,6 +35,7 @@ import { config } from '../config';
 import { IOledState } from '../models/IOledState';
 import { IPidSettings } from '../models/IPidSettings';
 import { ISavedProfiles } from '../models/ISavedProfiles';
+import uuid = require('uuid/v4');
 
 const debug = Debug('fc-enail:reducer');
 
@@ -650,19 +651,29 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
         case Constants.SAVE_SCRIPT: {
             const script = action.payload as IEnailScript;
             if (!state.scripts) {
+                const newScript = {
+                    ...script,
+                    key: uuid().toUpperCase()
+                }
                 return {
                     ...state,
-                    scripts: [script]
+                    scripts: [newScript],
+                    currentScript: newScript
                 };
             }
 
-            const index = state.scripts.findIndex(s => s.title === script.title);
+            const index = state.scripts.findIndex(s => (s.key && script.key ? s.key === script.key : false));
+            const currentScript = index >= 0 
+                ? script.key 
+                    ? script 
+                    : {...script, key: uuid().toUpperCase(), index} 
+                : {...script, key: uuid().toUpperCase(), index: state.scripts.length};
             return {
                 ...state,
                 scripts: index >= 0
                     ? [
                         ...state.scripts.slice(0, index),
-                        script,
+                        currentScript,
                         ...state.scripts.slice(index+1)
                     ].map((s, i) => ({
                         ...s,
@@ -670,11 +681,9 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
                     }))
                     : [
                         ...state.scripts,
-                        {
-                            ...script,
-                            index: state.scripts.length
-                        }
-                    ]
+                        currentScript
+                    ],
+                    currentScript
             };
         }
 
@@ -785,14 +794,17 @@ export const enailReducer = (state: IEnailState = initialState, action: EnailAct
             if (!state.scripts) {
                 return state;
             }
-            const title = action.payload as string;
-            const index = state.scripts.findIndex(s => s.title === title);
+            const key = action.payload as string;
+            const index = state.scripts.findIndex(s => s.key ? s.key === key : false);
             if (index < 0) {
                 return state;
             }
             const newScripts = [
                 ...state.scripts.slice(0, index),
-                ...state.scripts.slice(index+1)
+                ...state.scripts.slice(index+1).map(s => ({
+                    ...s,
+                    index: s.index!-1
+                }))
             ];
             return {
                 ...state,

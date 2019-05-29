@@ -1,29 +1,11 @@
-/*
- * File: c:\fc-enail\fc-enail-client\src\routes\scripts\scripts.tsx
- * Project: c:\fc-enail\fc-enail-client
- * Created Date: Tuesday November 13th 2018
- * Author: J-Cat
- * -----
- * Last Modified:
- * Modified By:
- * -----
- * License: 
- *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
- *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
- * -----
- * Copyright (c) 2018
- */
 import * as React from 'react';
-import { Prompt } from 'react-router';
-import { Form, Button, Dropdown, InputNumber, Select, Menu, Collapse } from 'antd';
-import { Modal, Toast } from 'antd-mobile';
-import { Action } from 'antd-mobile/lib/modal/PropsType';
-import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
+import { IonContent, IonReorderGroup, IonReorder, IonLabel, IonItem, IonButton, IonIcon, IonItemGroup, IonItemSliding, IonItemOptions, IonItemOption, IonInput, IonText, IonSelect, IonSelectOption, IonHeader, IonToolbar, IonButtons, IonPopover, IonList, IonTitle, IonAlert } from '@ionic/react';
+import { ItemReorderEventDetail } from '@ionic/core';
 import * as ScriptsProps from './container';
+import { Step } from '../../models/Step';
 import { IStep } from '../../models/IStep';
 import { IEnailScript } from '../../models/IEnailScript';
-import { moveStep, remapScript, addItem, deleteKey } from '../../helpers/stepHelper';
-// import { ISequentialStep } from '../../models/ISequentialStep';
+import { remapScript } from '../../helpers/stepHelper';
 import { ILoopStep } from '../../models/ILoopStep';
 import { IMoveTempStep } from '../../models/IMoveTempStep';
 import { IFeedbackStep } from '../../models/IFeedbackStep';
@@ -34,43 +16,39 @@ import * as Constants from '../../models/constants';
 
 import './scripts.less';
 
-const FormItem = Form.Item;
-const Panel = Collapse.Panel;
-
-export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.IState> {
+export default class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.IState> {
     constructor(props: ScriptsProps.IProps) {
         super(props);
         this.state = {
-            script: this.props.script || {
-                title: '',
-                step: remapScript({
-                    type: Constants.STEP_SEQUENTIAL,
-                    steps: []
-                })
-            },
+            script: this.props.script 
+                ? {...this.props.script}
+                : undefined,
             changed: false,
-            saved: false
+            saved: false,
+            menuOpen: [],
+            menuVisible: false,
+            confirmDeleteOpen: false,
+            saveDialogOpen: false,
+            addStepDialogOpen: false,
+            currentStep: ''
         };
-        this.onDragEnd = this.onDragEnd.bind(this);
+
+        this.deleteScript = this.deleteScript.bind(this);
     }
 
-    onDragEnd(result: DropResult) {
-        if (!result.destination) {
-            return;
+    static getDerivedStateFromProps(nextProps: ScriptsProps.IProps, prevState: ScriptsProps.IState) {
+        if ((!prevState.script && nextProps.script)
+            || (prevState.script && nextProps.script && prevState.script.title !== nextProps.script.title && prevState.script.title !== '')
+         ) {
+            return {
+                script: {...nextProps.script},
+                menuOpen: []
+            };
         }
-
-        const step = moveStep(this.state.script.step, result.draggableId, result.destination.droppableId, result.destination.index);
-
-        this.setState({
-            script: {
-                ...this.state.script,
-                step
-            },
-            changed: true
-        });
+        return null;
     }
 
-    createNew = (e: React.FormEvent) => {
+    createNew = (e: MouseEvent) => {
         e.preventDefault();
 
         const script = {
@@ -82,541 +60,591 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
         } as IEnailScript;
 
         this.setState({
+            menuVisible: false,
             script
         });
     }
 
     submit = (e: React.FormEvent) => {
         e.preventDefault();
+    }
 
-        this.props.form.validateFields((errors: any, values: any) => {
-            if (errors) {
-                return;
-            }
+    deleteScript = (e: MouseEvent) => {
+        e.preventDefault();
 
-            const modal = Modal.prompt('Save Script', 'Please enter the script name.', [{
-                text: 'Ok',
-                onPress: (value: string) => {
-                    if (!value) {
-                        return;
-                    }
-                    return new Promise<void>((resolve) => {
-                        Toast.info(`Saving script: ${value}`, 1);
-                        setTimeout(() => {
-                            const step = this.getUpdatedStep(this.state.script.step);
-                            this.props.saveScript({
-                                title: value,
-                                step
-                            } as IEnailScript);
-                            this.setState({
-                                changed: false,
-                                saved: true
-                            });
-                            this.props.history.push('/home');
-                            resolve();
-                        }, 1000);
-                    })
-                },
-            }, {
-                text: 'Cancel',
-                onPress: () => { 
-                    return new Promise<string>((resolve, reject) => {
-                        Toast.info('Cancelled', 1);
-                        setTimeout(() => {
-                            reject();
-                            modal.close();
-                        }, 1000);
-                    })},
-                },
-            ] as Array<Action<string>>, 
-            'default', 
-            this.state.script.title || '', ['enter a script name']);
+        this.setState({
+            confirmDeleteOpen: this.state.script ? true : false
         });
     }
 
-    deleteScript = (e: React.FormEvent) => {
+    saveScript = (e: MouseEvent) => {
         e.preventDefault();
 
-        const modal = Modal.alert('Delete Script?', `Are you sure you want to delete this scipt:  ${this.state.script.title}?`, [
-            { text: 'Cancel', onPress: () => {modal.close();} },
-            { 
-                text: 'Ok', 
-                onPress: () => {
-                    return new Promise<void>((resolve, reject) => {
-                        Toast.info(`Deleting script ...`, 1);
-                        setTimeout(() => {
-                            this.props.deleteScript(this.state.script.title);
-                            this.setState({
-                                saved: true
-                            });
-                            resolve();
-                            modal.close();
-                            this.props.history.push('/home');
-                        }, 1000);
-                    })    
-                }
-            }
-        ]);
+        this.setState({
+            saveDialogOpen: this.state.script ? true : false
+        });
     }
 
-    getUpdatedStep = (step: IStep): IStep => {
-        let newStep: IStep;
-        switch (step.type) {
-            case Constants.STEP_LOOP: {
-                newStep = {
-                    ...step,
-                    count: this.props.form.getFieldValue(`${step.key}-count`)
-                } as ILoopStep;
-                break;
+    addStepStart = (step: IStep) => {
+        this.setState({
+            menuVisible: false,
+            addStepDialogOpen: true,
+            currentStep: step.key!
+        });
+    }
+
+    addStepComplete = (type: string) => {
+        const step = this.getNewStep(type);
+        this.setState({
+            script: {
+                ...this.state.script!,
+                step: this.addStep(this.state.currentStep, this.state.script!.step, step as IStep)
             }
-            case Constants.STEP_FEEDBACK: {
-                const flashRate = this.props.form.getFieldValue(`${step.key}-flash`);
-                const led = this.props.form.getFieldValue(`${step.key}-led`);
-                newStep = {
-                    ...step,
-                    flashRate: flashRate === undefined || flashRate === '' ? undefined : flashRate,
-                    icon: this.props.form.getFieldValue(`${step.key}-icon`) || undefined,
-                    led: led === undefined || led === '' ? undefined : led,
-                    sound: this.props.form.getFieldValue(`${step.key}-sound`) || undefined
-                } as IFeedbackStep;
-                break;
-            }
-            case Constants.STEP_MOVETEMP: {
-                newStep = {
-                    ...step,
-                    value: this.props.form.getFieldValue(`${step.key}-value`)
-                } as IMoveTempStep;
-                break;
-            }
-            case Constants.STEP_TIMER: {
-                newStep = {
-                    ...step,
-                    timeout: this.props.form.getFieldValue(`${step.key}-timeout`)
-                } as ITimerStep;
-                break;
-            }
-            case Constants.STEP_WAITTEMP: {
-                newStep = {
-                    ...step,
-                    direction: this.props.form.getFieldValue(`${step.key}-direction`),
-                    offset: this.props.form.getFieldValue(`${step.key}-offset`),
-                    timeout: this.props.form.getFieldValue(`${step.key}-timeout`)
-                } as IWaitTempStep;
-                break;
-            }
-            default: {
-                newStep = {
-                    ...step
-                };
-                break;
-            }
-        }
+        });
+    }
+
+    addStep = (key: string, step: IStep, newStep: IStep): IStep => {
         return {
-            ...newStep!,
-            steps: !step.steps 
-                ? []
-                : step.steps.map(s => {
-                    return this.getUpdatedStep(s);
+            ...step,
+            steps: step.key! === key 
+                ? [...step.steps!, {
+                    ...newStep,
+                    key: `${step.key!}${step.key! !== '' ? '.' : ''}${step.steps!.length}`
+                }]
+                : step.steps!.map(s => {
+                    return this.addStep(key, s, newStep)
                 })
         };
     }
 
-    render() {
-        const getFieldDecorator = this.props.form.getFieldDecorator;
-        
-        return (<div className="scripts">
-        <React.Fragment>
-            <Prompt
-                when={(this.props.form.isFieldsTouched() || this.state.changed) && !this.state.saved}
-                message='You have unsaved changes to your script, are you sure you want to leave?'
-            />
-        </React.Fragment>            
-        <div className="version-label">{this.props.version}</div>
-            <div className="scripts-content">
-                <Form onSubmit={this.submit}>
-                    <div className='scripts-content-datarow' style={{flexDirection: "column", display: "flex"}}>
-                        {// tslint:disable-next-line:no-console jsx-no-lambda
-                        <DragDropContext onDragEnd={this.onDragEnd}>
-                            <Droppable droppableId='root' type='rootContainer'>
-                                {(provided, snapshot) => (
-                                    <div 
-                                        ref={provided.innerRef}
-                                        className="step-droppable"
-                                    >
-                                        {this.state.script && this.state.script.step && this.state.script.step.steps 
-                                            ? this.state.script.step.steps.map((step, index) => (
-                                                <Draggable key={step.key!} draggableId={step.key!} index={index}>
-                                                {(provided1, snapshot1) => (
-                                                    <div
-                                                        ref={provided1.innerRef}
-                                                        {...provided1.draggableProps}
-                                                        {...provided1.dragHandleProps}
-                                                        className={`step-draggable${snapshot1.isDragging ? ' step-draggable-dragging' : ''}`}
-                                                        >
-                                                        {this.container(step, getFieldDecorator)}
-                                                    </div>
-                                                )}
-                                                </Draggable>
-                                            )) : ''
-                                        }
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
-                        }
-                    </div>
-                    <FormItem className="scripts-content-buttonrow">
-                        <Button
-                            htmlType="submit"
-                        >
-                            Save
-                        </Button>
-                        &nbsp;&nbsp;
-                        <Dropdown overlay={this.overlay(this.state.script.step)}>
-                            <Button
-                                htmlType="button"
-                            >
-                                Add Step
-                            </Button>
-                        </Dropdown>
-                        &nbsp;&nbsp;
-                        <Button
-                            htmlType="button"
-                            onClick={this.createNew}
-                        >
-                            Create
-                        </Button>
-                        &nbsp;&nbsp;
-                        <Button
-                            htmlType="button"
-                            onClick={this.deleteScript}
-                        >
-                            Delete
-                        </Button>
-                    </FormItem>
-                </Form>                    
-            </div>
-        </div>);
+    deleteStep = (key: string, step: IStep): IStep => {
+        return {
+            ...step,
+            steps: step.steps!.filter(s => s.key! !== key).map((s, index) => {
+                return this.deleteStep(key, s)
+            })
+        }
     }
 
-    container = (item: IStep, getFieldDecorator: (...args: any) => any) => {
-        return (<Droppable droppableId={`${item.key}`} type='container'>
-            {(provided, snapshot) => (
-                <div 
-                    ref={provided.innerRef}
-                    className={`step-droppable${snapshot.isDraggingOver ? ' step-droppable-dragging' : ''}`}
+    reorder = (key: string, event: CustomEvent<ItemReorderEventDetail>) => {
+        if (this.state.script && this.state.script.step.steps) {
+            const newScript = {
+                ...this.state.script,
+                step: this.reorderStep(this.state.script!.step, key, event.detail.from, event.detail.to)
+            }
+            this.setState({
+                script: newScript
+            });
+        }
+        event.stopPropagation();
+        event.detail.complete();
+    }
+
+    reorderStep = (step: IStep, key: string, from: number, to: number): IStep => {
+        if (!step.steps) {
+            return {
+                ...step
+            };
+        } else if (step.key !== key) {
+            return {
+                ...step,
+                steps: step.steps.map(s => {
+                    return this.reorderStep(s, key, from, to)
+                })
+            };
+        } else {
+            const newSteps = step.steps.filter((s, index) => index !== from);
+            return {
+                ...step,
+                steps: [
+                    ...newSteps.slice(0, to),
+                    step.steps[from],
+                    ...newSteps.slice(to)
+                ]
+            };
+        }
+    }
+
+    getStepByKey = (key: string): IStep => {
+        const keyParts = key.split('.');
+        return keyParts.reduce<IStep>((previous, current) => {
+            const key = `${previous.key!}${previous.key! !== '' ? '.' : ''}${current}`;
+
+            if (previous.steps) {
+                const step = previous.steps.find(s => s.key! === key);
+                if (step) {
+                    return step;
+                }
+            } 
+
+            return previous;
+        }, this.state.script!.step);
+    }
+
+    renderStep = (step: IStep) => {
+        return <IonItemGroup key={step.key!} class="scripts">
+            <IonItemSliding>
+                <IonItemOptions>
+                    {step.type === Constants.STEP_LOOP || step.type === Constants.STEP_SEQUENTIAL
+                        ? <IonItemOption onClick={() => this.addStepStart(step)}>
+                            Add Step
+                        </IonItemOption>    
+                        : ''
+                    }
+                    <IonItemOption color="danger" onClick={() => this.setState({
+                        script: {
+                            ...this.state.script!,
+                            step: this.deleteStep(step.key!, this.state.script!.step)
+                        }
+                    })}>
+                        Delete
+                    </IonItemOption>
+                </IonItemOptions>
+                <IonItem class="step-item">
+                    <IonIcon name={this.state.menuOpen.includes(step.key!) ? "arrow-dropdown" : "arrow-dropright"} slot="start" onClick={() => {
+                        if (this.state.menuOpen.includes(step.key!)) {
+                            this.setState({
+                                menuOpen: [
+//                                    ...this.state.menuOpen.filter(m => m !== step.key!)
+                                ]
+                            });    
+                        } else {
+                            this.setState({
+                                menuOpen: [
+//                                    ...this.state.menuOpen,
+                                    step.key!
+                                ]
+                            })
+                        }
+                    }} />
+                    <IonLabel>{this.getStepTitle(step)}</IonLabel>
+                    <IonReorder slot="end" />
+                </IonItem>
+            </IonItemSliding>
+            {this.state.menuOpen.includes(step.key!)
+                ? this.getStepPanel(step)
+                : ''
+            }
+            {step.steps && step.steps.length > 0 
+                ? <IonItem>
+                    <IonReorderGroup class="step-item-steps" disabled={false} onIonItemReorder={event => this.reorder(step.key!, event)}>
+                        {step.steps.map(subStep => {
+                            return this.renderStep(subStep);
+                        })}
+                    </IonReorderGroup>
+                </IonItem>
+                : ''
+            }
+        </IonItemGroup>;
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <IonHeader>
+                    <IonToolbar>
+                        <IonButtons slot="start">
+                            <IonButton onClick={() => {
+                                this.setState({menuVisible: true});
+                            }}>
+                                <IonIcon slot="icon-only" name="menu" />
+                            </IonButton>
+                        </IonButtons>
+                        <IonTitle>{this.state.script ? this.state.script.title || '-New-' : 'Scripts'}</IonTitle>
+                    </IonToolbar>
+                </IonHeader>
+                <IonContent>
+                    {this.state.script && this.state.script.step.steps ? (
+                        <IonReorderGroup disabled={false} onIonItemReorder={event => this.reorder('', event)}>
+                            {this.state.script.step.steps.map(step => {
+                                return this.renderStep(step);
+                            })}
+                        </IonReorderGroup>
+                    ) : ''}
+                </IonContent>
+                <IonAlert
+                    isOpen={this.state.confirmDeleteOpen}
+                    onDidDismiss={() => this.setState({ confirmDeleteOpen: false })}
+                    header={'Delete Script?'}
+                    message={'Are you sure you want to delete this script?'}
+                    buttons={[{
+                        text: 'Cancel',
+                        role: 'cancel',
+                        cssClass: 'secondary'
+                    }, {
+                        text: 'Ok',
+                        handler: () => {
+                            this.props.deleteScript(this.state.script!.key || this.state.script!.title);
+                            this.setState({
+                                menuVisible: false
+                            }, () => {
+                                setTimeout((() => {
+                                    this.props.history.push('/home');
+                                }).bind(this), 500);                                    
+                            });
+                        }
+                    }]}
+                />
+                <IonAlert
+                    isOpen={this.state.saveDialogOpen}
+                    onDidDismiss={() => this.setState({ saveDialogOpen: false })}
+                    header={'Save Script?'}
+                    message={'Please enter the script title.'}
+                    inputs={[{
+                        name: 'title',
+                        type: 'text',
+                        value: this.state.script ? this.state.script.title : '',
+                        placeholder: 'Script Title'
+                    }]}
+                    buttons={[{
+                        text: 'Cancel',
+                        role: 'cancel',
+                        cssClass: 'secondary'
+                    }, {
+                        text: 'Ok',
+                        handler: (value) => {
+                            this.props.saveScript({
+                                ...this.state.script!,
+                                title: value.title
+                            });
+                            setTimeout((() => {
+                                this.setState({
+                                    menuVisible: false,
+                                    script: {
+                                        ...this.state.script!,
+                                        title: value.title
+                                    }
+                                })
+                            }).bind(this), 500);
+                        }
+                    }]}
+                />
+                <IonAlert
+                    isOpen={this.state.addStepDialogOpen}
+                    onDidDismiss={() => this.setState({ addStepDialogOpen: false })}
+                    header={'Add Step?'}
+                    message={'Please select a new step type.'}
+                    inputs={[{
+                        name: 'stepType',
+                        type: 'radio',
+                        label: 'Loop',
+                        value: Constants.STEP_LOOP
+                    }, {
+                        name: 'stepType',
+                        type: 'radio',
+                        label: 'Feedback',
+                        value: Constants.STEP_FEEDBACK
+                    }, {
+                        name: 'stepType',
+                        type: 'radio',
+                        label: 'Move Temperature',
+                        value: Constants.STEP_MOVETEMP
+                    }, {
+                        name: 'stepType',
+                        type: 'radio',
+                        label: 'Timer',
+                        value: Constants.STEP_TIMER
+                    }, {
+                        name: 'stepType',
+                        type: 'radio',
+                        label: 'Wait for Set Point',
+                        value: Constants.STEP_WAITTEMP
+                    }]}
+                    buttons={[{
+                        text: 'Cancel',
+                        role: 'cancel',
+                        cssClass: 'secondary'
+                    }, {
+                        text: 'Ok',
+                        handler: (value) => {
+                            this.addStepComplete(value);
+                            this.setState({
+                                menuVisible: false
+                            });
+                        }
+                    }]}
+                />
+                <IonPopover
+                    isOpen={this.state.menuVisible}
+                    onDidDismiss={() => this.setState(() => ({ menuVisible: false }))}
                 >
-                    {this.stepBar(item, 'step-droppable-title', getFieldDecorator)}
-                    {item.steps ? item.steps.map((step: IStep, index: number) => (
-                        <Draggable key={step.key!} draggableId={step.key!} index={index}>
-                            {(provided1, snapshot1) => (
-                                <div
-                                    ref={provided1.innerRef}
-                                    {...provided1.draggableProps}
-                                    {...provided1.dragHandleProps}
-                                    className={`step-draggable${snapshot1.isDragging ? ' step-draggable-dragging' : ''}`}
-                                >
-                                    {this.stepBar(step, 'step-draggable-title', getFieldDecorator)}
-                                </div>
-                            )}
-                        </Draggable>
-                    )) : ''}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
+                    <IonList>
+                        <IonItem onClick={() => this.addStepStart(this.state.script!.step)}>
+                            <IonIcon name="add" slot="start" />
+                            <IonLabel>Add Step</IonLabel>
+                        </IonItem>
+                        <IonItem onClick={this.createNew}>
+                            <IonIcon name="code" slot="start" />
+                            <IonLabel>New Script</IonLabel>
+                        </IonItem>
+                        <IonItem onClick={this.saveScript}>
+                            <IonIcon name="save" slot="start" />
+                            <IonLabel>Save Script</IonLabel>
+                        </IonItem>
+                        <IonItem onClick={this.deleteScript}>
+                            <IonIcon name="trash" slot="start" />
+                            <IonLabel>Delete Script</IonLabel>
+                        </IonItem>
+                    </IonList>
+                </IonPopover>                
+            </React.Fragment>
         );
     }
-    
-    stepBar = (step: IStep, classname: string, getFieldDecorator: (...args: any) => any) => {
-        return (
-            <Collapse className={classname} accordion={true}>
-                {this.getStepPanel(step, getFieldDecorator)}
-            </Collapse>
-        )
-    }
-    
-    addItemInternal = (step: IStep, type: string) => {
-        // e.preventDefault();
-        // e.stopPropagation();
 
-        const newRoot = remapScript(addItem(
-            this.state.script.step, {
-                type,
-                ...this.getNewStep(type),
-                steps: []
-            },
-            step.key!,
-            step.steps!.length
-        ));
-        this.setState({
-            changed: true,
-            script: {
-                ...this.state.script,
-                step: newRoot
-            }
-        });
-    }
-
-    getNewStep = (type: string) => {
+    getNewStep = (type: string): IStep => {
+        const base = {
+            type,
+            steps: []
+        };
         switch (type) {
             case Constants.STEP_LOOP: {
                 return {
+                    ...base,
                     count: 1
                 } as ILoopStep;
             }
             case Constants.STEP_MOVETEMP: {
                 return {
+                    ...base,
                     value: 20
                 } as IMoveTempStep;
             }
             case Constants.STEP_TIMER: {
                 return {
+                    ...base,
                     timeout: 5
                 } as ITimerStep;
             }
             default: {
                 return {
-                };
+                    ...base,
+                } as IStep
             }
         }
     }
-    
-    delItemInternal = (e: React.FormEvent, step: IStep) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const modal = Modal.alert('Delete Step', `Are you sure you want to delete this step:  ${this.getStepTitle(step)}?`, [
-            { text: 'Cancel', onPress: () => {modal.close();} },
-            { 
-                text: 'Ok', 
-                onPress: () => {
-                    return new Promise<void>((resolve, reject) => {
-                        Toast.info(`Deleting step ...`, 1);
-                        setTimeout(() => {
-                            const newRoot = remapScript(deleteKey(this.state.script.step, step.key!));
-                            this.setState({
-                                script: {
-                                    ...this.state.script,
-                                    step: newRoot
-                                },
-                                changed: true
-                            });
-                            resolve();
-                            modal.close();
-                        }, 1000);
-                    })    
-                }
+
+    setStepValue = (updatedStep: Step) => {
+        this.setState({
+            script: {
+                ...this.state.script!,
+                step: this.updateStepValue(this.state.script!.step, updatedStep)
             }
-        ]);
+        });
     }
-    
-    getStepPanel = (step: IStep, getFieldDecorator: (...args: any) => any) => {
+
+    updateStepValue = (step: IStep, updatedStep: Step): IStep => {
+        const props = step.key! === updatedStep.key! ? updatedStep : {};
+        const newStep = {
+            ...step,
+            ...props,
+            steps: step.steps!.map(s => this.updateStepValue(s, updatedStep))
+        };
+        return newStep;
+    }
+
+    getStepPanel = (step: IStep) => {
         switch (step.type) {
             case Constants.STEP_LOOP: {
                 const loop = step as ILoopStep;
                 return (
-                    <Panel key={step.key!} header={this.getHeader(step)}>
-                        <div>
-                            <FormItem label="Count">
-                                {getFieldDecorator(`${step.key}-count`, {
-                                    rules: [{ required: true, message: 'Please enter a # of loops >=1!' }],
-                                    initialValue: loop.count
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                        </div>
-                    </Panel>
+                    <IonItem class="step-panel">
+                        <IonLabel position="fixed">Count <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={loop.count.toString()}
+                            required={true}
+                            placeholder="# of Loops"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...loop, count: value});
+                            }}
+                        />
+                    </IonItem>
                 );
             }
     
             case Constants.STEP_TIMER: {
+                const timer = step as ITimerStep;
                 return (
-                    <Panel key={step.key!} header={this.getHeader(step)}>
-                        <div>
-                            <FormItem label="Timeout">
-                                {getFieldDecorator(`${step.key}-timeout`, {
-                                    rules: [{ required: true, message: 'Please enter a timeout in seconds.' }],
-                                    initialValue: (step as ITimerStep).timeout
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                        </div>
-                    </Panel>
+                    <IonItem class="step-panel">
+                        <IonLabel position="fixed">Timeout <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={timer.timeout.toString()}
+                            required={true}
+                            placeholder="Timeout in seconds"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...timer, timeout: value});
+                            }}
+                        />
+                    </IonItem>
                 );
             }
-    
+
             case Constants.STEP_WAITTEMP: {
+                const waitStep = step as IWaitTempStep;
                 return (
-                    <Panel key={step.key!} header={this.getHeader(step)}>
-                        <div>
-                            <FormItem label="Direction">
-                                {getFieldDecorator(`${step.key}-direction`, {
-                                    rules: [{ required: true, message: 'Please select a direction!' }],
-                                    initialValue: (step as IWaitTempStep).direction
-                                })(
-                                    <Select>
-                                        <Select.Option key={Direction.DOWN} value={Direction.DOWN}>Down</Select.Option>
-                                        <Select.Option key={Direction.UP} value={Direction.UP}>Up</Select.Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem label="Offset">
-                                {getFieldDecorator(`${step.key}-offset`, {
-                                    rules: [{ required: true, message: 'Please enter an offset.' }],
-                                    initialValue: (step as IWaitTempStep).offset
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                            <FormItem label="Timeout (s)">
-                                {getFieldDecorator(`${step.key}-timeout`, {
-                                    rules: [{ required: true, message: 'Please enter a timeout in seconds.' }],
-                                    initialValue: (step as IWaitTempStep).timeout
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                        </div>
-                    </Panel>
+                    <IonItemGroup class="step-panel">
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Direction <IonText color="danger">*</IonText></IonLabel>
+                        <IonSelect
+                            value={waitStep.direction}
+                            placeholder="Direction"
+                            onIonChange={event => {
+                                const value = event.detail.value
+                                if (![Direction.DOWN, Direction.UP].includes(value)) {
+                                    return;
+                                }
+                                this.setStepValue({...waitStep, direction: value});
+                            }}
+                        >
+                            <IonSelectOption value={Direction.DOWN}>Down</IonSelectOption>
+                            <IonSelectOption value={Direction.UP}>Up</IonSelectOption>
+                        </IonSelect>
+                    </IonItem>
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Offset <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={waitStep.offset.toString()}
+                            required={true}
+                            placeholder="Offset degrees"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...waitStep, offset: value});
+                            }}
+                        />
+                    </IonItem>
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Timeout <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={waitStep.timeout.toString()}
+                            required={true}
+                            placeholder="Timeout in seconds"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...waitStep, timeout: value});
+                            }}
+                        />
+                    </IonItem>
+                    </IonItemGroup>
                 );
             }
     
             case Constants.STEP_MOVETEMP: {
-                const temp = step as IMoveTempStep;
+                const moveStep = step as IMoveTempStep;
                 return (
-                    <Panel key={step.key!} header={this.getHeader(step)}>
-                        <div>
-                            <FormItem label="Change (+/-)">
-                                {getFieldDecorator(`${step.key}-value`, {
-                                    rules: [{ required: true, message: 'Please enter a change in temperature.' }],
-                                    initialValue: temp.value
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                        </div>
-                    </Panel>
+                    <IonItem class="step-panel">
+                        <IonLabel position="fixed">Change (+/-) <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={moveStep.value.toString()}
+                            required={true}
+                            placeholder="Temperature change in \xb0"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...moveStep, value });
+                            }}
+                        />
+                    </IonItem>
                 );
             }
     
             case Constants.STEP_FEEDBACK: {
-                const feedback = step as IFeedbackStep;
+                const feedbackStep = step as IFeedbackStep;
                 return (
-                    <Panel key={step.key!} header={this.getHeader(step)}>
-                        <div>
-                            <FormItem label="Icon">
-                                {getFieldDecorator(`${step.key}-icon`, {
-                                    rules: [{ required: false, message: 'Please select an icon.' }],
-                                    initialValue: feedback.icon
-                                })(
-                                    <Select>
-                                        <Select.Option key="" value="">-None-</Select.Option>
-                                        <Select.Option key="home" value="home">Home</Select.Option>
-                                        <Select.Option key="cloud" value="cloud">Cloud</Select.Option>
-                                        <Select.Option key="drop" value="drop">Drop</Select.Option>
-                                        <Select.Option key="gear" value="gear">Gear</Select.Option>
-                                        <Select.Option key="script" value="script">Script</Select.Option>
-                                        <Select.Option key="thermometerDown" value="thermometerDown">Thermometer</Select.Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem label="Flash (s)">
-                                {getFieldDecorator(`${step.key}-flash`, {
-                                    rules: [{ required: false, message: 'Please enter a flash rate in seconds. (0 for always on)' }],
-                                    initialValue: feedback.flashRate || 0
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                            <FormItem label="Sound">
-                                {getFieldDecorator(`${step.key}-sound`, {
-                                    rules: [{ required: false, message: 'Please select a sound.' }],
-                                    initialValue: feedback.sound
-                                })(
-                                    <Select>
-                                        <Select.Option key="" value="">-None-</Select.Option>
-                                        <Select.Option key="appear" value="appear">Appear</Select.Option>
-                                        <Select.Option key="beep" value="beep">Beep</Select.Option>
-                                        <Select.Option key="bell" value="bell">Bell</Select.Option>
-                                        <Select.Option key="chime" value="chime">Chime</Select.Option>
-                                        <Select.Option key="complete" value="complete">Complete</Select.Option>
-                                        <Select.Option key="disconnected" value="disconnected">Disconnected</Select.Option>
-                                        <Select.Option key="error" value="error">Error</Select.Option>
-                                        <Select.Option key="money" value="money">Money</Select.Option>
-                                        <Select.Option key="organ" value="organ">Organ</Select.Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem label="LED (s)">
-                                {getFieldDecorator(`${step.key}-led`, {
-                                    rules: [{ required: false, message: 'Please enter a flash rate for the LED. (0 for always on)' }],
-                                    initialValue: feedback.led
-                                })(
-                                    <InputNumber />
-                                )}
-                            </FormItem>
-                        </div>
-                    </Panel>
+                    <IonItemGroup class="step-panel">
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Icon <IonText color="danger">*</IonText></IonLabel>
+                        <IonSelect
+                            value={feedbackStep.icon || ''}
+                            placeholder="Icon"
+                            onIonChange={event => {
+                                const value = event.detail.value;
+                                if (Constants.ICONS.findIndex(i => i.value === value) < 0) {
+                                    return;
+                                }
+                                this.setStepValue({...feedbackStep, icon: value});
+                            }}
+                        >{Constants.ICONS.map(icon => {
+                            return <IonSelectOption key={icon.value} value={icon.value}>{icon.title}</IonSelectOption>;
+                        })}
+                        </IonSelect>
+                    </IonItem>
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Flash (s) <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={(feedbackStep.flashRate || 0).toString()}
+                            required={true}
+                            placeholder="Icon flash rate"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...feedbackStep, flashRate: value});
+                            }}
+                        />
+                    </IonItem>
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">Sound <IonText color="danger">*</IonText></IonLabel>
+                        <IonSelect
+                            value={feedbackStep.sound || ''}
+                            placeholder="Icon"
+                            onIonChange={event => {
+                                const value = event.detail.value;
+                                if (Constants.SOUNDS.findIndex(s => s.value === value) < 0) {
+                                    return;
+                                }
+                                this.setStepValue({...feedbackStep, sound: value});
+                            }}
+                        >{Constants.SOUNDS.map(sound => {
+                            return <IonSelectOption key={sound.value} value={sound.value}>{sound.title}</IonSelectOption>;
+                        })}
+                        </IonSelect>
+                    </IonItem>
+                    <IonItem class="step-panel-item">
+                        <IonLabel position="fixed">LED (s) <IonText color="danger">*</IonText></IonLabel>
+                        <IonInput 
+                            type="number"
+                            value={(feedbackStep.led || 0).toString()}
+                            required={true}
+                            placeholder="LED flash rate"
+                            onIonChange={event => {
+                                const value = parseInt(event.detail.value as string);
+                                if (isNaN(value)) {
+                                    return;   
+                                }
+                                this.setStepValue({...feedbackStep, led: value});
+                            }}
+                        />
+                    </IonItem>
+                    </IonItemGroup>
                 );
             }
-    
+  
             default: {
-                return <Panel key={step.key!} header={this.getHeader(step)} />;
+                return "";
             }
         }
-    }
-
-    getHeader = (step: IStep) => {
-        return (
-            <div className="step-panel-bar">
-                <div className="step-panel-bar-label">
-                    {this.getStepTitle(step)}
-                </div>
-                <div className="step-panel-bar-buttons">
-                    { 
-                        step.type === Constants.STEP_LOOP || step.type === Constants.STEP_SEQUENTIAL
-                            ? this.getAddButton(step)
-                            : ''
-                    }
-                    {
-                        // tslint:disable-next-line:jsx-no-lambda
-                        <Button icon="close-circle" onClick={(e: React.FormEvent) => this.delItemInternal(e, step)} />
-                    }
-                </div>
-            </div>
-        );
-    }
-    overlay = (step: IStep) => (
-        <Menu onClick={
-            // tslint:disable-next-line:jsx-no-lambda
-            (param) => this.addItemInternal(step, param.key)
-        }>
-            { step.key === '' 
-                ? <Menu.Item key={Constants.STEP_LOOP}>Loop</Menu.Item>
-                : ''
-            }
-            <Menu.Item key={Constants.STEP_FEEDBACK}>Feedback</Menu.Item>
-            <Menu.Item key={Constants.STEP_MOVETEMP}>Move Temp</Menu.Item>
-            <Menu.Item key={Constants.STEP_TIMER}>Timer</Menu.Item>
-            <Menu.Item key={Constants.STEP_WAITTEMP}>Wait</Menu.Item>
-        </Menu>
-    );
-
-    getAddButton = (step: IStep) => {
-        return (<div>
-            <Dropdown overlay={this.overlay(step)}>
-                <Button onClick={
-                    // tslint:disable-next-line:jsx-no-lambda
-                    (e: React.FormEvent) => { 
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                } icon="plus-circle" />
-            </Dropdown>
-        </div>);
     }
 
     getStepTitle = (step: IStep) => {
@@ -645,8 +673,3 @@ export class Scripts extends React.Component<ScriptsProps.IProps, ScriptsProps.I
         }
     }
 }
-
-
-const ScriptsForm = Form.create()(Scripts);
-
-export default ScriptsForm as any;

@@ -23,7 +23,10 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
             scriptRunning: this.props.state ? this.props.state.scriptRunning : false,
             currentScript: this.props.state ? this.props.state.currentScript || 0 : 0,
             scriptChanging: true,
-            showSPDialog: false
+            showSPDialog: false,
+            runningChanging: false,
+            isMounted: false,
+            scripts: this.props.scripts
         };
 
         this.scriptAfterChange = this.scriptAfterChange.bind(this);
@@ -31,6 +34,23 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     }
 
     static getDerivedStateFromProps(nextProps: HomeProps.IProps, prevState: HomeProps.IState) {
+        if (!nextProps.state && !nextProps.scripts) {
+            return null;
+        }
+
+        if (nextProps.scripts.length !== prevState.scripts.length) {
+            return {
+                currentScript: nextProps.state ? nextProps.state.currentScript : 0,
+                scripts: [
+                    ...nextProps.scripts,
+                    ...prevState.scripts.filter(s => nextProps.scripts.findIndex(n => n.title === s.title) < 0).map(s => ({
+                        ...s,
+                        deleted: true
+                    }))
+                ]
+            };
+        }
+
         if (!nextProps.state) {
             return null;
         }
@@ -49,10 +69,14 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                 setPoint: nextProps.state.sp,
                 sliderValue: nextProps.state.sp
             };
-        } else if (nextProps.state && nextProps.state.currentScript !== undefined && prevState.currentScript !== nextProps.state.currentScript && prevState.scriptChanging) {
+        } else if (nextProps.state && nextProps.state.currentScript !== undefined && prevState.currentScript !== nextProps.state.currentScript) {
             return {
                 currentScript: nextProps.state.currentScript,
                 scriptChanging: false
+            };
+        } else if (nextProps.state && nextProps.state.running !== prevState.running && !prevState.runningChanging) {
+            return {
+                running: nextProps.state.running
             };
         }
 
@@ -102,7 +126,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
 
     toggleState = () => {
         this.setState({
-            running: !this.state.running
+            running: !this.state.running,
+            runningChanging: true
         }, () => {
             this.props.toggleState();
         });
@@ -149,8 +174,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
         });
     }
 
-    renderScriptItem = (script: IEnailScript) => {
-        return <IonItem>
+    renderScriptItem = (script: IEnailScript & { deleted?: boolean }) => {
+        return <IonItem hidden={script.deleted}>
             <IonLabel>{script.title}</IonLabel>
             <IonButton slot="end" onClick={this.runEndScript}>
                 <IonIcon name={this.state.scriptRunning ? 'square' : 'play'} style={{
@@ -163,15 +188,49 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
     slider: any;
 
     componentDidUpdate(prevProps: HomeProps.IProps, prevState: HomeProps.IState) {
-        if (this.slider && !this.state.scriptChanging) {
-            const p = this.slider.getActiveIndex();
-            if (p !== undefined) {
-                (p as Promise<number>).then(index => {
-                    if (index !== this.state.currentScript) {
-                        this.slider.swiper.slideTo(this.state.currentScript);
-                    }
-                });
+        try {
+            if (this.slider && !this.state.scriptChanging) {
+                const p = this.slider.getActiveIndex();
+                if (p !== undefined) {
+                    (p as Promise<number>).then(index => {
+                        if (this.slider && index !== this.state.currentScript) {
+                            this.slider.slideTo(this.state.currentScript);
+                        }
+                    });
+                }
             }
+
+            if (this.slider && this.props.scripts.length !== prevState.scripts.length) {
+                this.slider.update();
+            }
+        } catch (e) {}
+    }
+
+    componentWillUnmount() {
+        console.log('will unmount');
+        this.setState({
+            isMounted: false
+        });
+    }
+
+    componentDidMount() {
+        console.log('did mount');
+        this.setState({
+            isMounted: true
+        });
+    }
+
+    private getTimeRemaining = (): string => {
+        if (!this.props.state) {
+            return '';
+        }
+
+        const milliseconds = (this.props.autoShutoff * 60000) - (Date.now() - this.props.state.runningSince);
+        const hours = Math.floor(milliseconds / 1000 / 60 / 60);
+        if (hours > 0) {
+            return `${hours}:${format(milliseconds, 'mm:ss')}`;
+        } else {
+            return format(milliseconds, 'm:ss');
         }
     }
 
@@ -207,7 +266,7 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                         : ''
                                     }
                                     {this.props.state.running
-                                        ? <IonBadge>{format((this.props.autoShutoff * 60000) - (Date.now() - this.props.state.runningSince), 'm:ss')}</IonBadge>
+                                        ? <IonBadge>{this.getTimeRemaining()}</IonBadge>
                                         : ''
                                     }
                                 </IonRow>
@@ -215,7 +274,8 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                         </IonRow>
                         <IonRow class="home-content-scripts">
                             <IonCol>
-                                <IonSlides pager={true} {...this.state.currentScript}
+                                {this.state.isMounted && this.state.scripts.length > 0 ?
+                                <IonSlides {...{ numScripts: this.state.scripts.length }} pager={true}
                                     ref={(ref) => {
                                         this.slider = ref;
                                     }}
@@ -228,13 +288,17 @@ export class Home extends React.Component<HomeProps.IProps, HomeProps.IState> {
                                             scriptChanging: true
                                         });
                                     }}
+                                    onIonSlidesDidLoad={(event) => {
+                                        (event.target as any).slideTo(this.state.currentScript);
+                                    }}
                                 >
-                                    {this.props.scripts.map(script => {
-                                        return <IonSlide key={script.index}>
+                                    {this.state.scripts.map(script => {
+                                        return this.state.isMounted ? <IonSlide key={script.key} hidden={script.deleted}>
                                             {this.renderScriptItem(script)}
-                                        </IonSlide>;
+                                        </IonSlide> : '';
                                     })}
                                 </IonSlides>
+                                : ''}
                             </IonCol>
                         </IonRow>
                         <IonRow class="home-content-presets">

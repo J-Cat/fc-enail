@@ -91,24 +91,19 @@ export const monitorTemp = async (step: IWaitTempStep): Promise<void> => {
 }
 
 const getStepByKey = (root: IStep, key: string): IStep | undefined => {
-    if (key === '') {
-        return root;
-    }
+    const keyParts = key.split('.');
+    return keyParts.reduce<IStep>((previous, current) => {
+        const key = `${previous.key!}${previous.key! !== '' ? '.' : ''}${current}`;
 
-    let step = root;
-    for (const index of key.split('.').map(s => parseInt(s))) {
-        if (step.steps === undefined) {
-            break;
-        }
+        if (previous.steps) {
+            const step = previous.steps.find(s => s.key! === key);
+            if (step) {
+                return step;
+            }
+        } 
 
-        if (step.steps.length < index) {
-            break;
-        }
-
-        step = step.steps[index];
-    }
-
-    return step;
+        return previous;
+    }, root);
 }
 
 const getNextStepKey = (step: IStep, stepIndex: number, parent: IStep, root: IStep) => {

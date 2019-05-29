@@ -15,7 +15,6 @@
  */
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { FormComponentProps } from 'antd/lib/form';
 
 import { IEnailStore } from '../../models/IEnailStore';
 import Settings from './settings';
@@ -48,7 +47,7 @@ export interface IDispatchProps {
 export interface IOwnProps {
 }
 
-export interface IProps extends RouteComponentProps<any>, FormComponentProps, IStateProps, IDispatchProps, IOwnProps {
+export interface IProps extends RouteComponentProps<any>, IStateProps, IDispatchProps, IOwnProps {
 }
 
 export interface IState {
@@ -70,6 +69,8 @@ export interface IState {
         readonly profile: string;
     }
     readonly profile: string;
+    readonly menuVisible: boolean;
+    readonly mouseEvent?: MouseEvent;
 }
 
 function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {

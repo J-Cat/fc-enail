@@ -7,6 +7,7 @@ export interface IEnailState {
     readonly emitState?: IEnailEmitState;
     readonly requesting: boolean;
     readonly reconnect: boolean;
+    readonly tokenError: boolean;
     readonly serviceFound: boolean;
     readonly scripts?: IEnailScript[];
     readonly presets: number[];

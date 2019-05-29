@@ -76,7 +76,7 @@ export const socketIoMiddleware = (store: Store<IEnailStore>) => <A extends Enai
         }
 
         case Constants.SOCKET_CONNECTED: {
-            history.push('home');
+            // history.push('home');
             break;
         }
     }

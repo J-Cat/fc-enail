@@ -23,3 +23,4 @@ export interface IStep {
     readonly steps?: IStep[];
     readonly loopCount?: number;
 }
+

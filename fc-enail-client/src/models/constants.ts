@@ -87,3 +87,26 @@ export const STEP_TIMER = 'timer';
 export const STEP_SEQUENTIAL = 'sequential';
 
 export const UPDATE_VERSION = 'ENAIL/VERSION/UPDATE';
+
+export const ICONS = [
+    {title: '-None-', value: ''}, 
+    {title: 'Home', value: 'home'}, 
+    {title: 'Cloud', value: 'cloud'}, 
+    {title: 'Drop', value: 'drop'}, 
+    {title: 'Gear', value: 'gear'}, 
+    {title: 'Script', value: 'script'}, 
+    {title: 'Thermometer', value: 'thermometerDown'}
+];
+
+export const SOUNDS = [
+    {title: '-None-', value: ''}, 
+    {title: 'Appear', value: 'appear'}, 
+    {title: 'Beep', value: 'beep'}, 
+    {title: 'Bell', value: 'bell'}, 
+    {title: 'Chime', value: 'chime'}, 
+    {title: 'Complete', value: 'complete'}, 
+    {title: 'Disconnected', value: 'disconnected'}, 
+    {title: 'Error', value: 'error'}, 
+    {title: 'Money', value: 'money'}, 
+    {title: 'Organ', value: 'organ'}
+];

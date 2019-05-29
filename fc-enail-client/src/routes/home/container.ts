@@ -53,6 +53,9 @@ export interface IState {
     readonly currentScript: number;
     readonly scriptChanging: boolean;
     readonly showSPDialog: boolean;
+    readonly runningChanging: boolean;
+    readonly isMounted: boolean;
+    readonly scripts: (IEnailScript & { deleted?: boolean })[];
 }
 
 function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {

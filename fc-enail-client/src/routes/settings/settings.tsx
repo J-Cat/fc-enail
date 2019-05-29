@@ -1,33 +1,15 @@
-/*
- * File: c:\fc-enail\fc-enail-client\src\routes\settings\settings.tsx
- * Project: c:\fc-enail\fc-enail-client
- * Created Date: Tuesday November 13th 2018
- * Author: J-Cat
- * -----
- * Last Modified:
- * Modified By:
- * -----
- * License: 
- *    This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 
- *    International License (http://creativecommons.org/licenses/by-nc/4.0/).
- * -----
- * Copyright (c) 2018
- */
 import * as React from 'react';
-import { Form, InputNumber, Button, Select } from 'antd';
-import { Modal, Toast } from 'antd-mobile';
-import { Action } from 'antd-mobile/lib/modal/PropsType';
+import { Route, Switch } from 'react-router-dom';
+import { IonLabel, IonHeader, IonToolbar, IonTitle, IonIcon, IonButtons, IonButton, IonPopover, IonList, IonItem } from '@ionic/react';
 import * as SettingsProps from './container';
+import { GeneralSettings } from './general';
 import './settings.less';
-
-const Option = Select.Option;
-const FormItem = Form.Item;
+import Profiles from './profiles/profiles';
 
 const MIN_PRESET = 0;
 const MAX_PRESET = 1000;
 
-export class Settings extends React.Component<SettingsProps.IProps, SettingsProps.IState> {
-
+export default class Settings extends React.Component<SettingsProps.IProps, SettingsProps.IState> {
     constructor(props: SettingsProps.IProps) {
         super(props);
 
@@ -43,7 +25,9 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                 d: this.props.d,
                 profile: this.props.profile
             },
-            profile: this.props.profile
+            profile: this.props.profile,
+            menuVisible: false,
+            mouseEvent: undefined
         };
 
         this.deleteProfile.bind(this);
@@ -178,7 +162,7 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
     savePidSettings = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const modal = Modal.prompt('Profile Name', 'Please enter the profile name.', [{
+/*        const modal = Modal.prompt('Profile Name', 'Please enter the profile name.', [{
             text: 'Ok',
             onPress: (value: string) => {
                 return new Promise<string>((resolve, reject) => {
@@ -190,15 +174,6 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                             i: this.state.i,
                             d: this.state.d
                         });
-                        // this.setState({
-                        //     profile: value,
-                        //     start: {
-                        //         p: this.state.p,
-                        //         i: this.state.i,
-                        //         d: this.state.d,
-                        //         profile: value
-                        //     }
-                        // });
                         resolve(value);
                         modal.close();
                     }).bind(this), 1000);
@@ -216,7 +191,7 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                 })},
             },
         ] as Array<Action<string>>, 'default', this.state.profile, ['profile name']);  
-        
+*/        
         // this.props.
     }
 
@@ -261,6 +236,52 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
 
     render() {
         return (
+            <React.Fragment>
+            <IonHeader>
+                <IonToolbar>
+                    <IonButtons slot="start">
+                        <IonButton onClick={() => {
+                            this.setState({menuVisible: true});
+                        }}>
+                            <IonIcon slot="icon-only" name="menu" />
+                        </IonButton>
+                    </IonButtons>
+                    <IonTitle>{this.props.location.pathname.indexOf('profiles') >= 0 ? 'Profiles' : 'Settings'}</IonTitle>
+                </IonToolbar>
+            </IonHeader>
+            <Switch>
+                <Route path="/settings/profiles" component={Profiles} />
+                <Route path="/settings" component={GeneralSettings} />
+            </Switch>
+            <IonPopover
+                isOpen={this.state.menuVisible}
+                onDidDismiss={() => this.setState({ menuVisible: false })}
+            >
+                <IonList>
+                    <IonItem onClick={(event) => {
+                        event.preventDefault();
+                        this.props.history.push('/settings');
+                        this.setState({
+                            menuVisible: false
+                        });
+                    }}>
+                        <IonIcon name="settings" slot="start" />
+                        <IonLabel>Settings</IonLabel>
+                    </IonItem>
+                    <IonItem onClick={(event) => {
+                        event.preventDefault();
+                        this.props.history.push('/settings/profiles');
+                        this.setState({
+                            menuVisible: false
+                        });
+                    }}>
+                        <IonIcon name="options" slot="start" />
+                        <IonLabel>Profiles</IonLabel>
+                    </IonItem>
+                </IonList>
+            </IonPopover>                
+            </React.Fragment>
+            /*
             <div className="settings">
                 <div className="version-label">{this.props.version}</div>
                 <div className="settings-halfspacer" />
@@ -410,10 +431,7 @@ export class Settings extends React.Component<SettingsProps.IProps, SettingsProp
                 </div>
                 <div className="settings-footer" />
             </div>
+            */
         );
     }
 }
-
-const SettingsForm = Form.create()(Settings);
-
-export default SettingsForm as any;

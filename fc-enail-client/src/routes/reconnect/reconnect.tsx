@@ -14,87 +14,79 @@
  * Copyright (c) 2018
  */
 import * as React from 'react';
-import { Form, Input, Button } from 'antd';
 
 import * as ReconnectProps from './container';
 import * as Constants from '../../models/constants';
 import config from '../../config';
 
 import './reconnect.less';
+import { IonContent, IonLabel, IonHeader, IonText, IonGrid, IonRow, IonCol, IonInput, IonButton } from '@ionic/react';
 
-const fcLogo = require('../../assets/fclogo.png');
-const FormItem = Form.Item;
-
-export class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectProps.IState> {
+export default class Reconnect extends React.Component<ReconnectProps.IProps, ReconnectProps.IState> {
 
     constructor(props: ReconnectProps.IProps) {
         super(props);
+
+        this.state = {
+            serviceUrl: localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) || config.serviceUrl
+        };
     }
 
     submit = (e: React.FormEvent) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-               this.props.connectManual(values.serviceUrl);
-            }
-        });
+        this.props.connectManual(this.state.serviceUrl);
     }
 
-    handleUrlChange = (value: string) => {
-        this.setState({
-            serviceUrl: value
-        });
+    handleInputChange = (e: Event) => {
+        if (e.target) {
+            const input = e.target as HTMLInputElement;
+            this.setState({
+                serviceUrl: input.value
+            });
+        }
     }
 
     render() {
-        const getFieldDecorator = this.props.form.getFieldDecorator;
-
         return (
-            <div className="reconnect">
-                <div className="version-label">{this.props.version}</div>
-                <div className="reconnect-header">
-                    <img src={fcLogo} alt="FC" className="reconnect-header-logo" />
-                </div>
-                <div className="reconnect-halfspacer" />
-                <div className="reconnect-content">
-                    <div className="reconnect-content-container">
-                        <Form onSubmit={this.submit} >
-                            <div className='reconnect-content-container-datarow'>
-                                <div className='reconnect-content-container-datarow-spaer' />
-                                <div className='reconnect-content-container-datarow-content'>
-                                    <FormItem
-                                        help='Please enter the service URL.'
-                                    >
-                                    {getFieldDecorator('serviceUrl', {
-                                        rules: [{ required: true, message: 'Please enter a valid service URL!' }],
-                                        initialValue: localStorage.getItem(Constants.LOCAL_STORAGE_FCENAIL_SERVICE_URL) || config.serviceUrl
-                                      })(
-                                        <Input
-                                            placeholder='http://<IP Address>'
-                                            inputMode="url"
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                        />
-                                      )}
-                                    </FormItem>
-                                </div>
-                                <div className='reconnect-content-container-datarow-spaer' />
-                            </div>
-                            <FormItem className="reconnect-content-container-buttonrow">
-                                <Button
-                                    htmlType="submit"
+            <IonContent class="reconnect" scrollY={false}>
+                <form onSubmit={this.submit}>
+                    <IonLabel class="version-label">{this.props.version}</IonLabel>
+                    <IonHeader class="reconnect-header">
+                        <IonText>FC E-Nail</IonText>
+                    </IonHeader>
+                    <IonGrid class="reconnect-content">
+                        <IonRow class="reconnect-content-datarow">
+                            <IonCol>
+                                <IonLabel 
+                                    class="reconnect-content-datarow-label"
                                 >
-                                    Connect
-                                </Button>
-                            </FormItem>
-                        </Form>                    
-                    </div>
-                </div>
-                <div className="reconnect-footer" />
-            </div>
+                                    Please enter the service URL.
+                                </IonLabel>
+                                <IonInput
+                                    class="reconnect-content-datarow-input"
+                                    type="url"
+                                    autoCorrect="off"
+                                    name="serviceUrl"
+                                    placeholder="http://<IP Address>"
+                                    onInput={this.handleInputChange}
+                                    value={this.state.serviceUrl}
+                                    required={true}
+                                    autofocus={true}
+                                />
+                            </IonCol>
+                        </IonRow>
+                        <IonRow class="reconnect-content-buttonrow">
+                            <IonCol>
+                                <IonButton 
+                                    type="submit"
+                                >
+                                    Submit
+                                </IonButton>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
+                </form>
+            </IonContent>
         );
     }
 }
-
-const ReconnectForm = Form.create()(Reconnect);
-
-export default ReconnectForm as any;

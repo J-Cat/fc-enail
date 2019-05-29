@@ -14,76 +14,83 @@
  * Copyright (c) 2018
  */
 import * as React from 'react';
-import { Form, Input, Button } from 'antd';
 import * as SignInProps from './container';
 import './signin.less';
+import { IonContent, IonLabel, IonHeader, IonText, IonGrid, IonRow, IonInput, IonButton, IonItem, IonCol } from '@ionic/react';
 
-const FormItem = Form.Item;
-
-const fcLogo = require('../../assets/fclogo.png');
-
-export class SignIn extends React.Component<SignInProps.IProps, SignInProps.IState> {
+export default class SignIn extends React.Component<SignInProps.IProps, SignInProps.IState> {
 
     constructor(props: SignInProps.IProps) {
         super(props);
+
+        this.state = {
+            passphrase: ''
+        };
     }
 
     submit = (e: React.FormEvent) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-               this.props.verifyPassphrase(values.passphrase);
-            }
-        });
+        if (!this.props.ready) {
+            return;
+        }
+        this.props.verifyPassphrase(this.state.passphrase);
+    }
+
+    handleInputChange = (e: Event) => {
+        if (e.target) {
+            const input = e.target as HTMLInputElement;
+            this.setState({
+                passphrase: input.value
+            });
+        }
     }
 
     render() {
-        const getFieldDecorator = this.props.form.getFieldDecorator;
-
         return (
-            <div className="signin">
-                <div className="version-label">{this.props.version}</div>
-                <div className="signin-header">
-                    <img src={fcLogo} alt="FC" className="signin-header-logo" />
-                </div>
-                <div className="signin-halfspacer" />
-                <div className="signin-content">
-                    <div className="signin-content-container">
-                        <Form onSubmit={this.submit} >
-                            <div className='signin-content-container-datarow'>
-                                <div className='signin-content-container-datarow-spaer' />
-                                <div className='signin-content-container-datarow-content'>
-                                    <FormItem
-                                        help='Please enter the passphrase from the E-Nail.'
-                                    >
-                                    {getFieldDecorator('passphrase', {
-                                        rules: [{ required: true, message: 'Please enter a passphrase!' }]
-                                      })(
-                                        <Input
-                                            placeholder='passphrase'
-                                            // tslint:disable-next-line:jsx-no-lambda
-                                        />
-                                      )}
-                                    </FormItem>
-                                </div>
-                                <div className='signin-content-container-datarow-spaer' />
-                            </div>
-                            <FormItem className="signin-content-container-buttonrow">
-                                <Button
-                                    htmlType="submit"
+            <IonContent class="signin" scrollY={false}>
+                <form onSubmit={this.submit}>
+                    <IonLabel class="version-label">{this.props.version}</IonLabel>
+                    <IonHeader class="signin-header">
+                        <IonText>FC E-Nail</IonText>
+                    </IonHeader>
+                    <IonGrid class="signin-content">
+                        <IonRow class="signin-content-datarow">
+                            <IonCol>
+                                <IonLabel 
+                                    class="signin-content-datarow-label"
+                                    color={this.props.tokenError?'danger':''}
                                 >
-                                    Verify
-                                </Button>
-                            </FormItem>
-                        </Form>                    
-                    </div>
-                </div>
-                <div className="signin-footer" />
-            </div>
+                                    {this.props.tokenError
+                                        ? 'Failed to verify the token.  Please try again.'
+                                        : 'Please enter the passphrase from the E-Nail.'
+                                    }
+                                </IonLabel>
+                                <IonInput
+                                    class="signin-content-datarow-input"
+                                    type="text"
+                                    autoCorrect="off"
+                                    name="passphrase"
+                                    placeholder="passphrase"
+                                    onInput={this.handleInputChange}
+                                    required={true}
+                                    title="Passphrase did not match that on the e-nail."
+                                    autofocus={true}
+                                />
+                            </IonCol>
+                        </IonRow>
+                        <IonRow class="signin-content-buttonrow">
+                            <IonCol>
+                                <IonButton 
+                                    type="submit"
+                                    disabled={!this.props.ready}
+                                >
+                                    Submit
+                                </IonButton>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
+                </form>
+            </IonContent>
         );
     }
 }
-
-const SignInForm = Form.create()(SignIn);
-
-export default SignInForm as any;

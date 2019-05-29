@@ -1,138 +1,37 @@
 @import '../../styles/vars.less';
- 
-.scripts {
-    height: 100%;
-    width: 100%;
 
-    .step-panel-bar {
-        display: flex;
-        flex-direction: row;
-        &-label {
-            flex: 1 0 auto;
-        }
-        &-buttons {
-            flex: 0 1 auto;
-            display: flex;
-            flex-direction: row;
-            .ant-btn {
-                font-weight: bold !important;
-                svg {
-                    height: 12px;
-                    width: 12px;
-                }
-            }
-            div {
-                .ant-btn {
-                    font-weight: bold !important;
-                    svg {
-                        height: 14px;
-                        width: 14px;
-                    }
-                }
-            }
-        }
-    }
-
-    .ant-form-item {
-        .ant-input-number {
-            min-width: 140px;
-        }
-        &-label {
-            display: inline-block;
-            width: auto;
-            min-width: 90px;
-        }
-        &-control-wrapper {
-            display: inline-block;
-            width: auto;
-            min-width: 140px;
-        }
-    }
-
-    .ant-collapse {
-        background-color: unset;
-        border: unset;
-        &-content {
-            background-color: unset;
-            border: unset;
-            &-box {
-                padding: 0px 10px 0px 20px;
-            }
-        }
-        &-item {
-            border: unset;
-        }
-    }
-
-    .step-droppable {
-        .step-droppable {
-            .step-droppable {
-                padding: 8px;
-                width: 100%;
-                flex: 1 1 auto;
-                display: flex;
-                flex-direction: column;   
-                border: 1px solid @border-color-base;
-                border-collapse: collapse;    
-                &-dragging {
-                    background-color: @border-color-base;
-                }
-                &-title {
-                    font-weight: bold;
-                    padding: 2px 4px 2px 2px;
-                }
-            }
-        }
-
-        .step-draggable {
-            user-select: none;
-            padding: 0px 2px 0px 2px;
-            margin: 4px;
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid @border-color-base;
-            border-collapse: collapse;
-            &-dragging {
-                background-color: @border-color-base;
-            }
-            &-title {
-                font-weight: bold;
-                padding: 2px 4px 4px 4px;
-            }
-        }    
-    }
-
-    .version-label {
-        position: absolute;
-        bottom: 5px;
-        left: 5px;
+ion-item-group.step-panel, ion-item-group.scripts {
+    border: 1px solid var(--ion-color-medium);
+    border-radius: 4px;
+    margin: 4px;
+    ion-item {
+        --background: transparent;
+        --border-style: none;
         font-size: .8em;
-        opacity: 0.4;
-        @media @landscape {
-            display: none;
-        }
     }
+}
 
-    &-content {
-        height: 100%;
-        form {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow-y: hidden;
-        }
-        &-datarow {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            overflow-y: auto ;
-        }
-        &-buttonrow {
-            flex: 0 1 0;
-            margin: 20px !important;
-            text-align: center;
-        }
+ion-popover ion-item {
+    cursor: pointer;
+    &:hover {
+        --background: transparent;
+        background-color: #00000005;
     }
+}
+
+.item-inner {
+    --border-style: none;
+}
+.step-item {
+    &-steps {
+        width: 100%;
+    }
+    &-button {
+        color: var(--ion-text-color);
+        background: transparent;
+    }
+}
+.step-panel {
+    margin-left: 36px;
+    border: none;
 }
