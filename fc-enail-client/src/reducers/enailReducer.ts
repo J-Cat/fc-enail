@@ -23,7 +23,8 @@ const initialState: IEnailState = {
     token: '',
     profiles: {
         profiles: {}
-    }
+    },
+    theme: localStorage[Constants.LOCAL_STORAGE_FCENAIL_THEME] || 'dark'
 };
 
 export const connectSocket = () => {
@@ -486,8 +487,25 @@ export const moveStep = (key: string, destinationKey: string, destinationIndex: 
     }
 }
 
+export const setTheme = (theme: string) => {
+    return (dispatch: Dispatch<EnailAction>) => {
+        localStorage.setItem(Constants.LOCAL_STORAGE_FCENAIL_THEME, theme);
+        dispatch({
+            type: Constants.SET_THEME,
+            payload: theme
+        });
+    }
+}
+
 export const enailReducer = (state: IEnailState = initialState, action: EnailAction): IEnailState => {
     switch (action.type) {
+        case Constants.SET_THEME: {
+            return {
+                ...state,
+                theme: action.payload as string
+            };
+        }
+
         case Constants.SOCKET_CONNECTED: {
             return {
                 ...state,

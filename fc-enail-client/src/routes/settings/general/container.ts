@@ -5,17 +5,19 @@ import { IEnailStore } from '../../../models/IEnailStore';
 import GeneralSettings from './general';
 import { IEnailEmitState } from '../../../models/IEnailEmitState';
 import { ISavedState } from '../../../models/ISavedState';
-import { persistSavedState } from '../../../reducers/enailReducer';
+import { persistSavedState, setTheme } from '../../../reducers/enailReducer';
 
 export interface IStateProps {
     readonly version: string;
     readonly state?: IEnailEmitState;
     readonly presets: number[];
     readonly autoShutoff: number;
+    readonly theme: string;
 }
 
 export interface IDispatchProps {
     persistSavedState: (savedState: ISavedState) => void;
+    setTheme: (theme: string) => void;
 }
 
 export interface IOwnProps {
@@ -41,13 +43,15 @@ function mapStateToProps(state: IEnailStore, ownProps: IOwnProps) {
         version: state.version.version,
         state: state.enail.emitState,
         presets: state.enail.presets,
-        autoShutoff: state.enail.autoShutoff
+        autoShutoff: state.enail.autoShutoff,
+        theme: state.enail.theme
     };
 }
 
 function mapDispatchToProps(dispatch: (...args: any[]) => void) {
     return {
         persistSavedState: (savedState: ISavedState) => dispatch(persistSavedState(savedState)),
+        setTheme: (theme: string) => dispatch(setTheme(theme))
     };
 }
 

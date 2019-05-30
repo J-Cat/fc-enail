@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as GeneralSettingsProps from './container';
+import { IonContent, IonItemGroup, IonItem, IonLabel, IonText, IonInput, IonItemDivider, IonButton, IonSelectPopover, IonSelectOption, IonSelect } from '@ionic/react';
+import * as Constants from '../../../models/constants';
 import './general.less';
-import { IonContent, IonItemGroup, IonItem, IonLabel, IonText, IonInput, IonItemDivider, IonButton } from '@ionic/react';
 
 export default class GeneralSettings extends React.Component<GeneralSettingsProps.IProps, GeneralSettingsProps.IState> {
     constructor(props: GeneralSettingsProps.IProps) {
@@ -103,6 +104,18 @@ export default class GeneralSettings extends React.Component<GeneralSettingsProp
                             });
                         }}
                     />
+                </IonItem>
+                <IonItemDivider>
+                    <IonLabel>Theme</IonLabel>
+                </IonItemDivider>
+                <IonItem class="theme">
+                    <IonLabel position="fixed">Current</IonLabel>
+                    <IonSelect onIonChange={(event) => this.props.setTheme(event.detail.value)} value={this.props.theme}>
+                        <IonSelectPopover>
+                            <IonSelectOption key="dark" value="dark">Dark</IonSelectOption>
+                            <IonSelectOption key="ionic" value="ionic">Ionic</IonSelectOption>
+                        </IonSelectPopover>
+                    </IonSelect>
                 </IonItem>
             </IonItemGroup>
             <IonItem class="settings">

@@ -16,4 +16,5 @@ export interface IEnailState {
     readonly message?: string;
     readonly token: string;
     readonly profiles: ISavedProfiles;
+    readonly theme: string;
 }

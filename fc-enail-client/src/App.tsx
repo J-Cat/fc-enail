@@ -1,16 +1,18 @@
 import * as React from 'react';
 import { withRouter, RouteComponentProps, Route, Redirect } from 'react-router';
 import { IonApp, IonTabBar, IonTabButton, IonLabel, IonIcon, IonTabs, IonRouterOutlet, IonPage } from '@ionic/react';
-
-import './App.less';
 import { Home } from './routes/home';
 import { Scripts } from './routes/scripts';
 import { Settings } from './routes/settings';
 import { Reconnect } from './routes/reconnect';
 import { SignIn } from './routes/signin';
+import * as Constants from './models/constants';
+import * as AppProps from './AppContainer';
 
-class App extends React.Component<RouteComponentProps<{}>, {}> {
-  constructor(props: RouteComponentProps<{}>) {
+import './App.less';
+
+export class App extends React.Component<AppProps.IProps, AppProps.IState> {
+  constructor(props: AppProps.IProps) {
     super(props);
 
     if (this.props.location.pathname === '/') {
@@ -21,6 +23,7 @@ class App extends React.Component<RouteComponentProps<{}>, {}> {
   render() {
     return (
       <IonApp class="app">
+        <link rel="stylesheet" type="text/css" href={`./themes/theme.${this.props.theme}.css`} />
         <IonPage className="app-page">
           <IonTabs>
             <IonRouterOutlet>

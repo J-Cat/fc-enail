@@ -5,12 +5,11 @@ import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { CodePush, InstallMode } from '@ionic-native/code-push';
 
-import App from './App';
+import App from './AppContainer';
 
 import '@ionic/core/css/core.css';
 import '@ionic/core/css/ionic.bundle.css';
 
-import './styles/theme.css';
 import './index.less';
 
 import history from './history';

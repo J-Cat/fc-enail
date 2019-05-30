@@ -44,7 +44,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "deploy": "appcenter codepush release-cordova -a J-Cat/FC-E-Nail -d Staging -t 1.0.1-beta"
   },
   "devDependencies": {
     "@angular/core": "^7.0.3",
