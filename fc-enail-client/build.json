@@ -20,7 +20,7 @@
             "codeSignIdentity": "iPhone Developer",
             "developmentTeam": "DXWZU47ELN",
             "packageType": "development",
-            "provisioningProfile": "7d640a1e-416c-4b09-8471-12ce804314fa",
+            "provisioningProfile": "952b004e-260d-4840-8ad2-f8d07c3869c4",
             "buildFlag": [
                 "-UseModernBuildSystem=0"
             ]

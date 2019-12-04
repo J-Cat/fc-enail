@@ -1,14 +1,14 @@
 {
   "name": "fc-enail-client",
   "homepage": "./",
-  "version": "1.1.0-beta",
+  "version": "1.1.1-beta",
   "private": true,
   "dependencies": {
     "@ionic/core": "^4.4.2",
     "@ionic/react": "0.0.5",
     "code-push": "^2.0.6",
     "cordova-android": "^8.0.0",
-    "cordova-ios": "^5.0.1",
+    "cordova-ios": "^5.1.1",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-appcenter-analytics": "^0.3.3",
     "cordova-plugin-appcenter-crashes": "^0.3.3",
@@ -84,8 +84,8 @@
       "cordova-plugin-zip": {}
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   },
   "browserslist": {
