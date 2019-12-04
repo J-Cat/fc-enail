@@ -415,6 +415,14 @@ export default class Scripts extends React.Component<ScriptsProps.IProps, Script
                     timeout: 5
                 } as ITimerStep;
             }
+            case Constants.STEP_WAITTEMP: {
+                return {
+                    ...base,
+                    offset: 0,
+                    direction: Direction.DOWN,
+                    timeout: 90
+                } as IWaitTempStep
+            }
             default: {
                 return {
                     ...base,
