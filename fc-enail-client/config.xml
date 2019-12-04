@@ -35,6 +35,4 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="AndroidLaunchMode" value="singleTask" />
-    <icon src="icon.png" />
-    <splash src="splash.png" />
 </widget>
