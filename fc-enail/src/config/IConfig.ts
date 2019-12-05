@@ -10,6 +10,9 @@ export interface IConfig {
             readonly reallyLong: number;
         }
         readonly httpPort: number;
+        readonly httpsPort: number;
+        readonly httpsPrivateKey: string;
+        readonly httpsPublicKey: string;
         readonly mDNSName: string;
         readonly hardware: {
             readonly oled: {

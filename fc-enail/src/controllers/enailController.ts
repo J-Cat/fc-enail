@@ -13,6 +13,7 @@ import { generateToken } from '../helpers/securityHelper';
 import { IPidSettings } from '../models/IPidSettings';
 import { ISavedProfiles } from '../models/ISavedProfiles';
 import { IEnailScript } from '../models/IEnailScript';
+import { isNumber } from 'util';
 
 export class EnailController {
     get = (req: Request, res: Response, next: NextFunction): void => {
@@ -25,8 +26,12 @@ export class EnailController {
     }
 
     setSP = (req: Request, res: Response, next: NextFunction): void => {
-        store.dispatch<any>(setSP(req.params.value));
-        res.sendStatus(HttpStatus.OK);
+        if (isNumber(req.params.value)) {
+            store.dispatch<any>(setSP(req.params.value));
+            res.sendStatus(HttpStatus.OK);
+        } else {
+            res.sendStatus(HttpStatus.BAD_REQUEST);
+        }
     }
 
     toggleState = (req: Request, res: Response, next: NextFunction): void => {
@@ -40,8 +45,12 @@ export class EnailController {
     }
 
     setScript = (req: Request, res: Response, next: NextFunction): void => {
-        store.dispatch<any>(setCurrentScript(req.params.index));
-        res.sendStatus(HttpStatus.OK);
+        if (isNumber(req.params.index)) {
+            store.dispatch<any>(setCurrentScript(req.params.index));
+            res.sendStatus(HttpStatus.OK);
+        } else {
+            res.sendStatus(HttpStatus.BAD_REQUEST);
+        }
     }
 
     runScript = (req: Request, res: Response, next: NextFunction): void => {

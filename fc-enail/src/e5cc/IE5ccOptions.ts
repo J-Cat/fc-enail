@@ -13,7 +13,7 @@
  * -----
  * Copyright (c) 2018
  */
-import { SerialPortOptions } from 'modbus-serial';
+import { SerialPortOptions } from 'modbus-serial/ModbusRTU';
 
 export interface IE5CCOptions {
     readonly device: string;

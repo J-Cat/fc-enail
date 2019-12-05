@@ -1,7 +1,7 @@
 {
   "name": "fc-enail-client",
-  "homepage": "./",
-  "version": "1.1.1-beta",
+  "homepage": "http://github.cataford.com/fcenail/",
+  "version": "1.1.2-beta",
   "private": true,
   "dependencies": {
     "@ionic/core": "^4.4.2",

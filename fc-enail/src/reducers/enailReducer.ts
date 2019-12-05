@@ -318,7 +318,7 @@ export const setIcon = (icon: string, flashRate: number = 0) => {
 
 export const loadSavedState = () => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.readFile(config.files.savedState, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
+        fs.readFile(config.files.savedState, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {
             if (err) {
                 dispatch({
                     type: Constants.LOAD_SAVED_STATE,
@@ -339,7 +339,7 @@ export const loadSavedState = () => {
 
 export const persistSavedState = (savedState: ISavedState) => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.writeFile(config.files.savedState, JSON.stringify(savedState), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+        fs.writeFile(config.files.savedState, JSON.stringify(savedState), { encoding: 'utf8' }, (err: NodeJS.ErrnoException | null) => {
             if (!err) {
                 dispatch({
                     type: Constants.PERSIST_SAVED_STATE,
@@ -359,7 +359,7 @@ export const saveScript = (script: IEnailScript) => {
 
 export const loadProfiles = () => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.readFile(config.files.savedProfiles, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
+        fs.readFile(config.files.savedProfiles, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {
             if (err) {
                 dispatch({
                     type: Constants.LOAD_SAVED_PROFILES,
@@ -380,7 +380,7 @@ export const loadProfiles = () => {
 
 export const persistProfiles = (savedProfiles: ISavedProfiles) => {
     return (dispatch: Dispatch<EnailAction>) => {
-        fs.writeFile(config.files.savedProfiles, JSON.stringify(savedProfiles), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+        fs.writeFile(config.files.savedProfiles, JSON.stringify(savedProfiles), { encoding: 'utf8' }, (err: NodeJS.ErrnoException | null) => {
             if (!err) {
                 dispatch({
                     type: Constants.PERSIST_SAVED_PROFILES,

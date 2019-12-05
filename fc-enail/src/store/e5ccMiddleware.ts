@@ -14,7 +14,7 @@
  * Copyright (c) 2018
  */
 import { Dispatch, Store } from 'redux';
-import * as AsyncLock from 'async-lock';
+import AsyncLock from 'async-lock';
 
 import { IEnailStore } from '../models/IEnailStore';
 import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';

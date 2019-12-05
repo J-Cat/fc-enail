@@ -1,6 +1,6 @@
-import * as ModbusRtu from 'modbus-serial';
+import ModbusRTU from 'modbus-serial';
 import { send } from 'process';
-import * as AsyncLock from 'async-lock';
+import AsyncLock from 'async-lock';
 import { IE5CCOptions } from './IE5ccOptions';
 
 import Debug from 'debug';
@@ -23,7 +23,7 @@ const taskQueue = new SequentialTaskQueue({
     timeout: 10000
 });
 
-const _client = new ModbusRtu();
+const _client = new ModbusRTU();
 
 const cachedResults: {
     [address: number]: number

@@ -10,6 +10,9 @@
                 "reallyLong": 10000
             },
             "httpPort": 80,
+            "httpsPort": 443,
+            "httpsPrivateKey": "/home/pi/fc-enail.key",
+            "httpsPublicKey": "/home/pi/fc-enail.cert",
             "mDNSName": "FC Community E-Nail",
             "hardware": {
                 "oled": {

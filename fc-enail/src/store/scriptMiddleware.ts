@@ -71,7 +71,7 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
         }
 
         case Constants.SAVE_SCRIPT: {
-            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException | null) => {
                 debug(err);
             });
             break;
@@ -83,7 +83,7 @@ export const scriptMiddleware = (store: Store<IEnailStore>) => <A extends EnailA
         }
 
         case Constants.DELETE_SCRIPT: {
-            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException) => {
+            fs.writeFile(config.files.scripts, JSON.stringify(store.getState().enail.scripts), { encoding: 'utf8' }, (err: NodeJS.ErrnoException | null) => {
                 debug(err);
             });
             break;

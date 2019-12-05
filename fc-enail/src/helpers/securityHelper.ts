@@ -2,7 +2,7 @@ import { sign, verify, VerifyCallback, VerifyErrors } from 'jsonwebtoken';
 import * as fs from 'fs';
 import * as path from 'path';
 import { config } from '../config';
-import * as Debug from 'debug';
+import Debug from 'debug';
 
 const debug = Debug('fc-enail:controller');
 
