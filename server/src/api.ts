@@ -9,13 +9,8 @@ import path from 'path';
 import HttpStatusCode from 'http-status-codes';
 import { authController } from './controllers/authController';
 import { authRoute } from './routes/authRoute';
-// import { logErrors } from './utility/logErrors';
-// import { modemRoute } from './routes/modemRoute';
-// import { networkRoute } from './routes/networkRoute';
-// import { systemRoute } from './routes/systemRoute';
-// import { serviceRoute } from './routes/serviceRoute';
-// import { socketApi } from './socketApi';
-// import { monitorRoute } from './routes/monitorRoute';
+import { networkRoute } from './routes/networkRoute';
+import { stateRoute } from './routes/stateRoute';
 
 export const Api = (port = 8000, baseRoutePath = ''): void => {
   // initialize configuration environment
@@ -101,11 +96,8 @@ export const Api = (port = 8000, baseRoutePath = ''): void => {
 
   // Configure API endpoints.
   const routes = (app: Application) => {
-    // app.use(`${baseRoutePath}/modem`, modemRoute);
-    // app.use(`${baseRoutePath}/network`, networkRoute);
-    // app.use(`${baseRoutePath}/system`, systemRoute);
-    // app.use(`${baseRoutePath}/service`, serviceRoute);
-    // app.use(`${baseRoutePath}/monitor`, monitorRoute);
+    app.use(`${baseRoutePath}/network`, networkRoute);
+    app.use(`${baseRoutePath}/state`, stateRoute);
 
     // catch 404 and forward to error handler
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

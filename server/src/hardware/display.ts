@@ -13,9 +13,9 @@ let showPasscode = false;
 let state: ISharedState;
 let pos = {
   x: 64,
-  y: 42,
+  y: 40,
   lastX: 64,
-  lastY: 42,
+  lastY: 40,
   xDir: -1,
   yDir: -1,
 };
@@ -129,8 +129,8 @@ const render = () => {
   }
 
   if (showPasscode && (state.passcode?.length || 0) > 0) {
-    drawBitmap(0, 44, Icons.lock);
-    display.drawString(20, 42, state.passcode || '', 1, Color.White, Layer.Layer0);
+    drawBitmap(0, 42, Icons.lock);
+    display.drawString(20, 40, state.passcode || '', 1, Color.White, Layer.Layer0);
     display.refresh();
     return;
   }
@@ -145,7 +145,7 @@ const render = () => {
   ) {
     const newXDir = 
       pos.xDir === 1
-      ? pos.x + pos.xDir > 64
+      ? pos.x + pos.xDir > (state.nocoil ? 50 : 64)
       ? -1
       : 1
       : pos.x + pos.xDir < 0
@@ -153,7 +153,7 @@ const render = () => {
       : -1;
     const newYDir = 
       pos.yDir === 1
-      ? pos.y + pos.yDir > 42
+      ? pos.y + pos.yDir > (state.nocoil ? 46 : 40)
       ? -1
       : 1
       : pos.y + pos.yDir < 28
@@ -170,12 +170,26 @@ const render = () => {
   } else {
     pos = {
       xDir: -1, yDir: -1,
-      x: 64, y: 42,
-      lastX: 64, lastY: 42,
+      ...(
+        state.nocoil
+        ? {
+          x: 50, y: 46,
+          lastX: 50, lastY: 46,    
+        }
+        : {
+          x: 64, y: 40,
+          lastX: 64, lastY: 40,    
+        }
+      )
     };
-    drawBitmap(0, 42, Icons.home);
+    drawBitmap(0, 40, Icons.home);
   }
-  display.drawString(pos.x, pos.y, `${(state.sp || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
+  if (state.nocoil) {
+    display.setFont(Font.UbuntuMono_16ptFontInfo);
+    display.drawString(pos.x, pos.y, 'NO COIL', 1, Color.White, Layer.Layer0);
+  } else {
+    display.drawString(pos.x, pos.y, `${(state.pv || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
+  }
 
   display.refresh();
 }

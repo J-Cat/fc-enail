@@ -5,6 +5,7 @@ import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEnc
 import { Config } from './config';
 import { Api } from './api';
 import { initSharedState, setSharedState } from './utility/sharedState';
+import { emit } from './socketApi';
 
 let initialized = false;
 
@@ -15,8 +16,18 @@ let initialized = false;
   Api();
 })();
 
-initSharedState((lastState, state) => {
+initSharedState(async (lastState, state, source) => {
   setDisplayState(state);
+
+  if (source === 'e5cc') {
+    return;
+  }
+
+  if (lastState?.running !== state.running) {
+    await toggleE5ccState();
+  } else if (state.sp && lastState?.sp !== state.sp) {
+    await updateE5ccSetPoint(state.sp);
+  }
 });
 
 initEncoder(
@@ -42,7 +53,8 @@ initE5cc((lastState, state) => {
     setEncoderValue(state.sp || 0);
   }
 
-  setSharedState(state);
+  setSharedState(state, 'e5cc');
+  emit('E5CC', state);
 });
 
 

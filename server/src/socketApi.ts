@@ -1,16 +1,32 @@
-import { Server } from 'http';
-import { authorize } from 'socketio-jwt';
+import { Server as HttpServer } from 'http';
+import { authController } from './controllers/authController';
 import { IE5ccState } from './hardware/e5cc';
-const socketio = require('socket.io');
+import { Server, Socket } from 'socket.io';
 
-const io = socketio();
+const io = new Server();
 
-export const socketApi = (server: Server): void => {
+export const socketApi = (server: HttpServer): void => {
   io.attach(server);
-  // io.use(authorize({
-  //   secret: process.env.JWT_PUBLIC_CERT || '',
-  //   handshake: true,
-  // }));
+
+  // validate token
+  io.on('connect', async (socket, next) => {
+    const token = socket?.handshake?.query?.token;
+    if (!token) {
+      next(new Error('No authentication token was supplied.'));
+      return;
+    }
+
+    try {
+      const result = await authController.validateToken(token);
+      if (!result.success) {
+        next(new Error(`Failed to authenticate token: ${result.message}`));
+        return;
+      }
+    } catch (e) {
+      next(new Error(`An error occurred validating your token: ${e.message}`));
+    }
+    next();
+  });
 }
 
 export const emit = (type: 'E5CC', data: IE5ccState): boolean => {

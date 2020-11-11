@@ -41,7 +41,6 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/morgan": "^1.9.2",
     "@types/node": "^14.14.6",
-    "@types/socket.io": "^2.1.11",
     "@types/socketio-jwt": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
