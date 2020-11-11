@@ -36,6 +36,7 @@ import { IOledState } from '../models/IOledState';
 import { IPidSettings } from '../models/IPidSettings';
 import { ISavedProfiles } from '../models/ISavedProfiles';
 import uuid = require('uuid/v4');
+import { PayloadAction } from '@reduxjs/toolkit';
 
 const debug = Debug('fc-enail:reducer');
 
@@ -197,7 +198,7 @@ export const setReady = () => {
     }
 }
 
-export const updateState = (value: boolean) => {
+export const updateState = (value: boolean): PayloadAction<boolean> => {
     return {
         type: Constants.E5CC_UPDATE_STATE,
         payload: value

@@ -89,7 +89,7 @@ class E5CC {
                     if ((m.address as number) === Constants.E5CC.VARIABLES.SETPOINT && (m.isStep as boolean)) {
                         store.dispatch(nextStep());
                     } else {
-                        store.dispatch<any>(setReady());
+                        store.dispatch(setReady());
                     }
                     break;
                 }

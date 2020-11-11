@@ -13,11 +13,9 @@
  * -----
  * Copyright (c) 2018
  */
-import { Dispatch, Store } from 'redux';
+import { Middleware, MiddlewareAPI } from 'redux';
 import AsyncLock from 'async-lock';
-
-import { IEnailStore } from '../models/IEnailStore';
-import { EnailAction, IE5CCUpdateStateAction } from '../models/Actions';
+import { IE5CCUpdateStateAction } from '../models/Actions';
 import * as Constants from '../models/constants';
 import { nextStep, persistProfiles, setSP, updateState, toggleState } from '../reducers/enailReducer';
 import e5cc from '../e5cc/e5cc';
@@ -25,23 +23,26 @@ import led from '../ui/led';
 import server from '../server/server';
 import { IPidSettings } from '../models/IPidSettings';
 import { config } from '../config';
+import { RootState } from '../reducers';
+import { AppDispatch } from './createStore';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 const lock: AsyncLock = new AsyncLock();
 let moveSpTimeout: NodeJS.Timeout | undefined;
 
-export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAction>(next: Dispatch<A>) => (action: A) => {
-    const initState = store.getState().enail;
-    const result = next(action);
+export const e5ccMiddleware: Middleware = (store: MiddlewareAPI<AppDispatch, RootState>) => (
+    next: AppDispatch,
+) => <A extends PayloadAction<any>>(action: A): void => {
     const state = store.getState().enail;
 
     switch (action.type) {
         case Constants.E5CC_STEP_MOVE_TEMP: {
-            e5cc.setSP(state.setPoint, 3, { isStep: true });
+            e5cc.setSP(state.setPoint + (action.payload as number), 3, { isStep: true });
             break;
         }
 
         case Constants.E5CC_STEP_MOVE_TEMP_COMPLETE: {
-            store.dispatch<any>(nextStep())
+            store.dispatch(nextStep())
             break;
         }
 
@@ -55,7 +56,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
         }
 
         case Constants.E5CC_UPDATE_ALL_STATE: {
-            if ((action as IE5CCUpdateStateAction).payload!.isRunning) {
+            if ((action as IE5CCUpdateStateAction).payload?.isRunning) {
                 led.on();
                 if (state.runningSince !== 0 && (Date.now() - state.runningSince > (state.autoShutoff * 60000))) {
                     store.dispatch(toggleState());
@@ -86,7 +87,7 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
                         //                    e5cc.setSP(setPoint);
                         moveSpTimeout = undefined;                        
                     })
-                }).bind(null, state.setPoint), 750);
+                }).bind(null, state.setPoint + (action.payload as number)), 750);
             });
             break;
         }
@@ -121,6 +122,5 @@ export const e5ccMiddleware = (store: Store<IEnailStore>) => <A extends EnailAct
             break;
         }
     }
-
-    return result;
+    next(action);
 }

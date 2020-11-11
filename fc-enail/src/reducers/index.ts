@@ -13,14 +13,15 @@
  * -----
  * Copyright (c) 2018
  */
-import { combineReducers, Reducer } from 'redux';
-import { IEnailStore } from '../models/IEnailStore';
+import { combineReducers } from '@reduxjs/toolkit';
 import { enailReducer } from './enailReducer';
 import { menuReducer } from './menuReducer';
 
-const makeRootReducer: Reducer<IEnailStore> = combineReducers({
+const rootReducer = combineReducers({
     enail: enailReducer,
     menu: menuReducer
 });
 
-export default makeRootReducer;
+export type RootState = ReturnType<typeof rootReducer>;
+
+export { rootReducer };

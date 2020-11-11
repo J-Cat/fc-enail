@@ -13,44 +13,34 @@
  * -----
  * Copyright (c) 2018
  */
-import {
-    applyMiddleware,
-    compose,
-    createStore,
-    Store
-} from 'redux';
-import thunk from 'redux-thunk';
-
-import makeRootReducer from '../reducers';
-import { IEnailStore } from '../models/IEnailStore';
-import { EnailAction } from '../models/Actions';
+import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { configureStore, Action, AnyAction } from '@reduxjs/toolkit';
+import { rootReducer, RootState } from '../reducers';
 import { e5ccMiddleware } from './e5ccMiddleware';
-import { composeWithDevTools } from 'remote-redux-devtools';
 import { scriptMiddleware } from './scriptMiddleware';
 import { displayMiddleware } from './displayMiddleware';
 import { settingsMiddleware } from './settingsMiddleware';
 
-const configureStore = (initialState?: IEnailStore): Store<IEnailStore, EnailAction> => {
-    const middlewares: any = [
+export const store = configureStore({
+    reducer: rootReducer,
+    middleware: [
+        //...getDefaultMiddleware({ serializableCheck: false }),
         thunk,
         e5ccMiddleware,
         scriptMiddleware,
         settingsMiddleware,
-        displayMiddleware
-    ];
+        displayMiddleware,
+    ],
+});
 
-    const composeEnhancers = process.env.NODE_ENV === 'development' 
-        ? composeWithDevTools({ realtime: true }) 
-        : compose;
+// const store = configureStore();
+export type AppDispatch = ThunkDispatch<RootState, undefined, AnyAction>;
 
-    const newState = initialState || {} as IEnailStore;
-    const store: Store<IEnailStore, EnailAction> = createStore<IEnailStore, EnailAction, {}, {}>(makeRootReducer, newState,         
-        composeEnhancers(applyMiddleware(...middlewares))
-    );
+export type AppThunk<T> = ThunkAction<
+    Promise<T>,
+    RootState,
+    undefined,
+    Action<string>
+>;
 
-    return store;
-
-}
-
-const store = configureStore();
 export default store;
