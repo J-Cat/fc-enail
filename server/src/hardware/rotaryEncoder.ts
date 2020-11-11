@@ -14,7 +14,7 @@ let currentValue = 0;
 let store = 0;
 let prevNextCode = 0;
 let lastValue = -1;
-let velocity: number[] = [];
+let velocity: number[] = [0];
 
 export const setEncoderValue = (value: number) => {
   currentValue = value;

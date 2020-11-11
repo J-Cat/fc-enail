@@ -1,9 +1,23 @@
+import dotenv from 'dotenv';
 import { closeDisplay, setDisplayState } from './hardware/display';
 import { closeE5cc, initE5cc, toggleE5ccState, updateE5ccSetPoint } from './hardware/e5cc';
 import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEncoder';
 import { Config } from './config';
+import { Api } from './api';
+import { initSharedState, setSharedState } from './utility/sharedState';
 
 let initialized = false;
+
+// initialization
+(async () => {
+  dotenv.config();
+
+  Api();
+})();
+
+initSharedState((lastState, state) => {
+  setDisplayState(state);
+});
 
 initEncoder(
   Config.encoder.A, Config.encoder.B, Config.encoder.S, 
@@ -25,10 +39,10 @@ initEncoder(
 initE5cc((lastState, state) => {
   if (!initialized) {
     initialized = true;
-    setEncoderValue(state.sp);
+    setEncoderValue(state.sp || 0);
   }
 
-  setDisplayState(state);
+  setSharedState(state);
 });
 
 

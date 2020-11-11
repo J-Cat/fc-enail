@@ -1,15 +1,16 @@
 import { Color, display, Font, Layer } from 'ssd1306-i2c-js';
 import { Config } from '../config';
 import dayjs from 'dayjs';
-import { IEccState } from './e5cc';
-import { Icons } from '../icons';
+import { Icons } from '../models/icons';
+import { ISharedState } from '../utility/sharedState';
 
 const SCALE = 1;
 let sleeping = false;
 let lastUpdate = 0;
 let screenSaverDisabled = 0;
 let dirty = true;
-let state: IEccState;
+let showPasscode = false;
+let state: ISharedState;
 let pos = {
   x: 64,
   y: 42,
@@ -57,7 +58,7 @@ const refresh = (): Promise<void> => {
   });
 }
 
-export const setDisplayState = async (newState: IEccState): Promise<void> => {
+export const setDisplayState = async (newState: ISharedState): Promise<void> => {
   dirty = true;
   const savedState = {...(state || {})};
   state = {
@@ -71,10 +72,21 @@ export const setDisplayState = async (newState: IEccState): Promise<void> => {
     || (newState.nocoil !== savedState?.nocoil)
   ) {
     screenSaverDisabled = Date.now();  
+    showPasscode = false;
     if (sleeping) {
       sleeping = false;
       await refresh();
     }
+  }
+  if (savedState.passcode !== newState.passcode && (newState.passcode?.length || 0) > 0) {
+    showPasscode = true;
+    screenSaverDisabled = Date.now();
+    if (sleeping) {
+      sleeping = false;
+      await refresh();
+    }
+  } else if (newState.passcode !== savedState.passcode && (newState.passcode?.length || 0) === 0) {
+    showPasscode = false;
   }
 }
 
@@ -108,7 +120,7 @@ const render = () => {
 
   display.setFont(Font.UbuntuMono_16ptFontInfo);
   if (state.running) {
-    const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - state.started);
+    const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
     drawBitmap(0, 0, Icons.hourglass);
     display.drawString(18, 0, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {
@@ -116,10 +128,20 @@ const render = () => {
     display.drawString(18, 0, dayjs(Date.now()).format('h:mm a'), 1, Color.White, Layer.Layer0);
   }
 
+  if (showPasscode && (state.passcode?.length || 0) > 0) {
+    drawBitmap(0, 44, Icons.lock);
+    display.drawString(20, 42, state.passcode || '', 1, Color.White, Layer.Layer0);
+    display.refresh();
+    return;
+  }
+
   display.setFont(Font.UbuntuMono_24ptFontInfo);
   if (
-    ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
-    || (screenSaverDisabled === 0)
+    (
+      ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
+      || (screenSaverDisabled === 0)
+    ) 
+    && !showPasscode
   ) {
     const newXDir = 
       pos.xDir === 1
@@ -153,7 +175,7 @@ const render = () => {
     };
     drawBitmap(0, 42, Icons.home);
   }
-  display.drawString(pos.x, pos.y, `${state.sp.toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
+  display.drawString(pos.x, pos.y, `${(state.sp || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
 
   display.refresh();
 }

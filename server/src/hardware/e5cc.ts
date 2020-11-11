@@ -10,16 +10,16 @@ const INTERVAL = Config.e5cc.interval;
 const lock = new Lock();
 const modbus = new ModbusRTU();
 
-export interface IEccState {
-  readonly sp: number;
-  readonly pv: number;
-  readonly running: boolean;
-  readonly tuning: boolean;
-  readonly nocoil: boolean;
-  readonly started: number;
+export interface IE5ccState {
+  readonly sp?: number;
+  readonly pv?: number;
+  readonly running?: boolean;
+  readonly tuning?: boolean;
+  readonly nocoil?: boolean;
+  readonly started?: number;
 }
 
-let state: IEccState = {
+let state: IE5ccState = {
   sp: 0,
   pv: 0,
   running: false,
@@ -30,7 +30,7 @@ let state: IEccState = {
 let lastState = state;
 
 export const initE5cc = async (
-  onData?: (lastState: IEccState, state: IEccState) => void
+  onData?: (lastState: IE5ccState, state: IE5ccState) => void
 ): Promise<void> => {
   await lock.acquire();
   try {
@@ -70,7 +70,7 @@ export const initE5cc = async (
         if (
           state.running && state.started !== 0 
           && (
-            (Date.now() - state.started)
+            (Date.now() - (state.started || 0))
             >= (60000 * Config.e5cc.autoShutoff)
           )
         ) {

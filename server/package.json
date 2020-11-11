@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "environment": "./generate-environment.sh"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -17,6 +18,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.6.1",
+    "generate-password": "^1.5.1",
     "helmet": "^4.2.0",
     "http-status-codes": "^2.1.4",
     "i2c": "https://github.com/J-Cat/node-i2c.git",
