@@ -6,11 +6,17 @@ import { Server, Socket } from 'socket.io';
 const io = new Server();
 
 export const socketApi = (server: HttpServer): void => {
-  io.attach(server);
+  io.attach(
+    server, { 
+      cors: {
+        origin: '*',
+      },
+    },
+  );
 
   // validate token
-  io.on('connect', async (socket, next) => {
-    const token = socket?.handshake?.query?.token;
+  io.use(async (socket, next) => {
+    const token = (socket?.handshake.auth as { token: string })?.token;
     if (!token) {
       next(new Error('No authentication token was supplied.'));
       return;
@@ -31,7 +37,7 @@ export const socketApi = (server: HttpServer): void => {
 
 export const emit = (type: 'E5CC', data: IE5ccState): boolean => {
   try {
-    io.emit(type, { data });
+    io.emit(type, data);
     return true;
   } catch (e) {
     console.error(`Socket IO Emit Error: ${e.message}`);

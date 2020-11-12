@@ -5,7 +5,7 @@ import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEnc
 import { Config } from './config';
 import { Api } from './api';
 import { initSharedState, ISharedState, setSharedState } from './utility/sharedState';
-import { emit } from './socketApi';
+import { emit, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { exec } from 'child_process';
 import { connect as connectNgrok } from 'ngrok';
@@ -25,7 +25,8 @@ const processAction = () => {
 (async () => {
   dotenv.config();
 
-  Api();
+  const server = Api();
+  socketApi(server);
 
   const url = await connectNgrok(process.env.API_PORT || 8000);
   console.log(`NGROK URL: ${url}`);
@@ -97,6 +98,10 @@ initSharedState(async (lastState, state, source) => {
 
   if (source === 'e5cc') {
     return;
+  }
+
+  if (lastState?.passcode !== state?.passcode && state?.passcode) {
+    console.log(`Passcode: ${state.passcode}`);
   }
 
   if (lastState?.running !== state.running) {

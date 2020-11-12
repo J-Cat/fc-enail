@@ -1,0 +1,40 @@
+@import './variables.less';
+
+html,body,#root {
+  height: 100%
+}
+
+.app {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  &-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &-main {
+      overflow-y: auto;
+    }
+  }
+  &-footer {
+    background-color: @menu-dark-bg !important;
+    flex-direction: row;
+    padding: 0 !important;
+  }
+  &-menu {
+    width: fit-content !important;
+    margin: auto !important;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}

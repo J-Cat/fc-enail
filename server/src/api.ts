@@ -12,7 +12,7 @@ import { authRoute } from './routes/authRoute';
 import { networkRoute } from './routes/networkRoute';
 import { stateRoute } from './routes/stateRoute';
 
-export const Api = (port = 8000, baseRoutePath = ''): void => {
+export const Api = (port = 8000, baseRoutePath = ''): Server => {
   // initialize configuration environment
   const config = () => {
     port = process.env.API_PORT || 8000;
@@ -153,9 +153,10 @@ export const Api = (port = 8000, baseRoutePath = ''): void => {
 
   const server = createServer(app);
   listen(server);
-  //socketApi(server);
 
   handleExceptions();
+
+  return server;
 }
 
 

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
 import jwt from 'jsonwebtoken'
-import { getSharedState, setSharedState } from '../utility/sharedState';
+import { getSharedState, ISharedState, setSharedState } from '../utility/sharedState';
 import { generate } from 'generate-password';
 
 const BEARER_PREFIX = 'bearer ';
@@ -9,7 +9,11 @@ const BEARER_PREFIX = 'bearer ';
 export class StateController {
   async get(req: Request, res: Response): Promise<Response> {
     try {
-      const state = await getSharedState();
+      const state: ISharedState = {
+        ...(await getSharedState()),
+        passcode: undefined,
+      };
+
       return res.status(HttpStatusCode.OK).json(state);
     } catch (e) {
         const err: Error = e as Error;
