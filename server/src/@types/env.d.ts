@@ -9,6 +9,9 @@ declare global {
       API_JWT_PUBLIC_CERT?: string;
       API_JWT_PRIVATE_KEY?: string;
       API_JWT_EXPIRES_IN?: string;
+      API_SENDGRID_API_KEY?: string;
+      API_EMAIL_FROM?: string;
+      API_EMAIL_TO?: string;
 
       ENCODER_A?: number;
       ENCODER_B?: number;
@@ -25,10 +28,17 @@ declare global {
       E5CC_DEVICE?: string;
       E5CC_INTERVAL?: number;
       E5CC_AUTOSHUTOFF?: number;
+      E5CC_COMMAND_TIMEOUT?: number;
       E5CC_BAUDRATE?: number;
       E5CC_DATABITS?: number;
       E5CC_STOPBITS?: number;
       E5CC_PARITY?: 'even'|'none'|'mark'|'odd'|'space';
+
+      BUTTON_BUTTON_PIN?: number;
+      BUTTON_LED_PIN?: number;
+      BUTTON_LONG_CLICK?: number;
+      BUTTON_REALLY_LONG_CLICK?: number;
+      BUTTON_REALLY_REALLY_LONG_CLICK?: number;
     }
   }
 }

@@ -10,6 +10,7 @@
     "environment": "./generate-environment.sh"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.4.0",
     "body-parser": "^1.19.0",
     "coffee-script": "^1.12.7",
     "cors": "^2.8.5",
@@ -25,6 +26,7 @@
     "jsonwebtoken": "^8.5.1",
     "modbus-serial": "^8.0.1",
     "morgan": "^1.10.0",
+    "ngrok": "^3.3.0",
     "nocache": "^2.1.0",
     "oled-font-5x7": "^1.0.3",
     "onoff": "^6.0.1",

@@ -39,7 +39,7 @@ export const initE5cc = async (
       Config.e5cc.connectOptions,
     );
     modbus.setID(1);
-    modbus.setTimeout(1000);
+    modbus.setTimeout(Config.e5cc.commandTimeout);
   } finally {
     lock.release();
   }

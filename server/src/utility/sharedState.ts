@@ -5,21 +5,23 @@ const lock = new Lock();
 
 export interface ISharedState extends IE5ccState {
   passcode?: string;
+  rebooting?: boolean;
+  url?: string;
 }
 
 let state: ISharedState | undefined;
 let lastState: ISharedState | undefined;
 
-let onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api') => void;
+let onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void;
 
 export const initSharedState = (
-  onChangeFunc?: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api') => void,
+  onChangeFunc?: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void,
 ) => {
   if (onChangeFunc) {
     onChange = onChangeFunc;
   }
 }
-export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api' = 'api'): Promise<void> => {
+export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api'|'self' = 'api'): Promise<void> => {
   await lock.acquire();
   try {
     if (state) {

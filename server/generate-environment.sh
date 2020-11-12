@@ -16,7 +16,7 @@ openssl x509 -sha256 -req -days 3650 -in $OUTDIR/$PACKAGE_NAME.csr -signkey $OUT
 API_JWT_PUBLIC_CERT=`cat $OUTDIR/$PACKAGE_NAME.crt | sed -E ':a; N; s/\n/\\\\n/; ta'`
 API_JWT_PRIVATE_KEY=`cat $OUTDIR/$PACKAGE_NAME.key | sed -E ':a; N; s/\n/\\\\n/; ta'`
 
-OUTENV="PORT=80
+OUTENV="API_PORT=80
 API_BASE_ROUTE_PATH=/api
 API_JWT_EXPIRES_IN=365d
 API_JWT_PRIVATE_KEY=\"$API_JWT_PRIVATE_KEY\"
