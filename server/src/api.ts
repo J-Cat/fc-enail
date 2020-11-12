@@ -39,11 +39,11 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
 
   // static files (client)
   const serveStatic = (app: Application) => {
-    app.use('/client', express.static(process.env.API_CLIENT_PATH || path.join(__dirname, '../client'))); 
+    app.use('/client', express.static(process.env.API_CLIENT_PATH || path.join(__dirname, 'client'))); 
     app.use('/client', (req, res) => {
       const filePath = process.env.API_CLIENT_PATH
         ? path.resolve(path.join(process.env.API_CLIENT_PATH, 'index.html'))
-        : path.join(__dirname, '../client/index.html');
+        : path.join(__dirname, 'client/index.html');
       res.sendFile(filePath);
     });
   }
