@@ -7,10 +7,11 @@ import { Server, createServer } from 'http';
 import bodyParser from 'body-parser';
 import path from 'path';
 import HttpStatusCode from 'http-status-codes';
-import { authController } from './controllers/authController';
+import { validateToken } from './controllers/authController';
 import { authRoute } from './routes/authRoute';
 import { networkRoute } from './routes/networkRoute';
 import { stateRoute } from './routes/stateRoute';
+import { configRoute } from './routes/configRoute';
 
 export const Api = (port = 8000, baseRoutePath = ''): Server => {
   // initialize configuration environment
@@ -75,7 +76,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
       // check header or url parameters or post parameters for token
       const authToken: string = req.body.token || req.query.token || req.headers.authorization;
 
-      authController.validateToken(authToken)
+      validateToken(authToken)
         .then((result) => {
           if (result.success) {
             req.authenticated = true;
@@ -98,6 +99,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   const routes = (app: Application) => {
     app.use(`${baseRoutePath}/network`, networkRoute);
     app.use(`${baseRoutePath}/state`, stateRoute);
+    app.use(`${baseRoutePath}/config`, configRoute);
 
     // catch 404 and forward to error handler
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

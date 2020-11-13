@@ -8,8 +8,14 @@ import { initSharedState, ISharedState, setSharedState } from './utility/sharedS
 import { emit, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { exec } from 'child_process';
-import { connect as connectNgrok } from 'ngrok';
+import localtunnel, { Tunnel } from 'localtunnel';
 import mail from '@sendgrid/mail';
+import { Lock } from './utility/Lock';
+import { getUrl, setUrl } from './utility/localDb';
+import { playSound } from './hardware/sound';
+import { Sounds } from './models/sounds';
+
+const lock = new Lock();
 
 let initialized = false;
 let cancel = false;
@@ -21,6 +27,28 @@ const processAction = () => {
   }
 }
 
+// capture interrupts and cleanup on exit
+process.on('SIGINT', () => {
+  process.exit(0);
+});
+
+process.on('exit', () => {
+  console.log('Cleaning up.');
+  cleanup();
+});
+
+process.on('uncaughtException', (error) => {
+  console.error(`Uncaught exception: ${error.message}`);
+  cleanup();
+});
+
+const cleanup = () => {
+  closeE5cc();
+  closeEncoder();
+  closeDisplay();
+  closeButton();
+}
+
 // initialization
 (async () => {
   dotenv.config();
@@ -28,23 +56,39 @@ const processAction = () => {
   const server = Api();
   socketApi(server);
 
-  const url = await connectNgrok(process.env.API_PORT || 8000);
-  console.log(`NGROK URL: ${url}`);
-  await setSharedState({ url }, 'self');
-  if (Config.email.address?.length && Config.email.sendgridApiKey?.length) {
-    mail.setApiKey(Config.email.sendgridApiKey);
-    await mail.send({
-      from: Config.email.from || 'fcenail@jcatvapes.com',
-      to: Config.email.address,
-      subject: 'New FC-Enail URL',
-      text: `Your new FC-Enail public URL is: ${url}`,
+  try {
+    const tunnel = await localtunnel({ 
+      port: process.env.API_PORT || 8000,
+      subdomain: 'jcat', 
+      allow_invalid_cert: true,  
     });
+    console.log(`localtunnel.me URL: ${tunnel.url}`);
+    await setSharedState({ url: tunnel.url }, 'self');
+    // if url changed, send e-mail
+    if (getUrl() !== tunnel.url) {
+      await setUrl(tunnel.url);
+      if (Config.email.address?.length && Config.email.sendgridApiKey?.length) {
+        try {
+          mail.setApiKey(Config.email.sendgridApiKey);
+          await mail.send({
+            from: Config.email.from || 'fcenail@jcatvapes.com',
+            to: Config.email.address,
+            subject: 'New FC-Enail URL',
+            text: `Your new FC-Enail public URL is: ${tunnel.url}`,
+          });
+        } catch (e) {
+          console.error(`An error occurred sending the NGROK URL to your e-mail address (${Config.email.address}): ${e.message}`);
+        }
+      }
+    }
+  } catch (e) {
+    console.error(`An error occurred connecting to localtunnel.me: ${e.message}`);
   }
 
   await initButton(
     async () => {
       processAction();
-      await toggleE5ccState();
+      await setSharedState({ running: !currentState.running })
     }, 
     () => {
       processAction()
@@ -64,6 +108,7 @@ const processAction = () => {
           return;
         }
 
+        await playSound(Sounds.beep);
         setLed(true);
         await new Promise(resolve => setTimeout(resolve, 250));
         setLed(false);
@@ -82,32 +127,37 @@ const processAction = () => {
 })();
 
 initSharedState(async (lastState, state, source) => {
-  currentState = {
-    ...state,
-  };
-
-  if (!initialized) {
-    return;
-  }
-
-  setDisplayState(state);
-
-  if (lastState?.running !== state.running) {
-    await setLed(state.running || false);
-  }
-
-  if (source === 'e5cc') {
-    return;
-  }
-
-  if (lastState?.passcode !== state?.passcode && state?.passcode) {
-    console.log(`Passcode: ${state.passcode}`);
-  }
-
-  if (lastState?.running !== state.running) {
-    await toggleE5ccState();
-  } else if (state.sp && lastState?.sp !== state.sp) {
-    await updateE5ccSetPoint(state.sp);
+  lock.acquire();
+  try {
+    currentState = {
+      ...state,
+    };
+  
+    if (!initialized) {
+      return;
+    }
+  
+    setDisplayState(state);
+  
+    if (lastState?.running !== state.running) {
+      await setLed(state.running || false);
+    }
+  
+    if (source === 'e5cc') {
+      return;
+    }
+  
+    if (lastState?.passcode !== state?.passcode && state?.passcode) {
+      console.log(`Passcode: ${state.passcode}`);
+    }
+  
+    if (lastState?.running !== state.running) {
+      await toggleE5ccState();
+    } else if (state.sp && lastState?.sp !== state.sp) {
+      await updateE5ccSetPoint(state.sp);
+    }  
+  } finally {
+    lock.release();
   }
 });
 
@@ -140,26 +190,3 @@ initE5cc(async (lastState, state) => {
   await setSharedState(state, 'e5cc');
   emit('E5CC', state);
 });
-
-
-// capture interrupts and cleanup on exit
-process.on('SIGINT', () => {
-  process.exit(0);
-});
-
-process.on('exit', () => {
-  console.log('Cleaning up.');
-  cleanup();
-});
-
-process.on('uncaughtException', (error) => {
-  console.error(`Uncaught exception: ${error.message}`);
-  cleanup();
-});
-
-const cleanup = () => {
-  closeE5cc();
-  closeEncoder();
-  closeDisplay();
-  closeButton();
-}

@@ -1,5 +1,5 @@
 import { Server as HttpServer } from 'http';
-import { authController } from './controllers/authController';
+import { validateToken } from './controllers/authController';
 import { IE5ccState } from './hardware/e5cc';
 import { Server, Socket } from 'socket.io';
 
@@ -23,7 +23,7 @@ export const socketApi = (server: HttpServer): void => {
     }
 
     try {
-      const result = await authController.validateToken(token);
+      const result = await validateToken(token);
       if (!result.success) {
         next(new Error(`Failed to authenticate token: ${result.message}`));
         return;

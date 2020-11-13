@@ -119,8 +119,8 @@ const render = () => {
   }
 
   display.setFont(Font.UbuntuMono_16ptFontInfo);
-  if (state.running) {
-    const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
+  const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
+  if (state.running && timer >= 0) {
     drawBitmap(0, 0, Icons.hourglass);
     display.drawString(18, 0, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {

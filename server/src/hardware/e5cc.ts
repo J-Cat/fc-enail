@@ -2,7 +2,9 @@ import e = require('express');
 import ModbusRTU from 'modbus-serial';
 import { Config } from '../config';
 import { Constants } from '../models/Constants';
+import { Sounds } from '../models/sounds';
 import { Lock } from '../utility/Lock';
+import { playSound } from './sound';
 
 const DEVICE = Config.e5cc.device;
 const INTERVAL = Config.e5cc.interval;
@@ -46,8 +48,17 @@ export const initE5cc = async (
   console.log('Connected to Omron E5CC.');
 
   const getData = async (): Promise<void> => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       try {
+        if (lock.locked) {
+          setTimeout(async () => {
+            await getData();
+            resolve();
+          }, INTERVAL);
+          resolve();
+          return;    
+        }
+
         await lock.acquire();
         try {
           const statusReading = await modbus.readHoldingRegisters(Constants.e5cc.variables.status, 2);
@@ -74,6 +85,10 @@ export const initE5cc = async (
             >= (60000 * Config.e5cc.autoShutoff)
           )
         ) {
+          for (let i = 0; i < 3; i++) {
+            playSound(Sounds.beep);
+            await new Promise(resolve => setTimeout(resolve, 750));
+          }
           await toggleE5ccState();
         }
 
@@ -92,8 +107,8 @@ export const initE5cc = async (
         console.error(`Error getting state: ${e.message}`);
       }
       setTimeout(async () => {
-        resolve();
         await getData();
+        resolve();
       }, INTERVAL);
     });
   }

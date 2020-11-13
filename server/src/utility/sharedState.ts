@@ -9,8 +9,8 @@ export interface ISharedState extends IE5ccState {
   url?: string;
 }
 
-let state: ISharedState | undefined;
-let lastState: ISharedState | undefined;
+let state: ISharedState = {};
+let lastState: ISharedState = {};
 
 let onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void;
 
@@ -21,7 +21,7 @@ export const initSharedState = (
     onChange = onChangeFunc;
   }
 }
-export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api'|'self' = 'api'): Promise<void> => {
+export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api'|'self' = 'api'): Promise<{lastState: ISharedState, state: ISharedState}> => {
   await lock.acquire();
   try {
     if (state) {
@@ -34,6 +34,7 @@ export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api
       ...newState,
     };
     onChange?.(lastState, state, source);
+    return { lastState, state };
   } finally {
     lock.release();
   }

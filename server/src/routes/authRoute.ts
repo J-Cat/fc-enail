@@ -1,24 +1,10 @@
 import { Router } from 'express';
-import { authController } from '../controllers/authController';
+import { authenticate, generatePasscode } from '../controllers/authController';
 import { body } from 'express-validator';
 
-export class AuthRoute {
-    router: Router;
+const router: Router  = Router();
 
-    constructor() {
-        this.router = Router();
-        this.init();
-    }
-
-    private init(): void {
-      this.router.post('/passcode', [body('passphrase').notEmpty()], authController.generatePasscode);
-      this.router.post('/login', [body('passphrase').notEmpty()], authController.authenticate);
-    }
-}
-
-const route: AuthRoute = new AuthRoute();
-
-const router: Router = route.router;
+router.post('/passcode', [body('passphrase').notEmpty()], generatePasscode);
+router.post('/login', [body('passphrase').notEmpty()], authenticate);
 
 export { router as authRoute };
-export default router;

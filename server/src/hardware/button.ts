@@ -13,6 +13,7 @@ let ledState = false;
 
 export const setLed = async (state: boolean): Promise<void> => {
   ledState = state;
+  
   if (!led) {
     return;
   }

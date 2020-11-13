@@ -6,37 +6,31 @@ import { generate } from 'generate-password';
 
 const BEARER_PREFIX = 'bearer ';
 
-export class StateController {
-  async get(req: Request, res: Response): Promise<Response> {
-    try {
-      const state: ISharedState = {
-        ...(await getSharedState()),
-        passcode: undefined,
-      };
+export const getState = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const state: ISharedState = {
+      ...(await getSharedState()),
+      passcode: undefined,
+    };
 
-      return res.status(HttpStatusCode.OK).json(state);
-    } catch (e) {
-        const err: Error = e as Error;
+    return res.status(HttpStatusCode.OK).json(state);
+  } catch (e) {
+      const err: Error = e as Error;
 
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-            .json({ message: err.message, error: { message: err.message, stack: err.stack } });
-    }
-  }
-
-  async set(req: Request, res: Response): Promise<Response> {
-    try {
-      const state = req.body;
-      await setSharedState(state);
-      return res.sendStatus(HttpStatusCode.OK);
-    } catch (e) {
-        const err: Error = e as Error;
-
-        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-            .json({ message: err.message, error: { message: err.message, stack: err.stack } });
-    }
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
 }
-const stateController: StateController = new StateController();
 
-export { stateController };
-export default stateController;
+export const setState = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const newState = req.body;
+    const { lastState, state } = await setSharedState(newState);
+    return res.status(HttpStatusCode.OK).json([lastState, state]);
+  } catch (e) {
+      const err: Error = e as Error;
+
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+  }
+}

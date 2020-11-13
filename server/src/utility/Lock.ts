@@ -1,6 +1,6 @@
 export class Lock {
-  private locked = false;
-  private onRelease: (() => void) | undefined = undefined;
+  public locked = false;
+  private onRelease: (() => void)[] = [];
   
   public acquire = () => {
     return new Promise(resolve => {
@@ -12,19 +12,24 @@ export class Lock {
       const tryAcquire = () => {
         if (!this.locked) {
           this.locked = true;
-          this.onRelease = undefined;
           return resolve();
         }
       }
   
-      this.onRelease = tryAcquire;
+      this.onRelease.push(tryAcquire);
     });
   }
   
   public release = () => {
     this.locked = false;
-    if (this.onRelease) {
-      this.onRelease();
+    let release = this.onRelease.pop();
+    while (release) {
+      release();
+      if (this.onRelease.length > 0) {
+        release = this.onRelease.pop();        
+      } else {
+        release = undefined;
+      }
     }
   }
 }

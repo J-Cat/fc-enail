@@ -1,20 +1,22 @@
 @import '../../variables.less';
 
-.home-form {
-  &-label {
-    min-width: 110px;
-  }
-  .section-label {
-    font-style: italic;
-  }
-  .form-section {
-    padding-left: 20px;
-    .home-form-label {
-      min-width: 90px;
-      max-width: 200px;
+.home-grid {
+  width: 100% !important;
+  height: 100%;
+  .temp-card {
+    margin:5px;
+    .ant-card-head {
+      background-color: @text-color;
+      font-size: 1.5em;
+      .ant-card-head-title {
+        color: @component-background;
+      }
     }
   }
-  .ant-form-item {
-    margin: 0px;
+  .power-switch-card {
+    margin:5px;
+    .ant-card-head {
+      font-size: 1.5em;
+    }
   }
 }
