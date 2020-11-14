@@ -8,7 +8,8 @@ import {
   getProfiles as getLocalDbProfiles, 
   IProfile, 
   setCurrentProfile as setLocalDbCurrentProfile, 
-  setProfile 
+  setProfile,
+  deleteProfile as deleteLocalDbProfile,
 } from '../utility/localDb';
 import { Guid } from 'guid-typescript';
 
@@ -69,6 +70,23 @@ export const setCurrentProfile = async (req: Request, res: Response): Promise<Re
     }
     await setLocalDbCurrentProfile(key);
     await setPidSettings(profile.p, profile.i, profile.d);
+    return res.sendStatus(HttpStatusCode.OK);
+  } catch (e) {
+      const err: Error = e as Error;
+
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+  }
+}
+
+export const deleteProfile = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const key: string = req.body.key;
+    const profile = getProfile(key);
+    if (!profile) {
+      throw new Error('The profile you specified does not exist.');
+    }
+    await deleteLocalDbProfile(key);
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
       const err: Error = e as Error;

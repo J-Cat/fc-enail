@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useEnsureLoaded } from '../../hooks/useEnsureLoaded';
-import { getProfiles, saveProfile, setCurrentProfile as setProfile } from '../../store/reducers/profileReducer';
+import { deleteProfile, saveProfile, setCurrentProfile as setProfile, toggleTuning } from '../../store/reducers/profileReducer';
 import { RootState } from '../../store/reducers/rootReducer';
 import { IProfile } from '../../store/state/IProfileState';
 import { AppDispatch } from '../../store/store';
@@ -22,6 +22,7 @@ interface IFormData {
 const ProfilesPage: React.FC = () => {
   const [t] = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const tuning = useSelector<RootState, boolean>(state => state.enail.state?.tuning || false);
   const loading = useSelector<RootState, boolean>(state => state.enail.loading);
   const requesting = useSelector<RootState, boolean>(state => state.profiles.requesting);
   const profile = useSelector<RootState, string>(state => state.profiles.currentProfile || '');
@@ -29,13 +30,6 @@ const ProfilesPage: React.FC = () => {
   const [currentProfile, setCurrentProfile] = useState(profile);
   const formRef = useRef<FormInstance>();
 
-  useEnsureLoaded();
-
-  useEffect(() => {
-    dispatch(getProfiles());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
   useEffect(() => {
     setCurrentProfile(profile)
     setFormValues(profile);
@@ -85,8 +79,8 @@ const ProfilesPage: React.FC = () => {
           }));  
           if (result.error) {
             Modal.error({
-              title: t('error', 'Error'),
-              content: t('profiles.save.error', 'An error occured saving the profile: {{profile}}', { profile: formData.title }),
+              title: t('profiles.save.error.title', 'Error'),
+              content: t('profiles.save.error.content', 'An error occured saving the profile: {{profile}}', { profile: formData.title }),
             });
           } else {
             Modal.info({
@@ -105,18 +99,73 @@ const ProfilesPage: React.FC = () => {
       return;
     }
     Modal.confirm({
-      title: t('confirm.setActive.title', 'Set Active?'),
-      content: t('confirm.setActive.content', 'Load the {{profile}} profile?', { profile: prf.title }),
+      title: t('profile.setactive.confirm.title', 'Set Active?'),
+      content: t('profile.setactive.confirm.content', 'Load the {{profile}} profile?', { profile: prf.title }),
       onOk: async () => {
         const result = await dispatch(setProfile(currentProfile));
         if (result.error) {
           Modal.error({
-            title: t('error.setactive.title', 'Error Setting Active'),
-            content: t('error.setactive.content', 'An error occured setting {{profile}} to the active profile.', { profile: prf.title }),
+            title: t('profile.setactive.error.title', 'Error Setting Active'),
+            content: t('profile.setactive.error..content', 'An error occured setting {{profile}} to the active profile.', { profile: prf.title }),
           });
         }
       },
     });
+  }
+
+  const onDeleteProfile = async () => {
+    const prf = profiles.find(p => p.key === currentProfile);
+    if (!prf || (prf.key === profile)) {
+      return;
+    }
+    Modal.confirm({
+      title: t('profiles.deleteProfile.confirm.title', 'Delete Profile?'),
+      content: t('profiles.deleteProfile.confirm.content', 'Delete the {{profile}} profile?', { profile: prf.title }),
+      onOk: async () => {
+        const result = await dispatch(deleteProfile(currentProfile));
+        if (result.error) {
+          Modal.error({
+            title: t('profiles.deleteProfile.error.title', 'Error Deleting Profile'),
+            content: t('profiles.deleteProfile.error.content', 'An error occured deleting the {{profile}} profile.', { profile: prf.title }),
+          });
+          return;
+        }
+        setCurrentProfile(profile);
+        setFormValues(profile);
+      },
+    });
+  }
+
+  const onAutoTune = async () => {
+    const prf = profiles.find(p => p.key === currentProfile);
+    if (!prf || (prf.key !== profile)) {
+      return;
+    }
+    if (tuning) {
+      const result = await dispatch(toggleTuning());
+      if (result.error) {
+        Modal.error({
+          title: t('profiles.error.canceltune.title', 'Error Cancelling'),
+          content: t('profiles.error.canceltune.content', 'An error occured cancelling the auto-tuning for {{profile}}.', { profile: prf.title }),
+        });
+        return;
+      }    
+    } else {
+      Modal.confirm({
+        title: t('profiles.tune.confirm.title', 'Auto-Tune?'),
+        content: t('profiles.tune.confirm.content', 'Would you like to auto-tune the PID settings for {{profile}}? (this could take 5-10 minutes)', { profile: prf.title }),
+        onOk: async () => {
+          const result = await dispatch(toggleTuning());
+          if (result.error) {
+            Modal.error({
+              title: t('profiles.tune.error.title', 'Error Auto-Tuning'),
+              content: t('profiles.tune.error.content', 'An error occured starting the auto-tuning for {{profile}}.', { profile: prf.title }),
+            });
+            return;
+          }
+        },
+      });
+    }
   }
 
   if (loading) {
@@ -154,13 +203,23 @@ const ProfilesPage: React.FC = () => {
     </Form.Item>
 
     <Form.Item className="button-row">
-        <Button type="primary" htmlType="submit" disabled={requesting}>
+        <Button type="primary" htmlType="submit" disabled={requesting || tuning}>
           {t('profiles.buttonSave', 'Save')}
         </Button>
         &nbsp;
-        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')}
+        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
           onClick={setActive}>
           {t('button.setActive', 'Set Active')}
+        </Button>
+        &nbsp;
+        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
+          onClick={onDeleteProfile}>
+          {t('button.delete', 'Delete')}
+        </Button>
+        &nbsp;
+        <Button type="primary" htmlType="button" hidden={currentProfile !== profile}
+          onClick={onAutoTune}>
+          {!tuning ? t('button.tune', 'Auto-Tune') : t('button.cancelTune', 'Cancel Auto-Tune')}
         </Button>
       </Form.Item>
   </Form>;

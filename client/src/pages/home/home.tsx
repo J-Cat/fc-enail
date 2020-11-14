@@ -1,19 +1,20 @@
-import { Button, Card, Col, Row, Select, Slider, Spin, Switch } from 'antd';
+import { Button, Card, Col, Modal, Row, Select, Slider, Spin, Switch } from 'antd';
 import { PlaySquareOutlined } from '@ant-design/icons';
 import Grid from 'antd/lib/card/Grid';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { useSocketIO } from '../../hooks/useSocketIO';
 import { sendState } from '../../store/reducers/enailReducer';
 import { RootState } from '../../store/reducers/rootReducer';
 import { IConfig } from '../../store/state/IEnailState';
 import { AppDispatch } from '../../store/store';
 import './home.less';
-import { useEnsureLoaded } from '../../hooks/useEnsureLoaded';
+import { IProfile } from '../../store/state/IProfileState';
+import { setCurrentProfile as setProfile } from '../../store/reducers/profileReducer';
 
 const HomePage: FC = () => {
+  const tuning = useSelector<RootState, boolean>(state => state.enail.state?.tuning || false);
   const loading = useSelector<RootState, boolean>(state => state.enail.loading);
   const presentValue = useSelector<RootState, number>(state => state.enail?.state?.pv || 0);
   const setPoint = useSelector<RootState, number>(state => state.enail?.state?.sp || 0);
@@ -35,6 +36,15 @@ const HomePage: FC = () => {
   const setPointChangeStart = useRef(0);
   const setPointChanging = useRef(false);
 
+  const profile = useSelector<RootState, string>(state => state.profiles.currentProfile || '');
+  const profiles = useSelector<RootState, IProfile[]>(state => state.profiles.profiles);
+  const [currentProfile, setCurrentProfile] = useState(profile);
+
+  useEffect(() => {
+    setCurrentProfile(profile)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
+
   useEffect(() => {
     //presentValueChangeStart = Date.now();
     if (!loading && ((Date.now() - setPointChangeStart.current)>2000) && !setPointChanging.current) {
@@ -49,10 +59,6 @@ const HomePage: FC = () => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
-
-  useEnsureLoaded();
-
-  useSocketIO();
 
   const onPowerChange = async (value: boolean) => {
     powerChangeStart.current = Date.now();
@@ -100,6 +106,27 @@ const HomePage: FC = () => {
     }
   };
   
+  const profileOnChange = (key: string) => {
+    const prf = profiles.find(p => p.key === key);
+    if (!prf) {
+      return;
+    }
+    Modal.confirm({
+      title: t('confirm.setActive.title', 'Set Active?'),
+      content: t('confirm.setActive.content', 'Load the {{profile}} profile?', { profile: prf.title }),
+      onOk: async () => {
+        const result = await dispatch(setProfile(key));
+        if (result.error) {
+          Modal.error({
+            title: t('error.setactive.title', 'Error Setting Active'),
+            content: t('error.setactive.content', 'An error occured setting {{profile}} to the active profile.', { profile: prf.title }),
+          });
+        }
+        setCurrentProfile(key);
+      },
+    });
+  }
+
   if (loading) {
     return <Spin />;
   }
@@ -148,8 +175,17 @@ const HomePage: FC = () => {
             <div className="profile-card-content">
               <div>{t('profiles.label', 'Profile')}</div>
               <div>
-                <Select defaultValue={0}>
-                  <Select.Option value={0}>710Coils 30mm Ruby</Select.Option>
+                <Select value={currentProfile} onChange={profileOnChange} disabled={tuning}>
+                  <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
+                  {profiles.map(p => {
+                    return (
+                      <Select.Option 
+                        key={p.key} value={p.key}
+                      >
+                        {p.title}
+                      </Select.Option>
+                    );
+                  })}
                 </Select>
               </div>
             </div>

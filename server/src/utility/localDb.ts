@@ -76,6 +76,15 @@ export const setProfile = async (profile: IProfile): Promise<IProfile> => {
   }
 }
 
+export const deleteProfile = async (key: string): Promise<void> => {
+  const profile = db.get('profiles').find(p => p.key === key);
+  if (!profile) {
+    throw new Error('Invalid profile specified.');
+  }
+  await db.get('profiles').remove(p => p.key === key).write();
+  return;
+}
+
 export const getProfiles = (): IProfile[] => {
   return db.get('profiles').value();
 }

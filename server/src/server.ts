@@ -9,7 +9,7 @@ import { emitE5cc, emitPidSettings, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { exec } from 'child_process';
 import { Lock } from './utility/Lock';
-import { getUrl, setUrl } from './utility/localDb';
+import { getCurrentProfile, getProfile, getUrl, setProfile, setUrl } from './utility/localDb';
 import { playSound } from './hardware/sound';
 import { Sounds } from './models/sounds';
 import { initTunnel } from './tunnel';
@@ -122,7 +122,14 @@ const onSharedStateChange = async (
     ) {
       const pid = await getPidSettings()
       if (pid) {
-        emitPidSettings(pid);
+        let profile = getProfile(getCurrentProfile());
+  
+        if (profile) {
+          emitPidSettings({
+            ...profile,
+            ...pid,
+          });
+        }  
       }
     }
   

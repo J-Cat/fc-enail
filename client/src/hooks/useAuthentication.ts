@@ -10,6 +10,8 @@ import { Constants } from '../models/constants';
 import { Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+let lastLoginError = 0;
+
 export const useAuthentication = (): void => {
   const dispatch = useDispatch<AppDispatch>();
   const history = useHistory();
@@ -32,11 +34,14 @@ export const useAuthentication = (): void => {
         ) {
           if (error.response?.config.url !== '/auth') {
             if (!location.pathname.endsWith('login')) {
-              Modal.error({
-                centered: true,
-                title: t('labels.Unauthorized', 'Unauthorized!'),
-                content: t('error.unauthorized', 'Access denied to FC E-Nail: {{error}}', { error: error.message }),
-              });
+              if ((Date.now() - lastLoginError)>2000) {
+                Modal.error({
+                  centered: true,
+                  title: t('labels.Unauthorized', 'Unauthorized!'),
+                  content: t('error.unauthorized', 'Access denied to FC E-Nail: {{error}}', { error: error.message }),
+                });  
+              }
+              lastLoginError = Date.now();
             }
             dispatch(logoutSoft()).then(() => {
               history.push(`${Constants.CLIENT_BASE_PATH}login`)

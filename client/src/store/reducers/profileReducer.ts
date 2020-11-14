@@ -131,6 +131,36 @@ const setCurrentProfile = (key: string): AppThunk<{ error?: string }> => async (
   }
 }
 
+const deleteProfile = (key: string): AppThunk<{ error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ error?: string, profile?: IProfile }> => {
+  dispatch(startLoad());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/profiles/delete',
+      method: 'POST',
+      data: {
+        key,
+      },
+    });
+
+    dispatch(completeDeleteProfile(key));
+    return {};
+  } catch (e) {
+    const error = i18n.t(
+      'PROFILES.DELETE_PROFILE_ERROR', 
+      'An unknown error occured deleting the profile: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+}
 
 const slice = createSlice({
   name: 'PROFILES',
@@ -185,6 +215,26 @@ const slice = createSlice({
         currentProfile: action.payload,
       };
     },
+    completeDeleteProfile: (state: IProfileState, action: PayloadAction<string>): IProfileState => {
+      return {
+        ...state,
+        loading: false,
+        requesting: false,
+        loaded: true,
+        profiles: [
+          ...(state.profiles.filter(p => p.key !== action.payload)),
+        ],
+      };
+    },
+    updateCurrentProfile: (state: IProfileState, action: PayloadAction<IProfile>): IProfileState => {
+      return {
+        ...state,
+        profiles: [
+          ...(state.profiles.filter(p => p.key !== action.payload.key)),
+          action.payload,
+        ],
+      };
+    },
     setError: (state: IProfileState, action: PayloadAction<string>): IProfileState => {
       return {
         ...state,
@@ -199,6 +249,7 @@ export {
   getProfiles,
   toggleTuning,
   saveProfile,
+  deleteProfile,
   setCurrentProfile,
 };
 
@@ -209,6 +260,8 @@ export const {
   completeGetProfiles,
   completeSetCurrentProfile,
   completeSaveProfile,
+  completeDeleteProfile,
+  updateCurrentProfile,
   setError,
 } = slice.actions;
 

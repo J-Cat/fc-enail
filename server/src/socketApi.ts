@@ -2,6 +2,7 @@ import { Server as HttpServer } from 'http';
 import { validateToken } from './controllers/authController';
 import { IE5ccState } from './hardware/e5cc';
 import { Server, Socket } from 'socket.io';
+import { IProfile } from './utility/localDb';
 
 const io = new Server();
 
@@ -45,9 +46,9 @@ export const emitE5cc = (data: IE5ccState): boolean => {
   }
 }
 
-export const emitPidSettings = (pid: { p: number, i: number, d: number }): boolean => {
+export const emitPidSettings = (profile: IProfile): boolean => {
   try {
-    io.emit('PID', pid);
+    io.emit('PID', profile);
     return true;
   } catch (e) {
     console.error(`Socket IO Emit Error: ${e.message}`);

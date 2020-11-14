@@ -1,0 +1,151 @@
+{
+  "menu": {
+    "home": "Home",
+    "profiles": "Profiles",
+    "scripts": "Scripts",
+    "settings": "Settings"
+  },
+  "labels": {
+    "Unauthorized": "Unauthorized!"
+  },
+  "error": {
+    "unauthorized": "Access denied to FC E-Nail: {{error}}",
+    "setactive": {
+      "title": "Error Setting Active",
+      "content": "An error occured setting {{profile}} to the active profile."
+    }
+  },
+  "confirm": {
+    "setActive": {
+      "title": "Set Active?",
+      "content": "Delete the {{profile}} profile?"
+    }
+  },
+  "profiles": {
+    "label": "Profile",
+    "updateConfirm": "Update Profile?",
+    "updateConfirmContent": "Do you want to update the profile: {{profile}}",
+    "save": {
+      "error": {
+        "title": "Error",
+        "content": "An error occured saving the profile: {{profile}}"
+      }
+    },
+    "savesuccess": {
+      "title": "Success"
+    },
+    "deleteProfile": {
+      "confirm": {
+        "title": "Delete Profile?",
+        "content": "Delete the {{profile}} profile?"
+      },
+      "error": {
+        "title": "Error Deleting Profile",
+        "content": "An error occured deleting the {{profile}} profile."
+      }
+    },
+    "error": {
+      "canceltune": {
+        "title": "Error Cancelling",
+        "content": "An error occured cancelling the auto-tuning for {{profile}}."
+      }
+    },
+    "tune": {
+      "confirm": {
+        "title": "Auto-Tune?",
+        "content": "Would you like to auto-tune the PID settings for {{profile}}? (this could take 5-10 minutes)"
+      },
+      "error": {
+        "title": "Error Auto-Tuning",
+        "content": "An error occured starting the auto-tuning for {{profile}}."
+      }
+    },
+    "profile": "Profile",
+    "title": "Profile Title",
+    "buttonSave": "Save"
+  },
+  "scripts": {
+    "label": "Script"
+  },
+  "login": {
+    "loginError": "Login Error",
+    "passcode": "Passcode",
+    "passcodeRequired": "Passcode is required to authenticate to the FC-Enail.  It should be displayed on your device screen.",
+    "language": "Language",
+    "buttonLogin": "Login"
+  },
+  "language": {
+    "English": "English"
+  },
+  "profiels": {
+    "savesuccess": {
+      "content": "Successfully saved the profile: {{profile}}"
+    }
+  },
+  "profile": {
+    "setactive": {
+      "confirm": {
+        "title": "Set Active?",
+        "content": "Load the {{profile}} profile?"
+      },
+      "error": {
+        "title": "Error Setting Active",
+        "content": "An error occured setting {{profile}} to the active profile."
+      }
+    }
+  },
+  "active-tag": "(active)",
+  "label": {
+    "proportionalBand": "Proportional Band (P)",
+    "integralTime": "Integral Time (I)",
+    "derivativeTime": "Derivative Time (D)"
+  },
+  "button": {
+    "setActive": "Set Active",
+    "delete": "Delete",
+    "tune": "Auto-Tune",
+    "cancelTune": "Cancel Auto-Tune"
+  },
+  "settings": {
+    "error": {
+      "title": "Error",
+      "invalidParameters": "Invalid parameters specified",
+      "sendconfig": "An error occured saving the configuration.",
+      "sendquicksets": "An error occured saving the presets."
+    },
+    "min": "Minimum",
+    "max": "Maximum",
+    "presets": "Presets",
+    "presetsError": "Presets must be a comma separated list of numbers.",
+    "autoshutoff": "Auto Shutoff (in minutes)",
+    "screenSaverTimeout": "Screen Saver Timeout (in minutes)",
+    "screenOffTimeout": "Screen Off Timeout (in minutes)",
+    "localtunnel": "LocalTunnel.me Subdomain",
+    "buttonSave": "Save"
+  },
+  "success": {
+    "savedConfig": {
+      "Title": "Success",
+      "Content": "Successfully saved your settings."
+    }
+  },
+  "AUTH": {
+    "REQUEST_LOGIN_UNKNOWN_ERROR": "An unknown error occured trying to initiate a login request: {{error}}",
+    "LOGIN_FAILED": "Login failed.",
+    "LOGIN_UNKNOWN_ERROR": "An unknown error occured trying to login: {{error}}"
+  },
+  "ENAIL": {
+    "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the e-nail state: {{error}}",
+    "SEND_STATE_UNKNOWN_ERROR": "An unknown error occured trying to send an update to the e-nail: {{error}}",
+    "ERROR_SAVE_CONFIG": "An unknown error occured saving the configuration: {{error}}",
+    "GET_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the quick-set values: {{error}}",
+    "SEND_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to update the quick-set values: {{error}}"
+  },
+  "PROFILES": {
+    "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the profiles: {{error}}",
+    "SAVE_PROFILE_UNKNOWN_ERROR": "An unknown error occured trying to save the profile: {{error}}",
+    "TOGGLE_TUNING_ERROR": "An unknown error occured trying to change the e-nail tuning state: {{error}}",
+    "SET_CURRENT_PROFILE_ERROR": "An unknown error occured trying to set the current profile: {{error}}",
+    "DELETE_PROFILE_ERROR": "An unknown error occured deleting the profile: {{error}}"
+  }
+}

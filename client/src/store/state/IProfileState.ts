@@ -12,5 +12,6 @@ export interface IProfileState {
   loaded: boolean;
   currentProfile?: string; 
   profiles: IProfile[];
+  newPid?: { p: number; i: number; d: number };
   error?: string;
 }

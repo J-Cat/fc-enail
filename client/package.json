@@ -55,7 +55,8 @@
   "scripts": {
     "start": "craco start",
     "build": "sh -ac '. ./.env.production; craco build; ./copy2server.sh'",
-    "test": "craco test"
+    "test": "craco test",
+    "translate": "i18next"
   },
   "eslintConfig": {
     "extends": [

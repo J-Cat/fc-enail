@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { getState, getConfig, getQuickSet } from '../store/reducers/enailReducer';
+import { getProfiles } from '../store/reducers/profileReducer';
 import { AppDispatch } from '../store/store';
 
 export const useEnsureLoaded = () => {
@@ -9,7 +10,9 @@ export const useEnsureLoaded = () => {
   useEffect(() => {
     dispatch(getState()).then(() => {
       dispatch(getConfig()).then(() => {
-        dispatch(getQuickSet());
+        dispatch(getQuickSet()).then(() => {
+          dispatch(getProfiles());
+        })
       });
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps

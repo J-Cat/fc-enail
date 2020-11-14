@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfiles, saveProfile, setCurrentProfile, toggleTuning } from '../controllers/profileController';
+import { deleteProfile, getProfiles, saveProfile, setCurrentProfile, toggleTuning } from '../controllers/profileController';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -14,5 +14,6 @@ router.post(
 );
 router.post('/setCurrent', [body('key').notEmpty()], setCurrentProfile);
 router.post('/tuning', [], toggleTuning);
+router.post('/delete', [body('key').notEmpty()], deleteProfile);
 
 export { router as profileRoute };

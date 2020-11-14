@@ -112,7 +112,7 @@ const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string
   dispatch(startRequest());
 
   try {
-    const response = await Axios({
+    await Axios({
       baseURL: Constants.API_URL,
       url: '/config',
       method: 'POST',
@@ -123,8 +123,8 @@ const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string
     return { result: true };
   } catch (e) {
     const error = i18n.t(
-      'ENAIL.GET_STATE_UNKNOWN_ERROR', 
-      'An unknown error occured trying to retrieve the e-nail state: {{error}}', 
+      'ENAIL.ERROR_SAVE_CONFIG', 
+      'An unknown error occured saving the configuration: {{error}}', 
       { error: e.message },
     );
     

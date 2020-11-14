@@ -29,8 +29,6 @@ const SettingsPage: React.FC = () => {
   const quickset = useSelector<RootState, number[]>(state => state.enail.quickset);
   const [t] = useTranslation();
 
-  useEnsureLoaded();
-
   const submitSettings = async (formData: IFormData) => {
     if (
       (formData.autoShutoff === undefined)
@@ -41,8 +39,8 @@ const SettingsPage: React.FC = () => {
       || (formData.autoShutoff === undefined)
     ) {
       Modal.error({
-        title: t('error', 'Error'),
-        content: t('error.invalidParameters', 'Invalid parameters specified'),
+        title: t('settings.error.title', 'Error'),
+        content: t('settings.error.invalidParameters', 'Invalid parameters specified'),
       });
       return;
     }
@@ -58,22 +56,22 @@ const SettingsPage: React.FC = () => {
 
     if (result.error) {
       Modal.error({
-        title: t('error', 'Error'),
-        content: t('error.sendconfig', 'An error occured saving the configuration.'),
+        title: t('settings.error.title', 'Error'),
+        content: t('settings.error.sendconfig', 'An error occured saving the configuration.'),
       });
     }
 
     const result2 = await dispatch(sendQuickSet(formData.quickset?.split(',').map(s => parseInt(s)) || []));
     if (result2.error) {
       Modal.error({
-        title: t('error', 'Error'),
-        content: t('error.sendquicksets', 'An error occured saving the presets.'),
+        title: t('settings.error.title', 'Error'),
+        content: t('settings.error.sendquicksets', 'An error occured saving the presets.'),
       });
     }
 
     Modal.info({
-      title: t('success', 'Success'),
-      content: t('success.savedConfig', 'Successfully saved your settings.'),
+      title: t('success.savedConfig.Title', 'Success'),
+      content: t('success.savedConfig.Content', 'Successfully saved your settings.'),
     });
   };
 
@@ -179,15 +177,16 @@ const SettingsPage: React.FC = () => {
           type: 'string',
         }]}
         initialValue={config?.localtunnel}
+        className="last-row"
       >
         <Input disabled={requesting} />
       </Form.Item>
 
-      <div hidden={!url}>
+      <div hidden={!url} className="localtunnel-me-link">
         <a href={url}>{url}</a>
       </div>
 
-      <Form.Item>
+      <Form.Item className="button-row">
         <Button type="primary" htmlType="submit" disabled={requesting}>
           {t('settings.buttonSave', 'Save')}
         </Button>

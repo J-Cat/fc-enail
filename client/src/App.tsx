@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import './App.less';
 import { useAuthentication } from './hooks/useAuthentication';
+import { useEnsureLoaded } from './hooks/useEnsureLoaded';
+import { useSocketIO } from './hooks/useSocketIO';
 import { Constants } from './models/constants';
 import { HomePage } from './pages/home/home';
 import { LoginPage } from './pages/login/login';
@@ -20,6 +22,8 @@ export const App: React.FC = () => {
   const [t] = useTranslation();
 
   useAuthentication();
+  useEnsureLoaded();
+  useSocketIO();
 
   const getSelected = () => {
     if (location.pathname.endsWith('profiles')) {

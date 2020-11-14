@@ -41,15 +41,6 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-  };
-
-  const tailLayout = {
-    wrapperCol: { span: 24 },
-  };
-
   const languageOnChange = (value: string) => {
     console.log(JSON.stringify(i18n.languages));
     i18n.changeLanguage(value).then(() => {
@@ -59,8 +50,6 @@ const LoginPage: React.FC = () => {
 
   return (
     <Form
-      {...layout}
-      name="basic"
       initialValues={{ remember: true }}
       onFinish={submitLogin}
       className="login-form"
@@ -84,7 +73,7 @@ const LoginPage: React.FC = () => {
         </Select>
       </Form.Item>
 
-      <Form.Item {...tailLayout}>
+      <Form.Item className="button-row">
         <Button type="primary" htmlType="submit" disabled={authenticating || requesting}>
           {t('login.buttonLogin', 'Login')}
         </Button>

@@ -48,19 +48,7 @@ export const authMiddleware: Middleware<{}, RootState> = (api: MiddlewareAPI<App
       /* ********************************************************************* */
       /* Initialize Here!!                                                     */
       /* ********************************************************************* */
-      next(action);
-
-      // api.dispatch(getNetworkInformation()).then(({ result, error }) => {
-      //   if (result !== HttpStatusCodes.OK) {
-      //     Modal.error({
-      //       centered: true,
-      //       title: i18n.t('labels.error', 'Error'),
-      //       content: i18n.t('error.getNetworkInfo.content', 'An error occured trying to retrieve the network information: {{error}}.', { error }),
-      //     });
-      //   }
-      //   next(action);
-      // });
-      
+      next(action);    
 
       return;
     }
