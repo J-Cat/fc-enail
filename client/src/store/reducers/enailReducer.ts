@@ -10,6 +10,7 @@ const initialState: IEnailState = {
   loaded: false,
   loading: false,
   requesting: false,
+  quickset: [],
 };
 
 const getState = (): AppThunk<{ result: boolean, state?: ISharedState, error?: string }> => async (
@@ -135,6 +136,66 @@ const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string
   }
 }
 
+const getQuickSet = (): AppThunk<{ result: boolean, values?: number[], error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ result: boolean, values?: number[], error?: string }> => {
+  dispatch(startLoad());
+
+  try {
+    const response = await Axios({
+      baseURL: Constants.API_URL,
+      url: '/config/quickset',
+      method: 'GET',
+    });
+
+    const values: number[] = response.data;
+    dispatch(completeGetQuickSet(values));
+    return { result: true, values };
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.GET_QUICKSET_UNKNOWN_ERROR', 
+      'An unknown error occured trying to retrieve the quick-set values: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      result: false,
+      error,
+    };
+  }
+}
+
+const sendQuickSet = (values: number[]): AppThunk<{ result: boolean, error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ result: boolean, error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/config/quickset',
+      method: 'POST',
+      data: values,
+    });
+
+    dispatch(completeRequest());
+    return { result: true };
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.SEND_QUICKSET_UNKNOWN_ERROR', 
+      'An unknown error occured trying to update the quick-set values: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      result: false,
+      error,
+    };
+  }
+}
+
 const slice = createSlice({
   name: 'ENAIL',
   initialState,
@@ -175,6 +236,15 @@ const slice = createSlice({
         config: action.payload,
       };
     },
+    completeGetQuickSet: (state: IEnailState, action: PayloadAction<number[]>): IEnailState => {
+      return {
+        ...state,
+        loading: false,
+        requesting: false,
+        loaded: true,
+        quickset: action.payload,
+      };
+    },
     setState: (state: IEnailState, action: PayloadAction<ISharedState>): IEnailState => {
       return {
         ...state,
@@ -197,8 +267,10 @@ const slice = createSlice({
 export {
   getState,
   getConfig,
+  getQuickSet,
   sendState,
   sendConfig,
+  sendQuickSet,
 };
 
 export const {
@@ -207,6 +279,7 @@ export const {
   completeRequest,
   completeGetState,
   completeGetConfig,
+  completeGetQuickSet,
   setState,
   setError,
 } = slice.actions;

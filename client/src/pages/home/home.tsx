@@ -1,17 +1,17 @@
-import { Card, Col, Form, Row, Slider, Spin, Switch } from 'antd';
+import { Button, Card, Col, Row, Select, Slider, Spin, Switch } from 'antd';
+import { PlaySquareOutlined } from '@ant-design/icons';
 import Grid from 'antd/lib/card/Grid';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useSocketIO } from '../../hooks/useSocketIO';
-import { getConfig, getState, sendState, setState } from '../../store/reducers/enailReducer';
+import { sendState } from '../../store/reducers/enailReducer';
 import { RootState } from '../../store/reducers/rootReducer';
 import { IConfig } from '../../store/state/IEnailState';
 import { AppDispatch } from '../../store/store';
 import './home.less';
-
-const { Item } = Form;
+import { useEnsureLoaded } from '../../hooks/useEnsureLoaded';
 
 const HomePage: FC = () => {
   const loading = useSelector<RootState, boolean>(state => state.enail.loading);
@@ -19,6 +19,7 @@ const HomePage: FC = () => {
   const setPoint = useSelector<RootState, number>(state => state.enail?.state?.sp || 0);
   const running = useSelector<RootState, boolean>(state => state.enail.state?.running || false);
   const config = useSelector<RootState, IConfig|undefined>(state => state.enail.config);
+  const quickset = useSelector<RootState, number[]>(state => state.enail.quickset);
   const shutoffTimer = useSelector<RootState, number>(
     state => Math.max(
       0, 
@@ -49,12 +50,7 @@ const HomePage: FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 
-  useEffect(() => {
-    dispatch(getState()).then(() => {
-      dispatch(getConfig());
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEnsureLoaded();
 
   useSocketIO();
 
@@ -97,12 +93,25 @@ const HomePage: FC = () => {
     setPointChanging.current = false;
   };
   
+  const onQuickSet = async (value: number) => {
+    const result = await dispatch(sendState({ sp: value }));
+    if (result.result && result.state?.sp) {
+      setSetPointLocal(result.state?.sp);
+    }
+  };
+  
   if (loading) {
     return <Spin />;
   }
 
   return (
-    <Grid className="home-grid">
+    <Grid className="home-grid" hoverable={false}>
+      <Row>
+        <Col span={24} className="home-grid-header">
+          <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+        </Col>
+      </Row>
+
       <Row>
         <Col span={16}>
           <Card title={`${presentValue.toFixed(0)}\u00B0F`} className="temp-card">
@@ -124,6 +133,46 @@ const HomePage: FC = () => {
             onChange={onSetPointChange} 
             onAfterChange={updateSetPoint} 
           />
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24} className="quickset-bar">
+          {quickset.map(value => {
+            return <Button type="ghost" className={setPoint === value ? 'quickset-selected' : ''} key={`quickset-${value}`} onClick={() => { onQuickSet(value); }}>{value}</Button>
+          })}
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Card className="profile-card">
+            <div className="profile-card-content">
+              <div>{t('profiles.label', 'Profile')}</div>
+              <div>
+                <Select defaultValue={0}>
+                  <Select.Option value={0}>710Coils 30mm Ruby</Select.Option>
+                </Select>
+              </div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Card className="script-card">
+            <div className="script-card-content">
+              <div>
+                {t('scripts.label', 'Script')}
+              </div>
+              <div>
+                <Select defaultValue={0}>
+                  <Select.Option value={0}>40&deg; Up-Temp</Select.Option>
+                </Select>
+              </div>
+              <div>
+                <Button type="primary" icon={<PlaySquareOutlined />} />
+              </div>
+            </div>
+          </Card>
         </Col>
       </Row>
     </Grid>

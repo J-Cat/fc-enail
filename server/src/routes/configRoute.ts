@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getConfig, saveConfig } from '../controllers/configController';
+import { getConfig, getQuickSet, saveConfig, saveQuickSet } from '../controllers/configController';
 import { body } from 'express-validator';
 
 const router: Router  = Router();
@@ -15,5 +15,7 @@ router.post(
   ], 
   saveConfig,
 );
+router.get('/quickset', [], getQuickSet);
+router.post('/quickset', [body().isArray()], saveQuickSet);
 
 export { router as configRoute };

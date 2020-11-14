@@ -1,10 +1,14 @@
 import e = require('express');
 import ModbusRTU from 'modbus-serial';
-import { Config } from '../config';
+import { registerConfigChange } from '../config';
 import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
 import { Lock } from '../utility/Lock';
 import { playSound } from './sound';
+
+let Config = registerConfigChange(newConfig => {
+  Config = newConfig;
+});
 
 const DEVICE = Config.e5cc.device;
 const INTERVAL = Config.e5cc.interval;
@@ -178,6 +182,36 @@ export  const toggleE5ccTuning = async (percent: 40|100 = 100) => {
     );
   } catch (e) {
     console.error(`Error toggling tuning state: ${e.message}`);
+  } finally {
+    lock.release();
+  }
+}
+
+export const getPidSettings = async (): Promise<{ p: number, i: number, d: number}|undefined> => {
+  try {
+    await lock.acquire();
+
+    return {
+      p: (await modbus.readHoldingRegisters(Constants.e5cc.variables.p, 1))?.data?.[0] || 0,
+      i: (await modbus.readHoldingRegisters(Constants.e5cc.variables.i, 1))?.data?.[0] || 0,
+      d: (await modbus.readHoldingRegisters(Constants.e5cc.variables.d, 1))?.data?.[0] || 0,
+    };
+  } catch (e) {
+    console.error(`Error getting PID settings: ${e.message}`);
+  } finally {
+    lock.release();
+  }
+}
+
+export const setPidSettings = async (p: number, i: number, d: number): Promise<void> => {
+  try {
+    await lock.acquire();
+    
+    await modbus.writeRegister(Constants.e5cc.variables.p, p);
+    await modbus.writeRegister(Constants.e5cc.variables.i, i);
+    await modbus.writeRegister(Constants.e5cc.variables.d, d);
+  } catch (e) {
+    console.error(`Error getting PID settings: ${e.message}`);
   } finally {
     lock.release();
   }

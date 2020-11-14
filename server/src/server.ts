@@ -1,19 +1,22 @@
 import dotenv from 'dotenv';
 import { closeDisplay, setDisplayState } from './hardware/display';
-import { closeE5cc, initE5cc, toggleE5ccState, updateE5ccSetPoint } from './hardware/e5cc';
+import { closeE5cc, getPidSettings, IE5ccState, initE5cc, toggleE5ccState, updateE5ccSetPoint } from './hardware/e5cc';
 import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEncoder';
-import { Config } from './config';
+import { registerConfigChange } from './config';
 import { Api } from './api';
 import { initSharedState, ISharedState, setSharedState } from './utility/sharedState';
-import { emit, socketApi } from './socketApi';
+import { emitE5cc, emitPidSettings, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { exec } from 'child_process';
-import localtunnel, { Tunnel } from 'localtunnel';
-import mail from '@sendgrid/mail';
 import { Lock } from './utility/Lock';
 import { getUrl, setUrl } from './utility/localDb';
 import { playSound } from './hardware/sound';
 import { Sounds } from './models/sounds';
+import { initTunnel } from './tunnel';
+
+let Config = registerConfigChange(newConfig => {
+  Config = newConfig;
+});
 
 const lock = new Lock();
 
@@ -49,84 +52,54 @@ const cleanup = () => {
   closeButton();
 }
 
-// initialization
-(async () => {
-  dotenv.config();
+const onButtonClick = async () => {
+  processAction();
+  await setSharedState({ running: !currentState.running })
+};
 
-  const server = Api();
-  socketApi(server);
+const onLongButtonClick = () => {
+  processAction()
+  console.log('long click');
+}; 
 
-  try {
-    const tunnel = await localtunnel({ 
-      port: process.env.API_PORT || 8000,
-      subdomain: 'jcat', 
-      allow_invalid_cert: true,  
-    });
-    console.log(`localtunnel.me URL: ${tunnel.url}`);
-    await setSharedState({ url: tunnel.url }, 'self');
-    // if url changed, send e-mail
-    if (getUrl() !== tunnel.url) {
-      await setUrl(tunnel.url);
-      if (Config.email.address?.length && Config.email.sendgridApiKey?.length) {
-        try {
-          mail.setApiKey(Config.email.sendgridApiKey);
-          await mail.send({
-            from: Config.email.from || 'fcenail@jcatvapes.com',
-            to: Config.email.address,
-            subject: 'New FC-Enail URL',
-            text: `Your new FC-Enail public URL is: ${tunnel.url}`,
-          });
-        } catch (e) {
-          console.error(`An error occurred sending the NGROK URL to your e-mail address (${Config.email.address}): ${e.message}`);
-        }
-      }
+// restart service on really long click
+const onReallyLongButtonClick = () => {
+  processAction()
+  // restart service
+  console.log('really long click');
+};
+
+// reboot on super long click
+const onReallyReallyLongButonClick = async () => {
+  await setSharedState({ rebooting: true }, 'self');
+  let count = 0;
+  const rebootTimer = async () => {
+    if (cancel) {
+      cancel = false;
+      return;
     }
-  } catch (e) {
-    console.error(`An error occurred connecting to localtunnel.me: ${e.message}`);
+
+    await playSound(Sounds.beep);
+    setLed(true);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    setLed(false);
+    await new Promise(resolve => setTimeout(resolve, 250));
+
+    if (count >= 10) {
+      exec('sudo reboot');
+      return;
+    }
+    count++;
+    rebootTimer();
   }
+  rebootTimer();
+};
 
-  await initButton(
-    async () => {
-      processAction();
-      await setSharedState({ running: !currentState.running })
-    }, 
-    () => {
-      processAction()
-      console.log('long click');
-    }, 
-    () => {
-      processAction()
-      // restart service
-      console.log('really long click');
-    }, 
-    async () => {
-      await setSharedState({ rebooting: true }, 'self');
-      let count = 0;
-      const rebootTimer = async () => {
-        if (cancel) {
-          cancel = false;
-          return;
-        }
-
-        await playSound(Sounds.beep);
-        setLed(true);
-        await new Promise(resolve => setTimeout(resolve, 250));
-        setLed(false);
-        await new Promise(resolve => setTimeout(resolve, 250));
-
-        if (count >= 10) {
-          exec('sudo reboot');
-          return;
-        }
-        count++;
-        rebootTimer();
-      }
-      rebootTimer();
-    }, 
-  );
-})();
-
-initSharedState(async (lastState, state, source) => {
+const onSharedStateChange = async (
+  lastState: ISharedState | undefined, 
+  state: ISharedState, 
+  source: 'e5cc'|'api'|'self'
+): Promise<void> => {
   lock.acquire();
   try {
     currentState = {
@@ -141,6 +114,16 @@ initSharedState(async (lastState, state, source) => {
   
     if (lastState?.running !== state.running) {
       await setLed(state.running || false);
+    }
+
+    if (
+      lastState?.tuning !== undefined && state.tuning !== undefined
+      && lastState?.tuning !== state.tuning && !state.tuning
+    ) {
+      const pid = await getPidSettings()
+      if (pid) {
+        emitPidSettings(pid);
+      }
     }
   
     if (source === 'e5cc') {
@@ -159,28 +142,26 @@ initSharedState(async (lastState, state, source) => {
   } finally {
     lock.release();
   }
-});
+};
 
-initEncoder(
-  Config.encoder.A, Config.encoder.B, Config.encoder.S, 
-  async value => {
-    processAction()
-    if (!initialized) {
-      return;
-    }
+const onEncoderChange = async (value: number) => {
+  processAction()
+  if (!initialized) {
+    return;
+  }
 
-    const newValue = await updateE5ccSetPoint(value);
-    if (newValue !== value) {
-      setEncoderValue(newValue);
-    }
-  },
-  () => {
-    processAction()
-    // back button
-  },
-);
+  const newValue = await updateE5ccSetPoint(value);
+  if (newValue !== value) {
+    setEncoderValue(newValue);
+  }
+};
 
-initE5cc(async (lastState, state) => {
+const onEncoderClick = () => {
+  processAction()
+  // back button
+};
+
+const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState) => {
   if (!initialized) {
     initialized = true;
     setEncoderValue(state.sp || 0);
@@ -188,5 +169,23 @@ initE5cc(async (lastState, state) => {
   }
 
   await setSharedState(state, 'e5cc');
-  emit('E5CC', state);
-});
+  emitE5cc(state);
+};
+
+// initialization
+(async () => {
+  dotenv.config();
+
+  const server = Api();
+  socketApi(server);
+
+  await initTunnel();
+
+  await initButton(onButtonClick, onLongButtonClick, onReallyLongButtonClick, onReallyReallyLongButonClick);
+
+  initSharedState(onSharedStateChange);
+
+  initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick);
+
+  initE5cc(onE5ccChange);
+})();

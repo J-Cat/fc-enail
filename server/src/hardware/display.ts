@@ -1,8 +1,12 @@
 import { Color, display, Font, Layer } from 'ssd1306-i2c-js';
-import { Config } from '../config';
+import { registerConfigChange } from '../config';
 import dayjs from 'dayjs';
 import { Icons } from '../models/icons';
 import { ISharedState } from '../utility/sharedState';
+
+let Config = registerConfigChange(newConfig => {
+  Config = newConfig;
+});
 
 const SCALE = 1;
 let sleeping = false;

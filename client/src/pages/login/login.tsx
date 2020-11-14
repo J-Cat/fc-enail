@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
   };
 
   const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
+    wrapperCol: { span: 24 },
   };
 
   const languageOnChange = (value: string) => {

@@ -1,6 +1,10 @@
 import { Gpio } from 'onoff';
-import { Config } from '../config';
+import { registerConfigChange } from '../config';
 import { Lock } from '../utility/Lock';
+
+let Config = registerConfigChange(newConfig => {
+  Config = newConfig;
+});
 
 const lock = new Lock();
 

@@ -3,6 +3,27 @@
 .home-grid {
   width: 100% !important;
   height: 100%;
+  box-shadow: none !important;
+  height: fit-content;
+  @media only screen and (max-width: 420px) {
+    padding: 12px !important;
+  }
+  @media only screen and (max-width: 320px) {
+    padding: 4px !important;
+  }
+  &-header {
+    display: block;
+    padding-bottom: 5px;
+    img {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+    }
+    h1 {
+      display: inline-block;
+      font-family: cursive;
+    }
+  }
   .temp-card {
     margin:5px;
     .ant-card-head {
@@ -17,6 +38,27 @@
     margin:5px;
     .ant-card-head {
       font-size: 1.5em;
+    }
+  }
+  .quickset-selected, .ant-btn-ghost:focus {
+    background-color: @text-color;
+    color: @component-background;
+  }
+  .script-card, .profile-card {
+    margin-top: 15px;
+    align-content: center;
+    overflow-x: auto;
+    &-content {
+      display: flex;
+      flex-direction: row;
+      width: fit-content;
+      margin: auto;
+      div {
+        align-content: center;
+        padding: 0px 5px;
+        width: fit-content;
+        line-height: 32px;
+      }
     }
   }
 }

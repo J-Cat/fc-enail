@@ -3,42 +3,41 @@ declare global {
     interface ProcessEnv {
       NODE_ENV: 'development' | 'production';
 
-      API_PORT?: number;
+      LOCALTUNNEL_SUBDOMAIN?: string;
+
+      API_PORT?: string;
       API_BASE_ROUTE_PATH?: string;
       API_CLIENT_PATH?: string;
       API_JWT_PUBLIC_CERT?: string;
       API_JWT_PRIVATE_KEY?: string;
       API_JWT_EXPIRES_IN?: string;
-      API_SENDGRID_API_KEY?: string;
-      API_EMAIL_FROM?: string;
-      API_EMAIL_TO?: string;
 
-      ENCODER_A?: number;
-      ENCODER_B?: number;
-      ENCODER_S?: number;
-      ENCODER_MAX_VELOCITY?: number;
-      ENCODER_MIN_VALUE?: number;
-      ENCODER_MAX_VALUE?: number;
-      ENCODER_FREQUENCY?: number;
+      ENCODER_A?: string;
+      ENCODER_B?: string;
+      ENCODER_S?: string;
+      ENCODER_MAX_VELOCITY?: string;
+      ENCODER_MIN_VALUE?: string;
+      ENCODER_MAX_VALUE?: string;
+      ENCODER_FREQUENCY?: string;
 
-      DISPALY_INTERVAL?: number;
-      DISPLAY_SCREEN_OFF?: number;
-      DISPLAY_SCREEN_SAVER?: number;
+      DISPALY_INTERVAL?: string;
+      DISPLAY_SCREEN_OFF?: string;
+      DISPLAY_SCREEN_SAVER?: string;
 
       E5CC_DEVICE?: string;
-      E5CC_INTERVAL?: number;
-      E5CC_AUTOSHUTOFF?: number;
-      E5CC_COMMAND_TIMEOUT?: number;
-      E5CC_BAUDRATE?: number;
-      E5CC_DATABITS?: number;
-      E5CC_STOPBITS?: number;
+      E5CC_INTERVAL?: string;
+      E5CC_AUTOSHUTOFF?: string;
+      E5CC_COMMAND_TIMEOUT?: string;
+      E5CC_BAUDRATE?: string;
+      E5CC_DATABITS?: string;
+      E5CC_STOPBITS?: string;
       E5CC_PARITY?: 'even'|'none'|'mark'|'odd'|'space';
 
-      BUTTON_BUTTON_PIN?: number;
-      BUTTON_LED_PIN?: number;
-      BUTTON_LONG_CLICK?: number;
-      BUTTON_REALLY_LONG_CLICK?: number;
-      BUTTON_REALLY_REALLY_LONG_CLICK?: number;
+      BUTTON_BUTTON_PIN?: string;
+      BUTTON_LED_PIN?: string;
+      BUTTON_LONG_CLICK?: string;
+      BUTTON_REALLY_LONG_CLICK?: string;
+      BUTTON_REALLY_REALLY_LONG_CLICK?: string;
     }
   }
 }

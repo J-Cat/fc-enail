@@ -8,13 +8,12 @@ export interface IE5ccState {
 }
 
 export interface IConfig {
-  readonly emailFrom?: string;
-  readonly emailTo?: string;
   readonly autoShutoff: number;
   readonly screenSaverTimeout: number;
   readonly screenOffTimeout: number;
   readonly max: number;
   readonly min: number;
+  readonly localtunnel: string;
 }
 
 export interface ISharedState extends IE5ccState {
@@ -28,5 +27,6 @@ export interface IEnailState {
   loaded: boolean;
   state?: ISharedState; 
   config?: IConfig;
+  quickset: number[];
   error?: string;
 }

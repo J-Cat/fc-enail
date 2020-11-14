@@ -35,9 +35,19 @@ export const socketApi = (server: HttpServer): void => {
   });
 }
 
-export const emit = (type: 'E5CC', data: IE5ccState): boolean => {
+export const emitE5cc = (data: IE5ccState): boolean => {
   try {
-    io.emit(type, data);
+    io.emit('E5CC', data);
+    return true;
+  } catch (e) {
+    console.error(`Socket IO Emit Error: ${e.message}`);
+    return false;
+  }
+}
+
+export const emitPidSettings = (pid: { p: number, i: number, d: number }): boolean => {
+  try {
+    io.emit('PID', pid);
     return true;
   } catch (e) {
     console.error(`Socket IO Emit Error: ${e.message}`);

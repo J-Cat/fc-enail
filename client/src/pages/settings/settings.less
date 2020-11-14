@@ -1,0 +1,32 @@
+@import '../../variables.less';
+
+.settings-form {
+  width: 100%;
+  max-width: 500px;
+  margin: 20px;
+  @media only screen and (max-width: 320px) {
+    margin: 10px;
+  }
+  .ant-row {
+    flex-wrap: nowrap !important;
+    .ant-form-item-label {
+      min-width: 100px;
+      label {
+        height: fit-content;
+      }
+      white-space: normal;
+      flex: 1 auto;
+      max-width: 35%;
+    }
+    .ant-form-item-control {
+      white-space: normal;
+      flex: 1 100%;
+      max-width: 65%;
+      text-align: right;
+      input {
+        text-align: right;
+        padding-right: 30px;
+      }
+    }
+  }
+}

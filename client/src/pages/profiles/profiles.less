@@ -1,0 +1,30 @@
+@import '../../variables.less';
+
+.profile-form {
+  width: fit-content;
+  white-space: nowrap;
+  .ant-row {
+    flex-wrap: nowrap !important;
+    .ant-form-item-label {
+      white-space: nowrap;
+      flex: 1 auto !important;
+      //max-width: 35%;
+      padding-right: 10px;
+    }
+    .ant-form-item-control {
+      white-space: normal;
+      flex: 1 auto !important;
+      //max-width: 65%;
+      text-align: right;
+      input {
+        padding-right: 30px;
+        text-align: right;
+      }
+    }
+    .button-row {
+      .ant-form-item-control {
+        text-align: center;
+      }
+    }
+  }
+}

@@ -12,11 +12,13 @@ import { authRoute } from './routes/authRoute';
 import { networkRoute } from './routes/networkRoute';
 import { stateRoute } from './routes/stateRoute';
 import { configRoute } from './routes/configRoute';
+import { profileRoute } from './routes/profileRoute';
+import { parseIntDefault } from './utility/parseIntDefault';
 
 export const Api = (port = 8000, baseRoutePath = ''): Server => {
   // initialize configuration environment
   const config = () => {
-    port = process.env.API_PORT || 8000;
+    port = parseIntDefault(process.env.API_PORT, 8000);
     baseRoutePath = process.env.API_BASE_ROUTE_PATH || '';
   }
 
@@ -100,6 +102,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(`${baseRoutePath}/network`, networkRoute);
     app.use(`${baseRoutePath}/state`, stateRoute);
     app.use(`${baseRoutePath}/config`, configRoute);
+    app.use(`${baseRoutePath}/profiles`, profileRoute);
 
     // catch 404 and forward to error handler
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

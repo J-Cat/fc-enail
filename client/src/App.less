@@ -27,6 +27,12 @@ html,body,#root {
   &-menu {
     width: fit-content !important;
     margin: auto !important;
+    .ant-menu-item-selected, .ant-menu-item-active {
+      background-color: inherit !important;
+      svg {
+        color: @primary-color;
+      }
+    }
   }
 }
 

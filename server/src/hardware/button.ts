@@ -1,10 +1,11 @@
-import dotenv from 'dotenv';
 import { Gpio } from 'onoff';
-import { Config } from '../config';
+import { registerConfigChange } from '../config';
+
+let Config = registerConfigChange(newConfig => {
+  Config = newConfig;
+});
 
 export type ClickFunc = () => void;
-
-dotenv.config();
 
 let button = new Gpio(Config.button.buttonPin, 'in', 'both');
 let led = new Gpio(Config.button.ledPin, 'out');
