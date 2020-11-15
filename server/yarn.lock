@@ -2610,8 +2610,8 @@ sprintf-js@~1.0.2:
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
 "ssd1306-i2c-js@https://github.com/J-Cat/ssd1306-i2c-js":
-  version "1.0.2"
-  resolved "https://github.com/J-Cat/ssd1306-i2c-js#b817de4d6d067b9f36fb27b0d977d2a120fbb663"
+  version "1.0.3"
+  resolved "https://github.com/J-Cat/ssd1306-i2c-js#c4fbac75da9542966f91baf386db4b5942121373"
   dependencies:
     bindings "^1.3.0"
     typescript "^4.0.5"

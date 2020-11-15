@@ -166,6 +166,20 @@ const onEncoderChange = async (value: number) => {
 const onEncoderClick = () => {
   processAction()
   // back button
+  switch (currentState.mode || 'home') {
+    case 'home': {
+      setSharedState({ mode: 'settings' }, 'self');
+      break;
+    }
+    case 'settings': {
+      setSharedState({ mode: 'profiles' }, 'self');
+      break;
+    }
+    case 'profiles': {
+      setSharedState({ mode: 'home' }, 'self');
+      break;
+    }
+  }
 };
 
 const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState) => {

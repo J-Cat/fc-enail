@@ -39,6 +39,8 @@ export const closeEncoder = () => {
 let gpioA: Gpio;
 let gpioB: Gpio;
 let gpioSwitch: Gpio;
+let lastA = -1;
+let lastB = -1;
 
 export const initEncoder = (
   pinA: number = Config.encoder.A, 
@@ -52,11 +54,12 @@ export const initEncoder = (
   gpioB = new Gpio(pinB, 'in', 'both');
   gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
-  const processTick = async (from: 'a'|'b') => {  
+  const processTick = async (from: 'a'|'b', value: number) => {  
     lock.acquire();
     try {
-      const a = await gpioA.read();
-      const b = await gpioB.read();
+      const a = from === 'a' ? value : lastA;
+      const b = from === 'b' ? value : lastB;
+
       prevNextCode <<= 2;
       if (b === 1) {
         prevNextCode |= 0x02;
@@ -107,27 +110,30 @@ export const initEncoder = (
           }
         }
       }
+
+      lastA = a;
+      lastB = b;
     } finally {
       lock.release();
     }
   }
 
-  gpioA.watch(async (err) => {
+  gpioA.watch(async (err, value) => {
     if (err) {
       console.error(err);
       return;
     }
 
-    processTick('a');
+    await processTick('a', value);
   });
 
-  gpioB.watch(async (err) => {
+  gpioB.watch(async (err, value) => {
     if (err) {
       console.error(err);
       return;
     }
 
-    processTick('b');
+    await processTick('b', value);
   });
 
   gpioSwitch.watch((err, value) => {

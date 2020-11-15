@@ -115,13 +115,7 @@ const getTimeString = (value: number): string => {
   return `${h !== 0 ? `${h.toString()}:` : ''}${h === 0 ? m.toString() : m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-const render = () => {
-  display.clearScreen();
-
-  if (!state) {
-    return;
-  }
-
+const renderHome = () => {
   display.setFont(Font.UbuntuMono_16ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
   if (state.running && timer >= 0) {
@@ -196,6 +190,58 @@ const render = () => {
   }
 
   display.refresh();
+}
+
+const renderProfiles = () => {
+  drawBitmap(0, 40, Icons.script);
+  display.refresh();
+}
+  
+const renderSettings = () => {
+  drawBitmap(0, 40, Icons.gear);
+
+  const menuItems = ['Network Info', 'Connect WiFi', 'General'];
+
+  drawMenu(0, menuItems);
+  display.refresh();
+}
+
+const render = () => {
+  display.clearScreen();
+
+  if (!state) {
+    return;
+  }
+
+  switch (state.mode) {
+    case 'profiles': {
+      renderProfiles();
+      break;
+    }
+    case 'settings': {
+      renderSettings();
+      break;
+    }
+    default: {
+      renderHome();
+      break;
+    }
+  }
+}
+
+const drawMenu = (selected: number, menuItems: string[]) => {
+  let line = 0;
+  display.setFont(Font.UbuntuMono_12ptFontInfo);
+  
+  for (const item of menuItems) {
+    if (line === selected) {
+      display.fillRect(24, 2 + (line * 10), 104, 10, Color.White, Layer.Layer0);
+      display.drawString(24, 2 + (line * 10), item, 1, Color.Inverse, Layer.Layer0);
+    } else {
+      display.drawString(24, 2 + (line * 10), item, 1, Color.White, Layer.Layer0);
+    }
+    line++;
+  }
 }
 
 const drawBitmap = ( xPos: number, yPos: number, { width, data }: { width: number, height: number, data: Uint8Array }) => {

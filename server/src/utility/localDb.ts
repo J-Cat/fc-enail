@@ -15,12 +15,14 @@ export interface ILocalDb {
   quickSet: number[];
   profiles: IProfile[];
   currentProfile?: string;
+  ssids: string[];
 }
 
 const adapter = new FileAsync<ILocalDb>('./db.json', { 
   defaultValue: {
     quickSet: [465, 485, 495, 505, 510, 515, 530],
     profiles: [],
+    ssids: [],
   },
 });
 let db: LowdbAsync<ILocalDb>;
@@ -87,4 +89,12 @@ export const deleteProfile = async (key: string): Promise<void> => {
 
 export const getProfiles = (): IProfile[] => {
   return db.get('profiles').value();
+}
+
+export const getSsids = (): string[] => {
+  return db.get('ssids').value();
+}
+
+export const setSsids = (ssids: string[]): Promise<void> => {
+  return db.set('ssids', ssids).write();
 }

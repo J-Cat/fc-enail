@@ -7,6 +7,7 @@ export interface ISharedState extends IE5ccState {
   passcode?: string;
   rebooting?: boolean;
   url?: string;
+  mode?: 'home'|'profiles'|'settings',
 }
 
 let state: ISharedState = {};
