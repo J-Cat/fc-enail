@@ -4,7 +4,7 @@ import { closeE5cc, getPidSettings, IE5ccState, initE5cc, toggleE5ccState, updat
 import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEncoder';
 import { registerConfigChange } from './config';
 import { Api } from './api';
-import { initSharedState, ISharedState, setSharedState } from './utility/sharedState';
+import { IMenu, ISharedState, registerStateChange, setSharedState } from './utility/sharedState';
 import { emitE5cc, emitPidSettings, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { exec } from 'child_process';
@@ -13,9 +13,16 @@ import { getCurrentProfile, getProfile, getUrl, setProfile, setUrl } from './uti
 import { playSound } from './hardware/sound';
 import { Sounds } from './models/sounds';
 import { initTunnel } from './tunnel';
+import { scan } from './dao/networkDao';
+import { HomeMode } from './modes/homeMode';
+import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
 
 let Config = registerConfigChange(newConfig => {
   Config = newConfig;
+});
+
+registerStateChange('server', async (lastState, newState, source) => {
+  await onSharedStateChange(lastState, newState, source);
 });
 
 const lock = new Lock();
@@ -23,12 +30,6 @@ const lock = new Lock();
 let initialized = false;
 let cancel = false;
 let currentState: ISharedState = {};
-
-const processAction = () => {
-  if (currentState.rebooting) {
-    cancel = true;
-  }
-}
 
 // capture interrupts and cleanup on exit
 process.on('SIGINT', () => {
@@ -52,19 +53,39 @@ const cleanup = () => {
   closeButton();
 }
 
+const processAction = (): boolean => {
+  if (currentState.rebooting) {
+    cancel = true;
+  }
+  if (currentState.loading) {
+    return false;
+  }
+  if (!initialized) {
+    return false;
+  }
+  return true;
+}
+
 const onButtonClick = async () => {
-  processAction();
-  await setSharedState({ running: !currentState.running })
+  if (!processAction()) {
+    return;
+  }
+
+  await currentState.modes?.[currentState.mode || '']?.onClick();
 };
 
 const onLongButtonClick = () => {
-  processAction()
+  if (!processAction()) {
+    return;
+  }
   console.log('long click');
 }; 
 
 // restart service on really long click
 const onReallyLongButtonClick = () => {
-  processAction()
+  if (!processAction()) {
+    return;
+  }
   // restart service
   console.log('really long click');
 };
@@ -95,91 +116,21 @@ const onReallyReallyLongButonClick = async () => {
   rebootTimer();
 };
 
-const onSharedStateChange = async (
-  lastState: ISharedState | undefined, 
-  state: ISharedState, 
-  source: 'e5cc'|'api'|'self'
-): Promise<void> => {
-  lock.acquire();
-  try {
-    currentState = {
-      ...state,
-    };
-  
-    if (!initialized) {
-      return;
-    }
-  
-    setDisplayState(state);
-  
-    if (lastState?.running !== state.running) {
-      await setLed(state.running || false);
-    }
-
-    if (
-      lastState?.tuning !== undefined && state.tuning !== undefined
-      && lastState?.tuning !== state.tuning && !state.tuning
-    ) {
-      const pid = await getPidSettings()
-      if (pid) {
-        let profile = getProfile(getCurrentProfile());
-  
-        if (profile) {
-          emitPidSettings({
-            ...profile,
-            ...pid,
-          });
-        }  
-      }
-    }
-  
-    if (source === 'e5cc') {
-      return;
-    }
-  
-    if (lastState?.passcode !== state?.passcode && state?.passcode) {
-      console.log(`Passcode: ${state.passcode}`);
-    }
-  
-    if (lastState?.running !== state.running) {
-      await toggleE5ccState();
-    } else if (state.sp && lastState?.sp !== state.sp) {
-      await updateE5ccSetPoint(state.sp);
-    }  
-  } finally {
-    lock.release();
-  }
-};
-
 const onEncoderChange = async (value: number) => {
-  processAction()
-  if (!initialized) {
+  if (!processAction()) {
     return;
   }
 
-  const newValue = await updateE5ccSetPoint(value);
-  if (newValue !== value) {
-    setEncoderValue(newValue);
-  }
+  await currentState.modes?.[currentState.mode || '']?.onEncoderChange(value);
 };
 
-const onEncoderClick = () => {
-  processAction()
-  // back button
-  switch (currentState.mode || 'home') {
-    case 'home': {
-      setSharedState({ mode: 'settings' }, 'self');
-      break;
-    }
-    case 'settings': {
-      setSharedState({ mode: 'profiles' }, 'self');
-      break;
-    }
-    case 'profiles': {
-      setSharedState({ mode: 'home' }, 'self');
-      break;
-    }
+const onEncoderClick = async () => {
+  if (!processAction()) {
+    return;
   }
+
+  console.log(JSON.stringify(currentState, null, ' '));
+  await currentState.modes?.[currentState.mode || '']?.onEncoderClick();
 };
 
 const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState) => {
@@ -193,9 +144,37 @@ const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState
   emitE5cc(state);
 };
 
+const onSharedStateChange = async (
+  lastState: ISharedState | undefined, 
+  state: ISharedState, 
+  source: 'e5cc'|'api'|'self'
+): Promise<void> => {
+  lock.acquire();
+  try {
+    currentState = {
+      ...state,
+    };
+  
+    if (lastState?.passcode !== state?.passcode && state?.passcode) {
+      console.log(`Passcode: ${state.passcode}`);
+    }  
+  } finally {
+    lock.release();
+  }
+};
+
 // initialization
 (async () => {
   dotenv.config();
+
+  setSharedState({
+    menu: [initSettingsMenu()],
+    modes: {
+      'home': HomeMode,
+      'settings': SettingsMode,      
+    },
+    mode: 'home',
+  });
 
   const server = Api();
   socketApi(server);
@@ -203,8 +182,6 @@ const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState
   await initTunnel();
 
   await initButton(onButtonClick, onLongButtonClick, onReallyLongButtonClick, onReallyReallyLongButonClick);
-
-  initSharedState(onSharedStateChange);
 
   initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick);
 

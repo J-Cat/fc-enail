@@ -1,8 +1,15 @@
 import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
+import { registerStateChange } from '../utility/sharedState';
 
 let Config = registerConfigChange(newConfig => {
   Config = newConfig;
+});
+
+registerStateChange('button', async (oldState, newState) => {
+  if (oldState?.running !== newState.running) {
+    await setLed(newState.running || false);
+  }
 });
 
 export type ClickFunc = () => void;

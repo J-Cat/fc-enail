@@ -2,11 +2,19 @@ import { Color, display, Font, Layer } from 'ssd1306-i2c-js';
 import { registerConfigChange } from '../config';
 import dayjs from 'dayjs';
 import { Icons } from '../models/icons';
-import { ISharedState } from '../utility/sharedState';
+import { ISharedState, registerStateChange, setSharedState } from '../utility/sharedState';
+import { getNetworkInfo, scan } from '../dao/networkDao';
+import { stringify } from 'querystring';
+import { Console } from 'console';
+import { Constants } from '../models/Constants';
 
 let Config = registerConfigChange(newConfig => {
   Config = newConfig;
 });
+
+registerStateChange('oled', (oldState, newState, source) => {
+  setDisplayState(newState);
+})
 
 const SCALE = 1;
 let sleeping = false;
@@ -37,7 +45,7 @@ const init = async (): Promise<void> => {
   refresh();
 }
 
-const refresh = (): Promise<void> => {
+const refresh = async (): Promise<void> => {
   if (dirty) {
     dirty = false;
     lastUpdate = Date.now();
@@ -47,7 +55,7 @@ const refresh = (): Promise<void> => {
     || (lastUpdate === 0) 
     || state.running
   ) {
-    render();
+    await render();
   } else if (!sleeping) {
     sleeping = true;
     display.clearScreen();
@@ -62,6 +70,22 @@ const refresh = (): Promise<void> => {
   });
 }
 
+const isUpdated = (savedState: ISharedState, newState: ISharedState): boolean => {
+  const newMenu = newState.menu?.[newState.menu?.length];
+  const savedMenu = savedState.menu?.[savedState.menu?.length];
+
+  return (
+    (newState.sp !== savedState?.sp)
+    || (newState.running !== savedState?.running)
+    || (newState.tuning !== savedState?.tuning)
+    || (newState.nocoil !== savedState?.nocoil)
+    || (newState.mode !== savedState.mode)
+    || (newState.menu?.length !== savedState.menu?.length)
+    || (newMenu?.current !== savedMenu?.current)
+    || (newMenu?.action !== savedMenu?.action)
+  );
+}
+
 export const setDisplayState = async (newState: ISharedState): Promise<void> => {
   dirty = true;
   const savedState = {...(state || {})};
@@ -69,12 +93,7 @@ export const setDisplayState = async (newState: ISharedState): Promise<void> => 
     ...(state || {}),
     ...newState
   };
-  if (
-    (newState.sp !== savedState?.sp)
-    || (newState.running !== savedState?.running)
-    || (newState.tuning !== savedState?.tuning)
-    || (newState.nocoil !== savedState?.nocoil)
-  ) {
+  if (isUpdated(savedState, newState)) {
     screenSaverDisabled = Date.now();  
     showPasscode = false;
     if (sleeping) {
@@ -197,19 +216,49 @@ const renderProfiles = () => {
   display.refresh();
 }
   
-const renderSettings = () => {
+const renderSettings = async (): Promise<void> => {
+
+  const menu = state.menu?.[state.menu?.length-1];
+  if (!menu) {
+    return;
+  }
+
+  if (menu.action === 'network') {
+    const networkInfo = await getNetworkInfo()
+    display.setFont(Font.UbuntuMono_8ptFontInfo);    
+    display.drawString(0, 2, `Mode: ${networkInfo.network?.mode}`, 1, Color.White, Layer.Layer0);
+    display.drawString(0, 10, `SSID: ${networkInfo.network?.ssid}`, 1, Color.White, Layer.Layer0);
+    display.drawString(0, 20, `IP:   ${networkInfo.network?.address}`, 1, Color.White, Layer.Layer0);
+    drawStringWrapped(0, 30, `URL:  ${state.url}`, Font.UbuntuMono_8ptFontInfo, 6);
+    display.refresh();
+    return;
+  }
+  if (menu.action == 'connect') {
+    drawTextInput('Passcode');
+    return;
+  }
   drawBitmap(0, 40, Icons.gear);
-
-  const menuItems = ['Network Info', 'Connect WiFi', 'General'];
-
-  drawMenu(0, menuItems);
+  drawMenu(menu.current, menu.menuItems);
   display.refresh();
 }
 
-const render = () => {
+// const renderDataInput = async (): Promise<void> => {
+//   if (state.datainput.)
+// }
+
+const render = async () => {
   display.clearScreen();
 
   if (!state) {
+    return;
+  }
+
+  if (state.loading) {
+    display.clearScreen();
+    const width = (state.loadingMessage?.length || 0) * 7;
+    display.drawString(64 - Math.ceil(width / 2), 16, state.loadingMessage || '', 1, Color.White, Layer.Layer0);
+    drawBitmap(56, 30, Icons.hourglass);
+    display.refresh();
     return;
   }
 
@@ -219,7 +268,7 @@ const render = () => {
       break;
     }
     case 'settings': {
-      renderSettings();
+      await renderSettings();
       break;
     }
     default: {
@@ -229,19 +278,131 @@ const render = () => {
   }
 }
 
+let flashState = false;
+const drawTextInput = (label: string) => {
+  display.setFont(Font.UbuntuMono_8ptFontInfo);
+  display.drawString(0, 0, label, 1, Color.White, Layer.Layer0);
+  display.drawString(
+    0, 10, 
+    `${state.textinput?.text}${flashState === true ? '_' : ' '}${'_'.repeat(128-(state.textinput?.text?.length || 0))}`, 
+    1, Color.White, Layer.Layer0
+  );
+
+  const lines = Constants.textInput[state.textinput?.inputMode || 'lowercase'];
+  const lineLength = Math.ceil(lines.length / 2);
+  const startX = 6;
+
+  drawStringWrapped(
+    startX, 27, 
+    lines,
+    Font.UbuntuMono_8ptFontInfo, 
+    0, 
+    lineLength * 6,
+    11
+  );
+  const charPos = lines.indexOf(state.textinput?.activeChar || '--')
+  if (charPos >= 0) {
+    const x = startX + (charPos * 6) - (charPos > lineLength ? (lineLength * 6) : 0);
+    const y = 27 + (charPos >= lineLength ? 10 : 0);
+    display.drawLine(x, y+10, x+6, y+10, Color.White, Layer.Layer0);
+  }
+  
+  if (state.textinput?.activeChar === 'mode') {
+    display.fillRect(0, 54, 36, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(
+    0, 54, 
+    state.textinput?.inputMode === 'lowercase' 
+      ? 'upper'
+      : state.textinput?.inputMode === 'uppercase'
+      ? 'symbol'
+      : 'lower', 
+    1,
+    state.textinput?.activeChar === 'mode' ? Color.Inverse : Color.White, 
+    Layer.Layer0
+  );
+
+  if (state.textinput?.activeChar === 'del') {
+    display.fillRect(38, 54, 18, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(38, 54, 'Del', 1, state.textinput?.activeChar === 'del' ? Color.Inverse : Color.White, Layer.Layer0);
+  if (state.textinput?.activeChar === 'cancel') {
+    display.fillRect(64, 54, 36, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(64, 54, 'Cancel', 1, state.textinput?.activeChar === 'cancel' ? Color.Inverse : Color.White, Layer.Layer0);
+  if (state.textinput?.activeChar === 'ok') {
+    display.fillRect(108, 54, 12, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(108, 54, 'Ok', 1, state.textinput?.activeChar === 'ok' ? Color.Inverse : Color.White, Layer.Layer0);
+  display.refresh();
+  flashState = !flashState;
+}
+
 const drawMenu = (selected: number, menuItems: string[]) => {
   let line = 0;
-  display.setFont(Font.UbuntuMono_12ptFontInfo);
-  
+  display.setFont(Font.UbuntuMono_10ptFontInfo);
+  const startPos = Math.max(0, selected - 4)
+  let skip = 0;
   for (const item of menuItems) {
-    if (line === selected) {
-      display.fillRect(24, 2 + (line * 10), 104, 10, Color.White, Layer.Layer0);
-      display.drawString(24, 2 + (line * 10), item, 1, Color.Inverse, Layer.Layer0);
+    if (skip < startPos) {
+      skip++;
+      continue;
+    }
+    if ((line + skip) === selected) {
+      display.fillRect(24, 2 + (line * 11), 104, 11, Color.White, Layer.Layer0);
+      display.drawString(24, 2 + (line * 11), item, 1, Color.Inverse, Layer.Layer0);
     } else {
-      display.drawString(24, 2 + (line * 10), item, 1, Color.White, Layer.Layer0);
+      display.drawString(24, 2 + (line * 11), item, 1, Color.White, Layer.Layer0);
     }
     line++;
   }
+}
+
+const drawStringWrapped = (x: number, y: number, text: string, font: Font, indent = 1, fixedWidth: number = 0, lineSpacing: number = 0): number => {
+  let height = 10;
+  let width = 6;
+  switch (font) {
+    case Font.UbuntuMono_10ptFontInfo: {
+      height = 11;
+      width = 7;
+      break;
+    }
+    case Font.UbuntuMono_12ptFontInfo: {
+      height = 14;
+      width = 8;
+      break;
+    }
+    case Font.UbuntuMono_16ptFontInfo: {
+      height = 19;
+      width = 11;
+      break;
+    }
+    case Font.UbuntuMono_24ptFontInfo: {
+      height = 28;
+      width = 16;
+      break;
+    }
+    case Font.UbuntuMono_48ptFontInfo: {
+      height = 50;
+      width = 31;
+      break;
+    }
+  }  
+  if (lineSpacing !== 0) {
+    height = lineSpacing;
+  }
+  const length = Math.floor((fixedWidth > 0 ? fixedWidth : 128)/width);
+  let remainingText = text;
+  let line = 0;
+  let space = ' '.repeat(indent);
+  while (remainingText !== space) {
+    const value = remainingText.substr(0, length);
+    remainingText = space + remainingText.substr(length);
+    display.drawString(x, y + (line * height), value, 1, Color.White, Layer.Layer0);
+    line++;
+  }
+
+  return line;
 }
 
 const drawBitmap = ( xPos: number, yPos: number, { width, data }: { width: number, height: number, data: Uint8Array }) => {

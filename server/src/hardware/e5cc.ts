@@ -4,10 +4,23 @@ import { registerConfigChange } from '../config';
 import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
 import { Lock } from '../utility/Lock';
+import { registerStateChange } from '../utility/sharedState';
 import { playSound } from './sound';
 
 let Config = registerConfigChange(newConfig => {
   Config = newConfig;
+});
+
+registerStateChange('e5cc', async (oldState, newState, source) => {
+  if (source === 'e5cc') {
+    return;
+  }
+
+  if (oldState?.running !== newState.running) {
+    toggleE5ccState();
+  } else if (newState.sp && oldState?.sp !== newState.sp) {
+    updateE5ccSetPoint(newState.sp);
+  }  
 });
 
 const DEVICE = Config.e5cc.device;

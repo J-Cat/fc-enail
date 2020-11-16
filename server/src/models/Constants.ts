@@ -22,4 +22,9 @@ export const Constants = {
       nocoil: 64,
     },
   },
+  textInput: {
+    lowercase: 'abcdefghijklmnopqrstuvwxyz0123456789',
+    uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    symbols:   ' @^+-_><=*/\\!?,.:;|#$%&()[]{}"\'`~',
+  }
 };

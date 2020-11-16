@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
 import { Lock } from '../utility/Lock';
@@ -19,9 +20,11 @@ let store = 0;
 let prevNextCode = 0;
 let lastValue = -1;
 let velocity: number[] = [0];
+let _enforceMinMax = true;
 
-export const setEncoderValue = (value: number) => {
+export const setEncoderValue = (value: number, enforceMinMax: boolean = true) => {
   currentValue = value;
+  _enforceMinMax = enforceMinMax;
 }
 
 export const closeEncoder = () => {
@@ -46,8 +49,8 @@ export const initEncoder = (
   pinA: number = Config.encoder.A, 
   pinB: number = Config.encoder.B, 
   pinSwitch: number = Config.encoder.S, 
-  valueChanged = (value: number) => {},
-  onClick = () => {},
+  valueChanged: (value: number) => Promise<void> = async (value: number) => {},
+  onClick: () => Promise<void> = async () => {},
   frequency = Config.encoder.frequency,
 ) => {
   gpioA = new Gpio(pinA, 'in', 'both'); 
@@ -85,7 +88,7 @@ export const initEncoder = (
             ), 
             MAX_VELOCITY
           );
-          if (currentValue + scale > MAX_VALUE) {
+          if ((currentValue + scale > MAX_VALUE) && _enforceMinMax) {
             currentValue = MAX_VALUE;
           } else {
             currentValue += scale;
@@ -103,7 +106,7 @@ export const initEncoder = (
             ), 
             MAX_VELOCITY
           );
-          if (currentValue - scale < MIN_VALUE) {
+          if ((currentValue - scale < MIN_VALUE) && _enforceMinMax) {
             currentValue = MIN_VALUE;
           } else {
             currentValue -= scale;
