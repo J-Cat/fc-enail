@@ -1,6 +1,6 @@
 import Lowdb, { LowdbAsync } from 'lowdb';
-import FileAsync from 'lowdb/adapters/FileAsync'
-import { Guid } from 'guid-typescript'
+import FileAsync from 'lowdb/adapters/FileAsync';
+import { Guid } from 'guid-typescript';
 
 export interface IProfile {
   key: string;
@@ -36,23 +36,23 @@ let db: LowdbAsync<ILocalDb>;
 
 export const getUrl = (): string => {
   return db.get('url').value() || '';
-}
+};
 
 export const setUrl = (url: string): Promise<void> => {
   return db.set('url', url).write();
-}
+};
 
 export const getQuickSet = (): number[] => {
   return db.get('quickSet').value();
-}
+};
 
 export const setQuickSet = (values: number[]): Promise<void> => {
   return db.set('quickSet', values).write();
-}
+};
 
 export const getCurrentProfile = (): string => {
   return db.get('currentProfile').value();
-}
+};
 
 export const setCurrentProfile = async (key: string): Promise<void> => {
   const profile = db.get('profiles').find(p => p.key === key);
@@ -60,12 +60,12 @@ export const setCurrentProfile = async (key: string): Promise<void> => {
     throw new Error('Invalid profile specified.');
   }
   return db.set('currentProfile', key).write();
-}
+};
 
 export const getProfile = (key: string): IProfile => {
   const profile = db.get('profiles').find(p => p.key === key);
   return profile?.value?.();
-}
+};
 
 export const setProfile = async (profile: IProfile): Promise<IProfile> => {
   const existing = db.get('profiles').find(p => p.key === profile.key);
@@ -76,7 +76,7 @@ export const setProfile = async (profile: IProfile): Promise<IProfile> => {
     const p = await db.get('profiles').push({ ...profile, key: Guid.create().toString() }).write();
     return p?.[0];
   }
-}
+};
 
 export const deleteProfile = async (key: string): Promise<void> => {
   const profile = db.get('profiles').find(p => p.key === key);
@@ -85,16 +85,16 @@ export const deleteProfile = async (key: string): Promise<void> => {
   }
   await db.get('profiles').remove(p => p.key === key).write();
   return;
-}
+};
 
 export const getProfiles = (): IProfile[] => {
   return db.get('profiles').value();
-}
+};
 
 export const getSsids = (): string[] => {
   return db.get('ssids').value();
-}
+};
 
 export const setSsids = (ssids: string[]): Promise<void> => {
   return db.set('ssids', ssids).write();
-}
+};

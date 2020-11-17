@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import { getSharedState, setSharedState } from '../utility/sharedState';
 import { generate } from 'generate-password';
 
@@ -16,7 +16,7 @@ export const generatePasscode = async (req: Request, res: Response): Promise<Res
     }),
   });
   return res.sendStatus(HttpStatusCode.OK);
-}
+};
 
 export const authenticate = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -28,14 +28,14 @@ export const authenticate = async (req: Request, res: Response): Promise<Respons
     const state = await getSharedState();
     if (passphrase !== state?.passcode) {
       return res.status(HttpStatusCode.UNAUTHORIZED)
-          .json({ error: 'Failed to verify the supplied passphrase.' });
+        .json({ error: 'Failed to verify the supplied passphrase.' });
     }
     const token: string = jwt.sign(
       {},
       process.env.API_JWT_PRIVATE_KEY,
       {
-          algorithm: 'RS256',
-          expiresIn: process.env.API_JWT_EXPIRES_IN || '7d',
+        algorithm: 'RS256',
+        expiresIn: process.env.API_JWT_EXPIRES_IN || '7d',
       },
     );
 
@@ -45,12 +45,12 @@ export const authenticate = async (req: Request, res: Response): Promise<Respons
       token,
     });
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};
 
 
 export const validateToken = async (token: string): Promise<{ 
@@ -58,37 +58,37 @@ export const validateToken = async (token: string): Promise<{
 }> => {
   // decode token
   if (token) {
-      let userToken: string = token;
+    let userToken: string = token;
 
-      if (userToken.toLowerCase().startsWith(BEARER_PREFIX)) {
-          userToken = token.substring(BEARER_PREFIX.length);
+    if (userToken.toLowerCase().startsWith(BEARER_PREFIX)) {
+      userToken = token.substring(BEARER_PREFIX.length);
+    }
+
+    return new Promise(resolve => {
+      if (!process.env.API_JWT_PUBLIC_CERT) {
+        return { success: false, message: 'No public certificate to decode token exists.' };
       }
 
-      return new Promise(resolve => {
-        if (!process.env.API_JWT_PUBLIC_CERT) {
-          return { success: false, message: 'No public certificate to decode token exists.' };
-        }
-
-        jwt.verify(userToken, process.env.API_JWT_PUBLIC_CERT, { algorithms: ['RS256'], ignoreExpiration: false }, (err): void => {
-            if (err) {
-              resolve({
-                message: 'Failed to authenticate token.',
-                success: false,
-              });
-            } else {
-              // if everything is good, return decoded token
-              resolve({
-                success: true,
-              });
-            }
+      jwt.verify(userToken, process.env.API_JWT_PUBLIC_CERT, { algorithms: ['RS256'], ignoreExpiration: false }, (err): void => {
+        if (err) {
+          resolve({
+            message: 'Failed to authenticate token.',
+            success: false,
           });
-    })
+        } else {
+          // if everything is good, return decoded token
+          resolve({
+            success: true,
+          });
+        }
+      });
+    });
   } else {
     // if there is no token
     // return an error
     return {
-        message: 'No token provided.',
-        success: false,
+      message: 'No token provided.',
+      success: false,
     };
   }
-}
+};

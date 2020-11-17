@@ -34,13 +34,15 @@ export interface IServerConfig {
   localtunnel: {
     subdomain: string;
   };
-};
+}
 
-const onChanges: ((newConfig: IServerConfig) => void)[] = [];
+const onChanges: {
+  [key: string]: (newConfig: IServerConfig) => void;
+} = {};
 
 let config: IServerConfig;
 
-export const loadConfig = (newEnv?: string) => {
+export const loadConfig = (newEnv?: string): void => {
   dotenv.config();
 
   if (newEnv) {
@@ -90,14 +92,14 @@ export const loadConfig = (newEnv?: string) => {
     },
   };
 
-  for (const onChange of onChanges) {
-    onChange(config);
+  for (const key of Object.keys(onChanges)) {
+    onChanges[key]?.(config);
   }
-}
+};
 
-export const registerConfigChange = (onChange?: (newConfig: IServerConfig) => void): IServerConfig => {
+export const registerConfigChange = (key: string, onChange?: (newConfig: IServerConfig) => void): IServerConfig => {
   if (onChange) {
-    onChanges.push(onChange)
+    onChanges[key] = onChange;
   }
   return {...config};
 };

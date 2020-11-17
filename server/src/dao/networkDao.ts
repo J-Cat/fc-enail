@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { exec } from 'child_process';
 import { getSsids, setSsids } from '../utility/localDb';
 
@@ -11,27 +12,27 @@ export const getNetworkInfo = async (): Promise<{ error?: string, stdout?: strin
             | sed -E 's/^[^:]*:(.*)$/\\1/gi'; \
         `, 
         { encoding: 'utf8' }, (error, stdout, stderr) => {
-        if (error) {
-          resolve({
-            error: error.message,
-            stdout,
-            stderr,
-          });
-          return;
-        }
+          if (error) {
+            resolve({
+              error: error.message,
+              stdout,
+              stderr,
+            });
+            return;
+          }
 
-        const [mode, ssid, address] = stdout?.split('\n').filter(s => s.length > 0) || [];
-        if (!mode || !ssid || !address) {
-          throw new Error('Failed to retrieve network information.');
-        }
-        const ssids = getSsids();
-        resolve({ network: { mode, ssid, address, ssids } });
-      });
+          const [mode, ssid, address] = stdout?.split('\n').filter(s => s.length > 0) || [];
+          if (!mode || !ssid || !address) {
+            throw new Error('Failed to retrieve network information.');
+          }
+          const ssids = getSsids();
+          resolve({ network: { mode, ssid, address, ssids } });
+        });
     } catch (e) {
       resolve({ error: e.message });
     }
-  })
-}
+  });
+};
 
 export const scan = async (): Promise<{error?: string, stdout?: string, stderr?: string, ssids?: string[]}> => {
   return new Promise(resolve => {
@@ -44,24 +45,24 @@ export const scan = async (): Promise<{error?: string, stdout?: string, stderr?:
           sudo nmcli c up $ACTIVE_IF > /dev/null 2>&1; \
         `, 
         { encoding: 'utf8' }, async (error, stdout, stderr) => {
-        if (error) {
-          resolve({
-            error: error.message,
-            stdout,
-            stderr,
-          });
-          return;
-        }
+          if (error) {
+            resolve({
+              error: error.message,
+              stdout,
+              stderr,
+            });
+            return;
+          }
 
-        const ssids = stdout?.split('\n').filter(s => s.length > 0) || [];
-        await setSsids(ssids);
-        resolve({ ssids });
-      });
+          const ssids = stdout?.split('\n').filter(s => s.length > 0) || [];
+          await setSsids(ssids);
+          resolve({ ssids });
+        });
     } catch (e) {
       resolve({ error: e.message });
     }
-  })
-}
+  });
+};
 
 export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, passcode: string): Promise<{ error?: string, stdout?: string, stderr?: string }> => {
   return new Promise(resolve => {
@@ -121,5 +122,5 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
     } catch (e) {
       resolve({ error: e.message });
     }
-  })
-}
+  });
+};

@@ -3,4 +3,4 @@ export const Sounds = {
   beep: 'beep.wav',
   chime: 'chime.wav',
   organ: 'organ.wav',
-}
+};

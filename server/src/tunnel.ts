@@ -4,7 +4,7 @@ import { getUrl, setUrl } from './utility/localDb';
 import { parseIntDefault } from './utility/parseIntDefault';
 import { setSharedState } from './utility/sharedState';
 
-let Config = registerConfigChange(newConfig => {
+let Config = registerConfigChange('localtunnel', newConfig => {
   Config = newConfig;
 });
 
@@ -44,4 +44,4 @@ export const initTunnel = async (): Promise<void> => {
   } catch (e) {
     console.error(`An error occurred connecting to localtunnel.me: ${e.message}`);
   }
-}
+};

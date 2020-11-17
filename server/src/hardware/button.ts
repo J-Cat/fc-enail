@@ -2,7 +2,7 @@ import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
 import { registerStateChange } from '../utility/sharedState';
 
-let Config = registerConfigChange(newConfig => {
+let Config = registerConfigChange('button', newConfig => {
   Config = newConfig;
 });
 
@@ -14,8 +14,8 @@ registerStateChange('button', async (oldState, newState) => {
 
 export type ClickFunc = () => void;
 
-let button = new Gpio(Config.button.buttonPin, 'in', 'both');
-let led = new Gpio(Config.button.ledPin, 'out');
+const button = new Gpio(Config.button.buttonPin, 'in', 'both');
+const led = new Gpio(Config.button.ledPin, 'out');
 let down = 0;
 let ledState = false;
 
@@ -26,7 +26,7 @@ export const setLed = async (state: boolean): Promise<void> => {
     return;
   }
   await led.write(state ? 1 : 0);
-}
+};
 
 export const initButton = async (
   onClick: ClickFunc, 
@@ -64,13 +64,13 @@ export const initButton = async (
       down = 0;
     }
   });
-}
+};
 
-export const closeButton = () => {
+export const closeButton = (): void => {
   if (led) {
     led.write(0);
   }
   if (button) {
     button.unwatchAll();
   }
-}
+};

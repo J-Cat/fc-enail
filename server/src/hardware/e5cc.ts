@@ -1,4 +1,3 @@
-import e = require('express');
 import ModbusRTU from 'modbus-serial';
 import { registerConfigChange } from '../config';
 import { Constants } from '../models/Constants';
@@ -7,7 +6,7 @@ import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../utility/sharedState';
 import { playSound } from './sound';
 
-let Config = registerConfigChange(newConfig => {
+let Config = registerConfigChange('e5cc', newConfig => {
   Config = newConfig;
 });
 
@@ -65,81 +64,78 @@ export const initE5cc = async (
   console.log('Connected to Omron E5CC.');
 
   const getData = async (): Promise<void> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (lock.locked) {
-          setTimeout(async () => {
-            await getData();
-            resolve();
-          }, INTERVAL);
-          resolve();
-          return;    
-        }
-
-        await lock.acquire();
-        try {
-          const statusReading = await modbus.readHoldingRegisters(Constants.e5cc.variables.status, 2);
-          const status = statusReading?.data?.[1];
-          const nocoil = (statusReading?.data?.[0] & Constants.e5cc.flags.nocoil) === Constants.e5cc.flags.nocoil;
-          const running = (status & Constants.e5cc.flags.stopped) !== Constants.e5cc.flags.stopped
-          state = {
-            pv: nocoil ? 0 : (await modbus.readHoldingRegisters(Constants.e5cc.variables.presentValue, 1))?.data?.[0] || 0,
-            sp: (await modbus.readHoldingRegisters(Constants.e5cc.variables.setPoint, 1))?.data?.[0] || 0,
-            running,
-            tuning: (status & Constants.e5cc.flags.tuning) === Constants.e5cc.flags.tuning,
-            nocoil,
-            started: !state.running && running ? Date.now() : state.started,
-          }
-        } finally {
-          lock.release();
-        }
-
-        // if auto-shutoff should be triggered
-        if (
-          state.running && state.started !== 0 
-          && (
-            (Date.now() - (state.started || 0))
-            >= (60000 * Config.e5cc.autoShutoff)
-          )
-        ) {
-          for (let i = 0; i < 3; i++) {
-            playSound(Sounds.beep);
-            await new Promise(resolve => setTimeout(resolve, 750));
-          }
-          await toggleE5ccState();
-        }
-
-        if (
-          lastState.pv !== state.pv 
-          || lastState.sp !== state.sp 
-          || lastState.running !== state.running 
-          || lastState.tuning !== state.tuning
-          || lastState.nocoil !== state.nocoil
-          || state.running
-        ) {
-          onData?.(lastState, state);
-          lastState = state;
-        }
-      } catch (e) {
-        console.error(`Error getting state: ${e.message}`);
+    try {
+      if (lock.locked) {
+        setTimeout(async () => {
+          await getData();
+          return;
+        }, INTERVAL);
+        return;    
       }
-      setTimeout(async () => {
-        await getData();
-        resolve();
-      }, INTERVAL);
-    });
-  }
+
+      await lock.acquire();
+      try {
+        const statusReading = await modbus.readHoldingRegisters(Constants.e5cc.variables.status, 2);
+        const status = statusReading?.data?.[1];
+        const nocoil = (statusReading?.data?.[0] & Constants.e5cc.flags.nocoil) === Constants.e5cc.flags.nocoil;
+        const running = (status & Constants.e5cc.flags.stopped) !== Constants.e5cc.flags.stopped;
+        state = {
+          pv: nocoil ? 0 : (await modbus.readHoldingRegisters(Constants.e5cc.variables.presentValue, 1))?.data?.[0] || 0,
+          sp: (await modbus.readHoldingRegisters(Constants.e5cc.variables.setPoint, 1))?.data?.[0] || 0,
+          running,
+          tuning: (status & Constants.e5cc.flags.tuning) === Constants.e5cc.flags.tuning,
+          nocoil,
+          started: !state.running && running ? Date.now() : state.started,
+        };
+      } finally {
+        lock.release();
+      }
+
+      // if auto-shutoff should be triggered
+      if (
+        state.running && state.started !== 0 
+        && (
+          (Date.now() - (state.started || 0))
+          >= (60000 * Config.e5cc.autoShutoff)
+        )
+      ) {
+        for (let i = 0; i < 3; i++) {
+          playSound(Sounds.beep);
+          await new Promise(resolve => setTimeout(resolve, 750));
+        }
+        await toggleE5ccState();
+      }
+
+      if (
+        lastState.pv !== state.pv 
+        || lastState.sp !== state.sp 
+        || lastState.running !== state.running 
+        || lastState.tuning !== state.tuning
+        || lastState.nocoil !== state.nocoil
+        || state.running
+      ) {
+        onData?.(lastState, state);
+        lastState = state;
+      }
+    } catch (e) {
+      console.error(`Error getting state: ${e.message}`);
+    }
+    setTimeout(async () => {
+      await getData();
+      return;
+    }, INTERVAL);
+  };
 
   getData();
-}
+};
 
-export const closeE5cc = () => {
+export const closeE5cc = (): void => {
   if (modbus?.isOpen) {
     modbus.close(() => {
       console.log('Omron E5CC connection closed.');
     });
   }
-}
+};
 
 export const toggleE5ccState = async (): Promise<void> => {
   try {
@@ -167,7 +163,7 @@ export const toggleE5ccState = async (): Promise<void> => {
   } finally {
     lock.release();
   }
-}
+};
 
 export const updateE5ccSetPoint = async (value: number): Promise<number> => {
   try {
@@ -180,25 +176,25 @@ export const updateE5ccSetPoint = async (value: number): Promise<number> => {
   } finally {
     lock.release();
   }
-}
+};
 
-export  const toggleE5ccTuning = async (percent: 40|100 = 100) => {
+export  const toggleE5ccTuning = async (percent: 40|100 = 100): Promise<void> => {
   try {
     await lock.acquire();
-    const result = modbus.writeRegister(
+    modbus.writeRegister(
       Constants.e5cc.commands.run, 
       state.tuning
         ? Constants.e5cc.commands.tuneCancel
         : percent === 100
-        ? Constants.e5cc.commands.tune100
-        : Constants.e5cc.commands.tune40,
+          ? Constants.e5cc.commands.tune100
+          : Constants.e5cc.commands.tune40,
     );
   } catch (e) {
     console.error(`Error toggling tuning state: ${e.message}`);
   } finally {
     lock.release();
   }
-}
+};
 
 export const getPidSettings = async (): Promise<{ p: number, i: number, d: number}|undefined> => {
   try {
@@ -214,7 +210,7 @@ export const getPidSettings = async (): Promise<{ p: number, i: number, d: numbe
   } finally {
     lock.release();
   }
-}
+};
 
 export const setPidSettings = async (p: number, i: number, d: number): Promise<void> => {
   try {
@@ -228,4 +224,4 @@ export const setPidSettings = async (p: number, i: number, d: number): Promise<v
   } finally {
     lock.release();
   }
-}
+};

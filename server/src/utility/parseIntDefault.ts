@@ -5,4 +5,4 @@ export const parseIntDefault = (value: string|undefined, defaultValue: number): 
   } else {
     return parsed;
   }
-}
+};

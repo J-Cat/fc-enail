@@ -2,7 +2,7 @@ export class Lock {
   public locked = false;
   private onRelease: (() => void)[] = [];
   
-  public acquire = () => {
+  public acquire = (): Promise<void> => {
     return new Promise(resolve => {
       if (!this.locked) {
         this.locked = true;
@@ -14,13 +14,13 @@ export class Lock {
           this.locked = true;
           return resolve();
         }
-      }
+      };
   
       this.onRelease.push(tryAcquire);
     });
   }
   
-  public release = () => {
+  public release = (): void => {
     this.locked = false;
     let release = this.onRelease.pop();
     while (release) {

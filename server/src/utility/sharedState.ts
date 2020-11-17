@@ -1,4 +1,5 @@
 import { IE5ccState } from '../hardware/e5cc';
+import { IIcon } from '../models/icons';
 import { Lock } from './Lock';
 
 export type ChangeFunc = (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void;
@@ -14,7 +15,10 @@ export interface IMenu {
   max: number;
   action?: string;
   menuItems: string[];
+  icon?: IIcon;
+  isMoving?: boolean;
   onClick: (index: number, action?: string) => void;
+  onLongClick?: (index: number) => Promise<void>;
 }
 
 export interface IMode {
@@ -42,13 +46,21 @@ export interface ISharedState extends IE5ccState {
     text: string;
     activeChar: string;
     inputMode: 'lowercase' | 'uppercase' | 'symbols';
+    onOk?: (text: string) => Promise<void>;
   };
+  numberinput?: {
+    value: number;
+    min: number;
+    max: number;
+    step: number;
+    onClick?: (value: number) => Promise<void>;
+  }
 }
 
 let state: ISharedState = { menu: [], loading: false, };
 let lastState: ISharedState = { menu: [], loading: false, };
 
-export const setNextMode = (source: 'e5cc'|'api'|'self') => {
+export const setNextMode = (source: 'e5cc'|'api'|'self'): void => {
   const keys = Object.keys(state.modes || []);
   const index = keys.findIndex(key => key === state.mode);
   let newIndex = 0;
@@ -58,14 +70,14 @@ export const setNextMode = (source: 'e5cc'|'api'|'self') => {
     newIndex = 0;
   }
   setSharedState({ mode: keys[newIndex] }, source);
-}
+};
 
 export const registerStateChange = (
   key: string,
   onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void | Promise<void>,
-) => {
+): void => {
   onChanges[key] = onChange;
-}
+};
 
 export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api'|'self' = 'api'): Promise<{lastState: ISharedState, state: ISharedState}> => {
   await lock.acquire();
@@ -86,7 +98,7 @@ export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api
   } finally {
     lock.release();
   }
-}
+};
 
 export const getSharedState = async (): Promise<ISharedState|undefined> => {
   await lock.acquire();
@@ -95,4 +107,4 @@ export const getSharedState = async (): Promise<ISharedState|undefined> => {
   } finally {
     lock.release();
   }
-}
+};

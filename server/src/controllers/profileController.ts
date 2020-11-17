@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { registerConfigChange } from '../config';
 import { getPidSettings, setPidSettings, toggleE5ccTuning } from '../hardware/e5cc';
 import { 
   getCurrentProfile, 
@@ -12,10 +11,6 @@ import {
   deleteProfile as deleteLocalDbProfile,
 } from '../utility/localDb';
 import { Guid } from 'guid-typescript';
-
-let Config = registerConfigChange(newConfig => {
-  Config = newConfig;
-});
 
 export const getProfiles = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -37,12 +32,12 @@ export const getProfiles = async (req: Request, res: Response): Promise<Response
 
     return res.status(HttpStatusCode.OK).json({ currentProfile, profiles });
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};
 
 export const saveProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -54,12 +49,12 @@ export const saveProfile = async (req: Request, res: Response): Promise<Response
     }
     return res.status(HttpStatusCode.OK).json(updated);
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};
 
 export const setCurrentProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -72,12 +67,12 @@ export const setCurrentProfile = async (req: Request, res: Response): Promise<Re
     await setPidSettings(profile.p, profile.i, profile.d);
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};
 
 export const deleteProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -89,21 +84,21 @@ export const deleteProfile = async (req: Request, res: Response): Promise<Respon
     await deleteLocalDbProfile(key);
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};
 
 export const toggleTuning = async (req: Request, res: Response): Promise<Response> => {
   try {
     await toggleE5ccTuning();
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-      const err: Error = e as Error;
+    const err: Error = e as Error;
 
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
-}
+};

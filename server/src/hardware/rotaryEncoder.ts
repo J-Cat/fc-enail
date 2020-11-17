@@ -1,33 +1,35 @@
-import { Console } from 'console';
 import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
 import { Lock } from '../utility/Lock';
 
-let Config = registerConfigChange(newConfig => {
+let Config = registerConfigChange('rotary-encoder', newConfig => {
   Config = newConfig;
 });
 
 const lock = new Lock();
 
-const MIN_VALUE = Config.encoder.minValue;
-const MAX_VALUE = Config.encoder.maxValue;
-
-const MAX_VELOCITY = Config.encoder.maxVelocity;
 const rotEncTable = [0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0];
 
 let currentValue = 0;
 let store = 0;
 let prevNextCode = 0;
 let lastValue = -1;
-let velocity: number[] = [0];
+const velocity: number[] = [0];
 let _enforceMinMax = true;
+let overrideMin: number | undefined = undefined;
+let overrideMax: number | undefined = undefined;
 
-export const setEncoderValue = (value: number, enforceMinMax: boolean = true) => {
+export const setEncoderValue = (
+  value: number, enforceMinMax = true, 
+  min: number | undefined = undefined, max: number | undefined = undefined
+): void => {
   currentValue = value;
   _enforceMinMax = enforceMinMax;
-}
+  overrideMin = min;
+  overrideMax = max;
+};
 
-export const closeEncoder = () => {
+export const closeEncoder = (): void => {
   if (gpioA) {
     gpioA.unwatchAll();
   }
@@ -37,7 +39,7 @@ export const closeEncoder = () => {
   if (gpioSwitch) {
     gpioSwitch.unwatchAll();
   }
-}
+};
 
 let gpioA: Gpio;
 let gpioB: Gpio;
@@ -49,16 +51,16 @@ export const initEncoder = (
   pinA: number = Config.encoder.A, 
   pinB: number = Config.encoder.B, 
   pinSwitch: number = Config.encoder.S, 
-  valueChanged: (value: number) => Promise<void> = async (value: number) => {},
-  onClick: () => Promise<void> = async () => {},
+  valueChanged?: (value: number) => Promise<void>,
+  onClick?: () => Promise<void>,
   frequency = Config.encoder.frequency,
-) => {
+): void => {
   gpioA = new Gpio(pinA, 'in', 'both'); 
   gpioB = new Gpio(pinB, 'in', 'both');
   gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
   const processTick = async (from: 'a'|'b', value: number) => {  
-    lock.acquire();
+    await lock.acquire();
     try {
       const a = from === 'a' ? value : lastA;
       const b = from === 'b' ? value : lastB;
@@ -86,16 +88,16 @@ export const initEncoder = (
               Math.round(1 / ((Date.now() - velocity?.[0]) / 1000)),
               1
             ), 
-            MAX_VELOCITY
+            Config.encoder.maxVelocity
           );
-          if ((currentValue + scale > MAX_VALUE) && _enforceMinMax) {
-            currentValue = MAX_VALUE;
+          if ((currentValue + scale > (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue)) && _enforceMinMax) {
+            currentValue = (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue);
           } else {
             currentValue += scale;
           }
         }
         if ((store&0xff) === 0x17) {
-          if (velocity.length > 4) {
+          if (velocity.length > 3) {
             velocity.shift();
           }
           velocity.push(Date.now());
@@ -104,10 +106,10 @@ export const initEncoder = (
               Math.round(1 / ((Date.now() - velocity?.[0]) / 1000)),
               1
             ), 
-            MAX_VELOCITY
+            Config.encoder.maxVelocity,
           );
-          if ((currentValue - scale < MIN_VALUE) && _enforceMinMax) {
-            currentValue = MIN_VALUE;
+          if ((currentValue - scale < (overrideMin !== undefined ? overrideMin : Config.encoder.minValue)) && _enforceMinMax) {
+            currentValue = (overrideMin !== undefined ? overrideMin : Config.encoder.minValue);
           } else {
             currentValue -= scale;
           }
@@ -119,7 +121,7 @@ export const initEncoder = (
     } finally {
       lock.release();
     }
-  }
+  };
 
   gpioA.watch(async (err, value) => {
     if (err) {
@@ -139,19 +141,19 @@ export const initEncoder = (
     await processTick('b', value);
   });
 
-  gpioSwitch.watch((err, value) => {
+  gpioSwitch.watch((err) => {
     if (err) {
       console.error(err);
       return;
     }
 
-    onClick();
+    onClick?.();
   });
 
   const emitValue = (): Promise<void> => {
     return new Promise(resolve => {
       if (currentValue !== lastValue) {
-        valueChanged(currentValue);        
+        valueChanged?.(currentValue);        
         lastValue = currentValue;
       }
       setTimeout(async () => {
@@ -159,7 +161,7 @@ export const initEncoder = (
         await emitValue();
       }, frequency);  
     });
-  }
+  };
 
   emitValue();
-}
+};

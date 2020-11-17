@@ -20,7 +20,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   const config = () => {
     port = parseIntDefault(process.env.API_PORT, 8000);
     baseRoutePath = process.env.API_BASE_ROUTE_PATH || '';
-  }
+  };
 
   // Configure Express middleware.
   const middleware = (app: Application) => {
@@ -38,7 +38,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(logger('dev'));
     app.use(bodyParser.json({ limit: '50mb' }));
     app.use(bodyParser.urlencoded({ extended: true }));
-  }
+  };
 
   // static files (client)
   const serveStatic = (app: Application) => {
@@ -49,7 +49,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
         : path.join(__dirname, 'client/index.html');
       res.sendFile(filePath);
     });
-  }
+  };
 
   // token/auth middleware
   const verifyToken = (app: Application) => {
@@ -95,7 +95,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
 
     });
 
-  }
+  };
 
   // Configure API endpoints.
   const routes = (app: Application) => {
@@ -124,7 +124,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
           success: false,
         });
     });
-  }
+  };
 
   const listen = (server: Server) => {
     if (!server) {
@@ -135,7 +135,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     server.listen(port, () => {
       console.log('Running server on port %s', port);
     });
-  }
+  };
 
   const handleExceptions = () => {
     (process as NodeJS.EventEmitter).on('uncaughtException', (err: { code: string; message: string }) => {
@@ -145,7 +145,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
         throw err;
       }
     });
-  }
+  };
 
   // initialize 
   config();
@@ -153,7 +153,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   const app: Application = express();
   middleware(app);
   serveStatic(app);
-  verifyToken(app)
+  verifyToken(app);
   routes(app);
 
   const server = createServer(app);
@@ -162,6 +162,6 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   handleExceptions();
 
   return server;
-}
+};
 
 
