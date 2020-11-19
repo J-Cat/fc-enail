@@ -48,7 +48,6 @@ export const loadConfig = (newEnv?: string): void => {
   if (newEnv) {
     const parsed = dotenv.parse(newEnv);
     for (const key of Object.keys(parsed)) {
-      console.log(`Updating ${key}=${parsed[key]}`);
       process.env[key] = parsed[key];
     }
   }

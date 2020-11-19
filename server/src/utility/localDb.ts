@@ -27,12 +27,12 @@ const adapter = new FileAsync<ILocalDb>('./db.json', {
 });
 let db: LowdbAsync<ILocalDb>;
 
-(async () => {
+export const initLocalDb = async (): Promise<void> => {
   db = await Lowdb(adapter);
   if (!db.get('profiles')) {
     await db.set('profiles', []).write();
   }
-})();
+};
 
 export const getUrl = (): string => {
   return db.get('url').value() || '';
@@ -62,9 +62,10 @@ export const setCurrentProfile = async (key: string): Promise<void> => {
   return db.set('currentProfile', key).write();
 };
 
-export const getProfile = (key: string): IProfile => {
-  const profile = db.get('profiles').find(p => p.key === key);
-  return profile?.value?.();
+export const getProfile = (key: string): { index: number; profile: IProfile } => {
+  const profiles = db.get('profiles').value();
+  const index = profiles.findIndex(p => p.key === key);
+  return { index, profile: profiles[index] };
 };
 
 export const setProfile = async (profile: IProfile): Promise<IProfile> => {
@@ -73,9 +74,10 @@ export const setProfile = async (profile: IProfile): Promise<IProfile> => {
     const p = await existing.assign(profile).write();
     return p;
   } else {
-    const p = await db.get('profiles').push({ ...profile, key: Guid.create().toString() }).write();
-    return p?.[0];
-  }
+    const p = { ...profile, key: Guid.create().toString() };
+    await db.get('profiles').push(p).write();
+    return p;
+  }  
 };
 
 export const deleteProfile = async (key: string): Promise<void> => {
@@ -88,7 +90,7 @@ export const deleteProfile = async (key: string): Promise<void> => {
 };
 
 export const getProfiles = (): IProfile[] => {
-  return db.get('profiles').value();
+  return db.get('profiles').sort((a, b) => a.title.localeCompare(b.title)).value();
 };
 
 export const getSsids = (): string[] => {

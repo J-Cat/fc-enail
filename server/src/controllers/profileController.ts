@@ -1,104 +1,74 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { getPidSettings, setPidSettings, toggleE5ccTuning } from '../hardware/e5cc';
-import { 
-  getCurrentProfile, 
-  getProfile, 
-  getProfiles as getLocalDbProfiles, 
-  IProfile, 
-  setCurrentProfile as setLocalDbCurrentProfile, 
-  setProfile,
-  deleteProfile as deleteLocalDbProfile,
-} from '../utility/localDb';
-import { Guid } from 'guid-typescript';
+import { IProfile } from '../utility/localDb';
+import {
+  getProfiles as getProfilesDao,
+  deleteProfile as deleteProfileDao,
+  saveProfile as saveProfileDao,
+  setCurrentProfile as setCurrentProfileDao,
+  toggleTuning as toggleTuningDao,
+} from '../dao/profilesDao';
 
 export const getProfiles = async (req: Request, res: Response): Promise<Response> => {
   try {
-    let currentProfile = getCurrentProfile();
-    let profiles = getLocalDbProfiles();
-    if (profiles.length === 0) {
-      const currentPidSettings = await getPidSettings();
-      if (currentPidSettings) {
-        const profile = await setProfile({ 
-          key: Guid.createEmpty().toString(),
-          title: 'Default',
-          ...currentPidSettings,
-        });
-        profiles = [profile];
-        currentProfile = profile.key;
-        await setLocalDbCurrentProfile(currentProfile);
-      }
+    const { error, currentProfile, profiles } =  await getProfilesDao();
+    if (error) {
+      throw new Error(error);
     }
 
     return res.status(HttpStatusCode.OK).json({ currentProfile, profiles });
   } catch (e) {
-    const err: Error = e as Error;
-
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: e.message });
   }
 };
 
 export const saveProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
     const profile: IProfile = req.body;
-    const currentProfile = getCurrentProfile();
-    const updated = await setProfile(profile);
-    if (currentProfile === profile.key) {
-      await setPidSettings(profile.p, profile.i, profile.d);      
+    const { error, updated } = await saveProfileDao(profile);
+    if (error) {
+      throw new Error(error);
     }
     return res.status(HttpStatusCode.OK).json(updated);
   } catch (e) {
-    const err: Error = e as Error;
-
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: e.message });
   }
 };
 
 export const setCurrentProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
     const key: string = req.body.key;
-    const profile = getProfile(key);
-    if (!profile) {
-      throw new Error('The profile you specified does not exist.');
+    const { error } = await setCurrentProfileDao(key);
+    if (error) {
+      throw new Error(error);
     }
-    await setLocalDbCurrentProfile(key);
-    await setPidSettings(profile.p, profile.i, profile.d);
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-    const err: Error = e as Error;
-
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: e.message });
   }
 };
 
 export const deleteProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
     const key: string = req.body.key;
-    const profile = getProfile(key);
-    if (!profile) {
-      throw new Error('The profile you specified does not exist.');
+    const { error } = await deleteProfileDao(key);
+    if (error) {
+      throw new Error(error);
     }
-    await deleteLocalDbProfile(key);
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-    const err: Error = e as Error;
-
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: e.message });
   }
 };
 
 export const toggleTuning = async (req: Request, res: Response): Promise<Response> => {
   try {
-    await toggleE5ccTuning();
+    const { error } = await toggleTuningDao();
+    if (error) {
+      throw new Error(error);
+    }
     return res.sendStatus(HttpStatusCode.OK);
   } catch (e) {
-    const err: Error = e as Error;
-
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: e.message });
   }
 };

@@ -1,20 +1,18 @@
 import { updateE5ccSetPoint } from '../hardware/e5cc';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
-import { ISharedState, registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
+import { IModeInstance } from '../models/IModeInstance';
+import { registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
 
-let state: ISharedState;
-
-registerStateChange('home-mode', (oldState, newState) => {
+let state = registerStateChange('mode-home', (oldState, newState) => {
   state = newState;
   if ((oldState?.mode !== newState.mode) && (newState.mode === 'home') && (newState.sp)) {
     setEncoderValue(newState.sp);
   }
 });
 
-export const HomeMode = {
+export const HomeMode: IModeInstance = {
   key: 'home',
   onClick: async (): Promise<void> => {
-    console.log('click');
     await setSharedState({ running: !state.running });          
   },
   onEncoderClick: async (): Promise<void> => {

@@ -2,6 +2,7 @@ import ModbusRTU from 'modbus-serial';
 import { registerConfigChange } from '../config';
 import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
+import { getQuickSet } from '../utility/localDb';
 import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../utility/sharedState';
 import { playSound } from './sound';
@@ -9,6 +10,7 @@ import { playSound } from './sound';
 let Config = registerConfigChange('e5cc', newConfig => {
   Config = newConfig;
 });
+let presets: number[] = [];
 
 registerStateChange('e5cc', async (oldState, newState, source) => {
   if (source === 'e5cc') {
@@ -16,10 +18,16 @@ registerStateChange('e5cc', async (oldState, newState, source) => {
   }
 
   if (oldState?.running !== newState.running) {
-    toggleE5ccState();
+    await toggleE5ccState();
   } else if (newState.sp && oldState?.sp !== newState.sp) {
-    updateE5ccSetPoint(newState.sp);
-  }  
+    await updateE5ccSetPoint(newState.sp);
+  } else if (newState.mode === 'presets') {
+    if (newState.mode !== oldState?.mode) {
+      presets = getQuickSet();  
+    } else if (newState.currentPreset !== oldState.currentPreset) {
+      await updateE5ccSetPoint(presets[newState.currentPreset || 0]);
+    }
+  }
 });
 
 const DEVICE = Config.e5cc.device;

@@ -14,6 +14,10 @@ import { Sounds } from './models/sounds';
 import { initTunnel } from './tunnel';
 import { HomeMode } from './modes/homeMode';
 import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
+import { PresetsMode } from './modes/presetsMode';
+import { initProfilesMenu, ProfilesMode } from './modes/profilesMode';
+import { initLocalDb } from './utility/localDb';
+import { ScriptsMode } from './modes/scriptsMode';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
@@ -76,7 +80,6 @@ const onLongButtonClick = async () => {
   if (!processAction()) {
     return;
   }
-  console.log('long click');
 
   await currentState.modes?.[currentState.mode || '']?.onLongClick?.();
 }; 
@@ -87,7 +90,6 @@ const onReallyLongButtonClick = () => {
     return;
   }
   // restart service
-  console.log('really long click');
 };
 
 // reboot on super long click
@@ -166,15 +168,24 @@ const onSharedStateChange = async (
 (async () => {
   dotenv.config();
 
+  await initLocalDb();
+
+  const settingsMenu = initSettingsMenu();
   setSharedState({
-    menu: [initSettingsMenu()],
+    menu: [settingsMenu],
+    menus: [
+      [settingsMenu],
+      [initProfilesMenu()],
+    ],
     modes: {
       'home': HomeMode,
+      'presets': PresetsMode,
+      'scripts': ScriptsMode,
+      'profiles': ProfilesMode,
       'settings': SettingsMode,      
     },
     mode: 'home',
   });
-  console.log(JSON.stringify(currentState, null, ' '));
 
   const server = Api();
   socketApi(server);

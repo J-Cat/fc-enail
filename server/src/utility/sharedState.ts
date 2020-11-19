@@ -19,6 +19,7 @@ export interface IMenu {
   isMoving?: boolean;
   onClick: (index: number, action?: string) => void;
   onLongClick?: (index: number) => Promise<void>;
+  onMove?: () => Promise<void>;
 }
 
 export interface IMode {
@@ -37,6 +38,7 @@ export interface ISharedState extends IE5ccState {
   url?: string;
   mode?: string,
   menu?: IMenu[];
+  menus?: IMenu[][];
   loading?: boolean;
   loadingMessage?: string;
   modes?: {
@@ -55,6 +57,13 @@ export interface ISharedState extends IE5ccState {
     step: number;
     onClick?: (value: number) => Promise<void>;
   }
+  currentPreset?: number;
+  prompt?: {
+    text: string;
+    current: boolean;
+    onOk: () => Promise<void>;
+  }
+  currentProfile?: number;
 }
 
 let state: ISharedState = { menu: [], loading: false, };
@@ -75,8 +84,9 @@ export const setNextMode = (source: 'e5cc'|'api'|'self'): void => {
 export const registerStateChange = (
   key: string,
   onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void | Promise<void>,
-): void => {
+): ISharedState => {
   onChanges[key] = onChange;
+  return state;
 };
 
 export const setSharedState = async (newState: ISharedState, source: 'e5cc'|'api'|'self' = 'api'): Promise<{lastState: ISharedState, state: ISharedState}> => {

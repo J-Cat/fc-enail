@@ -1,7 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { validateToken } from './controllers/authController';
 import { getPidSettings, IE5ccState } from './hardware/e5cc';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { getCurrentProfile, getProfile, IProfile } from './utility/localDb';
 import { registerStateChange } from './utility/sharedState';
 
@@ -12,9 +12,9 @@ registerStateChange('socketio', async (oldState, newState, source) => {
     oldState?.tuning !== undefined && newState.tuning !== undefined
     && oldState?.tuning !== newState.tuning && !newState.tuning
   ) {
-    const pid = await getPidSettings()
+    const pid = await getPidSettings();
     if (pid) {
-      let profile = getProfile(getCurrentProfile());
+      const { profile } = getProfile(getCurrentProfile());
 
       if (profile) {
         emitPidSettings({
