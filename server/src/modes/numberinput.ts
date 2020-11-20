@@ -1,8 +1,10 @@
+import { Color, Font, Ioledjs, Layer } from 'ssd1306-i2c-js';
+import { fontSize } from '../hardware/display';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { registerStateChange, setSharedState } from '../utility/sharedState';
 import { getMenuUpdate } from './menu';
 
-let state = registerStateChange('number-input', (oldState, newState) => {
+let state = registerStateChange('number-input', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 
@@ -64,4 +66,29 @@ export const setNumberInput = (label: string, min: number, max: number, initialV
       }
     },
   });
+};
+
+export const renderNumberInput = (display: Ioledjs): void => {
+  if (state.numberinput?.value === undefined) {
+    return;
+  }
+
+  const menu = state.menu?.[state.menu?.length-1];
+  const label = menu?.action || ' ';
+
+  display.setFont(Font.UbuntuMono_10ptFontInfo);
+  const [labelFontWidth] = fontSize(Font.UbuntuMono_10ptFontInfo);
+  const labelX = Math.floor((128 - (label.length * labelFontWidth)) / 2);
+  display.drawString(labelX, 16, label, 1, Color.White, Layer.Layer0);
+
+  display.setFont(Font.UbuntuMono_16ptFontInfo);
+  const [fontWidth] = fontSize(Font.UbuntuMono_16ptFontInfo);
+  const width = state.numberinput?.value.toString().length * fontWidth;
+  if (width === 0) {
+    return;
+  }
+
+  const x = Math.floor((128 - width) / 2);
+  display.drawString(x, 29, state.numberinput?.value.toString(), 1, Color.White, Layer.Layer0);  
+  display.refresh();
 };

@@ -7,7 +7,7 @@ import { registerStateChange } from './utility/sharedState';
 
 const io = new Server();
 
-registerStateChange('socketio', async (oldState, newState, source) => {
+registerStateChange('socketio', async (oldState, newState): Promise<void> => {
   if (
     oldState?.tuning !== undefined && newState.tuning !== undefined
     && oldState?.tuning !== newState.tuning && !newState.tuning
@@ -24,7 +24,7 @@ registerStateChange('socketio', async (oldState, newState, source) => {
       }  
     }
   }
-})
+});
 
 export const socketApi = (server: HttpServer): void => {
   io.attach(
@@ -54,7 +54,7 @@ export const socketApi = (server: HttpServer): void => {
     }
     next();
   });
-}
+};
 
 export const emitE5cc = (data: IE5ccState): boolean => {
   try {
@@ -64,7 +64,7 @@ export const emitE5cc = (data: IE5ccState): boolean => {
     console.error(`Socket IO Emit Error: ${e.message}`);
     return false;
   }
-}
+};
 
 export const emitPidSettings = (profile: IProfile): boolean => {
   try {
@@ -74,4 +74,4 @@ export const emitPidSettings = (profile: IProfile): boolean => {
     console.error(`Socket IO Emit Error: ${e.message}`);
     return false;
   }
-}
+};

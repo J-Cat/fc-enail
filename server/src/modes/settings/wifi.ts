@@ -7,7 +7,7 @@ import { Sounds } from '../../models/sounds';
 import { setSharedState, registerStateChange } from '../../utility/sharedState';
 import { setTextInput } from '../textinput';
 
-let state = registerStateChange('mode-settings-wifi', (oldState, newState) => {
+let state = registerStateChange('mode-settings-wifi', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 

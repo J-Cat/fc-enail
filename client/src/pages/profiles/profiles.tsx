@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { useEnsureLoaded } from '../../hooks/useEnsureLoaded';
 import { deleteProfile, saveProfile, setCurrentProfile as setProfile, toggleTuning } from '../../store/reducers/profileReducer';
 import { RootState } from '../../store/reducers/rootReducer';
 import { IProfile } from '../../store/state/IProfileState';
@@ -31,7 +30,7 @@ const ProfilesPage: React.FC = () => {
   const formRef = useRef<FormInstance>();
 
   useEffect(() => {
-    setCurrentProfile(profile)
+    setCurrentProfile(profile);
     setFormValues(profile);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
@@ -46,7 +45,7 @@ const ProfilesPage: React.FC = () => {
       return;
     }
     setFormValues(key);
-  }
+  };
 
   const setFormValues = (key: string) => {
     const prf = profiles.find(p => p.key === key);
@@ -59,7 +58,7 @@ const ProfilesPage: React.FC = () => {
       i: prf.i,
       d: prf.d,
     });
-  }
+  };
 
   const updateProfile = async (formData: IFormData) => {
     Modal.confirm({
@@ -67,10 +66,10 @@ const ProfilesPage: React.FC = () => {
       content: t('profiles.updateConfirmContent', 'Do you want to update the profile: {{profile}}', { profile: formData.title }),
       onOk: async () => {
         const profile = currentProfile === 'new-profile'
-        ? {
-          key: '',
-        }
-        : profiles.find(p => p.key === currentProfile);
+          ? {
+            key: '',
+          }
+          : profiles.find(p => p.key === currentProfile);
         if (profile) {
           const result = await dispatch(saveProfile({
             ...profile,
@@ -91,7 +90,7 @@ const ProfilesPage: React.FC = () => {
         }
       },
     });
-  }
+  };
 
   const setActive = async () => {
     const prf = profiles.find(p => p.key === currentProfile);
@@ -111,7 +110,7 @@ const ProfilesPage: React.FC = () => {
         }
       },
     });
-  }
+  };
 
   const onDeleteProfile = async () => {
     const prf = profiles.find(p => p.key === currentProfile);
@@ -134,7 +133,7 @@ const ProfilesPage: React.FC = () => {
         setFormValues(profile);
       },
     });
-  }
+  };
 
   const onAutoTune = async () => {
     const prf = profiles.find(p => p.key === currentProfile);
@@ -166,7 +165,7 @@ const ProfilesPage: React.FC = () => {
         },
       });
     }
-  }
+  };
 
   if (loading) {
     return <Spin />;
@@ -203,27 +202,27 @@ const ProfilesPage: React.FC = () => {
     </Form.Item>
 
     <Form.Item className="button-row">
-        <Button type="primary" htmlType="submit" disabled={requesting || tuning}>
-          {t('profiles.buttonSave', 'Save')}
-        </Button>
+      <Button type="primary" htmlType="submit" disabled={requesting || tuning}>
+        {t('profiles.buttonSave', 'Save')}
+      </Button>
         &nbsp;
-        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
-          onClick={setActive}>
-          {t('button.setActive', 'Set Active')}
-        </Button>
+      <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
+        onClick={setActive}>
+        {t('button.setActive', 'Set Active')}
+      </Button>
         &nbsp;
-        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
-          onClick={onDeleteProfile}>
-          {t('button.delete', 'Delete')}
-        </Button>
+      <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
+        onClick={onDeleteProfile}>
+        {t('button.delete', 'Delete')}
+      </Button>
         &nbsp;
-        <Button type="primary" htmlType="button" hidden={currentProfile !== profile}
-          onClick={onAutoTune}>
-          {!tuning ? t('button.tune', 'Auto-Tune') : t('button.cancelTune', 'Cancel Auto-Tune')}
-        </Button>
-      </Form.Item>
+      <Button type="primary" htmlType="button" hidden={currentProfile !== profile}
+        onClick={onAutoTune}>
+        {!tuning ? t('button.tune', 'Auto-Tune') : t('button.cancelTune', 'Cancel Auto-Tune')}
+      </Button>
+    </Form.Item>
   </Form>;
-}
+};
 
 const profilesPage = withRouter(ProfilesPage);
 export { profilesPage as ProfilesPage };

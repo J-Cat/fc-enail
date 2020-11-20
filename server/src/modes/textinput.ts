@@ -1,9 +1,11 @@
+import { Color, Font, Ioledjs, Layer } from 'ssd1306-i2c-js';
+import { drawStringWrapped } from '../hardware/display';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { Constants } from '../models/Constants';
 import { registerStateChange, setSharedState } from '../utility/sharedState';
 import { getMenuUpdate } from './menu';
 
-let state = registerStateChange('text-input', (oldState, newState) => {
+let state = registerStateChange('text-input', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 
@@ -132,4 +134,66 @@ export const setTextInput = (label: string, initialValue: string, callback: (tex
       }
     },
   });
+};
+
+let flashState = false;
+export const renderTextInput = (display: Ioledjs): void => {
+  const menu = state.menu?.[state.menu?.length-1];
+  const label = menu?.action || ' ';
+  display.setFont(Font.UbuntuMono_8ptFontInfo);
+  display.drawString(0, 0, label, 1, Color.White, Layer.Layer0);
+  display.drawString(
+    0, 11, 
+    `${state.textinput?.text}${flashState === true ? '_' : ' '}${'_'.repeat(128-(state.textinput?.text?.length || 0))}`, 
+    1, Color.White, Layer.Layer0
+  );
+
+  const lines = Constants.textInput[state.textinput?.inputMode || 'lowercase'];
+  const lineLength = Math.ceil(lines.length / 2);
+  const startX = 6;
+
+  drawStringWrapped(
+    startX, 29, 
+    lines,
+    Font.UbuntuMono_8ptFontInfo, 
+    0, 
+    lineLength * 6,
+    11
+  );
+  const charPos = lines.indexOf(state.textinput?.activeChar || '--');
+  if (charPos >= 0) {
+    const x = startX + (charPos * 6) - (charPos > lineLength ? (lineLength * 6) : 0);
+    const y = 29 + (charPos >= lineLength ? 10 : 0);
+    display.drawRect(x-1, y-1, 8, 12, Color.White, Layer.Layer0);
+  }
+  
+  if (state.textinput?.activeChar === 'mode') {
+    display.fillRect(0, 55, 36, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(
+    0, 55, 
+    state.textinput?.inputMode === 'lowercase' 
+      ? 'upper'
+      : state.textinput?.inputMode === 'uppercase'
+        ? 'symbol'
+        : 'lower', 
+    1,
+    state.textinput?.activeChar === 'mode' ? Color.Inverse : Color.White, 
+    Layer.Layer0
+  );
+
+  if (state.textinput?.activeChar === 'del') {
+    display.fillRect(38, 55, 18, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(38, 55, 'Del', 1, state.textinput?.activeChar === 'del' ? Color.Inverse : Color.White, Layer.Layer0);
+  if (state.textinput?.activeChar === 'cancel') {
+    display.fillRect(64, 55, 36, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(64, 55, 'Cancel', 1, state.textinput?.activeChar === 'cancel' ? Color.Inverse : Color.White, Layer.Layer0);
+  if (state.textinput?.activeChar === 'ok') {
+    display.fillRect(108, 55, 12, 10, Color.White, Layer.Layer0);
+  }
+  display.drawString(108, 55, 'Ok', 1, state.textinput?.activeChar === 'ok' ? Color.Inverse : Color.White, Layer.Layer0);
+  display.refresh();
+  flashState = !flashState;
 };

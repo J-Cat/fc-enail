@@ -14,7 +14,7 @@ import { setTextInput } from './textinput';
 
 let profiles: IProfile[] = [];
 
-let state = registerStateChange('mode-profiles', (oldState, newState) => {
+let state = registerStateChange('mode-profiles', async (oldState, newState): Promise<void> => {
   state = newState;
   if ((oldState?.mode !== newState.mode) && (newState.mode === 'profiles')) {
     profiles = getProfiles();

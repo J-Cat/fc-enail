@@ -1,10 +1,12 @@
 import ModbusRTU from 'modbus-serial';
 import { registerConfigChange } from '../config';
+import { saveProfile } from '../dao/profilesDao';
 import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
-import { getQuickSet } from '../utility/localDb';
+import { getCurrentProfile, getProfile, getQuickSet } from '../utility/localDb';
 import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../utility/sharedState';
+import { showMessage } from './display';
 import { playSound } from './sound';
 
 let Config = registerConfigChange('e5cc', newConfig => {
@@ -13,21 +15,38 @@ let Config = registerConfigChange('e5cc', newConfig => {
 let presets: number[] = [];
 
 registerStateChange('e5cc', async (oldState, newState, source) => {
+  if (oldState?.tuning !== newState.tuning && !newState.tuning) {
+    const pid = await getPidSettings();
+    if (!pid) {
+      showMessage('Error updating profile.');
+      return;
+    }
+    const key = getCurrentProfile();
+    const { profile } = getProfile(key);
+    await saveProfile({
+      ...profile, 
+      ...pid,
+    });
+  }
+
   if (source === 'e5cc') {
     return;
   }
 
   if (oldState?.running !== newState.running) {
     await toggleE5ccState();
-  } else if (newState.sp && oldState?.sp !== newState.sp) {
+  }
+  if (newState.sp && oldState?.sp !== newState.sp) {
     await updateE5ccSetPoint(newState.sp);
-  } else if (newState.mode === 'presets') {
+  }
+  
+  if (newState.mode === 'presets') {
     if (newState.mode !== oldState?.mode) {
       presets = getQuickSet();  
     } else if (newState.currentPreset !== oldState.currentPreset) {
       await updateE5ccSetPoint(presets[newState.currentPreset || 0]);
     }
-  }
+  }  
 });
 
 const DEVICE = Config.e5cc.device;
@@ -129,7 +148,11 @@ export const initE5cc = async (
       console.error(`Error getting state: ${e.message}`);
     }
     setTimeout(async () => {
-      await getData();
+      try {
+        await getData();
+      } catch (e) {
+        console.error(`An error occured retrieving E5CC state: ${e.message}`);
+      }
       return;
     }, INTERVAL);
   };

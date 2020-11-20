@@ -7,7 +7,7 @@ import { initNetworkInfo } from './settings/networkInfo';
 import { initPresets } from './settings/presets';
 import { initWifi } from './settings/wifi';
 
-let state = registerStateChange('mode-settings', (oldState, newState) => {
+let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 

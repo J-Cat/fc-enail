@@ -1,8 +1,8 @@
 import { setEncoderValue } from '../hardware/rotaryEncoder';
-import { getCurrentProfile, getProfiles } from '../utility/localDb';
+import { getCurrentProfile, getCurrentScript, getProfiles, getScripts } from '../utility/localDb';
 import { IMenu, registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
 
-let state = registerStateChange('menu', (oldState, newState) => {
+let state = registerStateChange('menu', async (oldState, newState): Promise<void> => {
   state = newState;
   if (oldState?.mode !== newState.mode) {
     switch (newState.mode) {
@@ -27,6 +27,24 @@ let state = registerStateChange('menu', (oldState, newState) => {
           }] 
           : [],
         currentProfile,
+      });
+      break;
+    }
+    case 'scripts': {
+      const scripts = getScripts();
+      const currentKey = getCurrentScript();
+      const currentScript = scripts.findIndex(s => s.key === currentKey);
+      setSharedState({
+        menu: newState.menus?.[2]?.[0]
+          ? [{
+            ...newState.menus[2][0],
+            menuItems: scripts.map(s => `${s.key === currentKey ? '*' : ''} ${s.title}`),
+            current: currentScript,
+            min: 0,
+            max: scripts.length - 1,
+          }] 
+          : [],
+        currentScript,
       });
       break;
     }

@@ -2,20 +2,22 @@ import { exec } from 'child_process';
 import { Sounds } from '../models/sounds';
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
-  exec(`aplay "./sounds/${filename}"`, (error, stdout, stderr) => {
-    if (error) {
-      return {
-        error: new Error(error.message),
-        stderr,
-      };
-    }
+  return new Promise(resolve => {
+    exec(`aplay "./sounds/${filename}"`, (error, stdout, stderr) => {
+      if (error) {
+        resolve({
+          error: new Error(error.message),
+          stderr,
+        });
+      }
+      resolve({});
+    });
   });
-  return {};
 };
 
 export const playBeep = async (repeat: number): Promise<void> => {
   for (let i = 0; i < repeat; i++) {
-    playSound(Sounds.beep);
+    await playSound(Sounds.beep);
     await new Promise(resolve => setTimeout(resolve, 750));
   }
 };

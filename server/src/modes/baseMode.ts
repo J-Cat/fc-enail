@@ -1,13 +1,13 @@
 import { toggleTuning } from '../dao/profilesDao';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
-import { registerStateChange } from '../utility/sharedState';
+import { registerStateChange, setSharedState } from '../utility/sharedState';
 import { useMenuClick, useMenuLongClick, useMenuEncoderClick, useMenuEncoderChange } from './menu';
 import { processNumberInput, useNumberInputClick, useNumberInputEncoderChange, useNumberInputEncoderClick } from './numberinput';
 import { usePromptClick, usePromptEncoderChange, usePromptEncoderClick } from './promptinput';
 import { processTextInput, useTextInputClick, useTextInputEncoderChange, useTextInputEncoderClick } from './textinput';
 
-let state = registerStateChange('mode-base', (oldState, newState) => {
+let state = registerStateChange('mode-base', async (oldState, newState): Promise<void> => {
   state = newState;
   if ((oldState?.mode !== newState.mode) && (newState.mode === 'home') && (newState.sp)) {
     setEncoderValue(newState.sp);
@@ -16,6 +16,13 @@ let state = registerStateChange('mode-base', (oldState, newState) => {
 
 export const BaseMode: Partial<IModeInstance> = {
   onClick: async (): Promise<void> => {
+    if (state.scriptRunning) {
+      await setSharedState({
+        scriptRunning: false,
+        scriptFeedback: undefined,
+      });
+      return;
+    }
     if (state.tuning) {
       await toggleTuning();
       return;
@@ -32,7 +39,7 @@ export const BaseMode: Partial<IModeInstance> = {
     await useMenuClick();
   },
   onLongClick: async (): Promise<void> => {
-    if (state.tuning) {
+    if (state.tuning || state.scriptRunning) {
       return;
     }
     if (await useNumberInputClick()) {
@@ -44,6 +51,13 @@ export const BaseMode: Partial<IModeInstance> = {
     await useMenuLongClick();
   },
   onEncoderClick: async (): Promise<void> => {
+    if (state.scriptRunning) {
+      await setSharedState({
+        scriptRunning: false,
+        scriptFeedback: undefined,
+      });
+      return;
+    }
     if (state.tuning) {
       await toggleTuning();
       return;

@@ -41,7 +41,7 @@ const HomePage: FC = () => {
   const [currentProfile, setCurrentProfile] = useState(profile);
 
   useEffect(() => {
-    setCurrentProfile(profile)
+    setCurrentProfile(profile);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
@@ -68,7 +68,7 @@ const HomePage: FC = () => {
     if (result && state?.running !== isRunning && state?.running !== undefined) {
       setIsRunning(state?.running);
     }
-  }
+  };
 
   const getTimeString = (value: number): string => {
     if (!running) {
@@ -84,14 +84,14 @@ const HomePage: FC = () => {
       (value - (h * 3600000) - (m * 60000))
       /
       1000,
-    )
+    );
     return `${h !== 0 ? `${h.toString()}:` : ''}${h === 0 ? m.toString() : m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  }
+  };
 
   const onSetPointChange = (value: number) => {
     setPointChanging.current = true;
     setSetPointLocal(value);
-  }
+  };
   const updateSetPoint = async (value: number) => {
     setPointChangeStart.current = Date.now();
     setSetPointLocal(value);
@@ -125,7 +125,7 @@ const HomePage: FC = () => {
         setCurrentProfile(key);
       },
     });
-  }
+  };
 
   if (loading) {
     return <Spin />;
@@ -165,7 +165,7 @@ const HomePage: FC = () => {
       <Row>
         <Col span={24} className="quickset-bar">
           {quickset.map(value => {
-            return <Button type="ghost" className={setPoint === value ? 'quickset-selected' : ''} key={`quickset-${value}`} onClick={() => { onQuickSet(value); }}>{value}</Button>
+            return <Button type="ghost" className={setPoint === value ? 'quickset-selected' : ''} key={`quickset-${value}`} onClick={() => { onQuickSet(value); }}>{value}</Button>;
           })}
         </Col>
       </Row>

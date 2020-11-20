@@ -17,13 +17,13 @@ import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
 import { PresetsMode } from './modes/presetsMode';
 import { initProfilesMenu, ProfilesMode } from './modes/profilesMode';
 import { initLocalDb } from './utility/localDb';
-import { ScriptsMode } from './modes/scriptsMode';
+import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
 });
 
-registerStateChange('server', async (lastState, newState) => {
+registerStateChange('server', async (lastState, newState): Promise<void> => {
   await onSharedStateChange(lastState, newState);
 });
 
@@ -176,6 +176,7 @@ const onSharedStateChange = async (
     menus: [
       [settingsMenu],
       [initProfilesMenu()],
+      [initScriptsMenu()],
     ],
     modes: {
       'home': HomeMode,

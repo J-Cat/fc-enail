@@ -8,7 +8,7 @@ import { getMenuUpdate } from '../menu';
 import { setNumberInput } from '../numberinput';
 import { setTextInput } from '../textinput';
 
-let state = registerStateChange('mode-settings-general', (oldState, newState) => {
+let state = registerStateChange('mode-settings-general', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 

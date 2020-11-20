@@ -1,11 +1,15 @@
 import { Color, display, Font, Layer } from 'ssd1306-i2c-js';
 import { registerConfigChange } from '../config';
 import dayjs from 'dayjs';
-import { Icons, IIcon } from '../models/icons';
+import { getHourglass, Icons, IIcon } from '../models/icons';
 import { ISharedState, registerStateChange } from '../utility/sharedState';
 import { getNetworkInfo } from '../dao/networkDao';
-import { Constants } from '../models/Constants';
 import { getQuickSet } from '../utility/localDb';
+import { renderPrompt } from '../modes/promptinput';
+import { renderTextInput } from '../modes/textinput';
+import { renderNumberInput } from '../modes/numberinput';
+import { getTimeString } from '../utility/getTimeString';
+import { renderRunningScript } from '../utility/scriptEngine';
 
 let Config = registerConfigChange('display', newConfig => {
   Config = newConfig;
@@ -123,26 +127,11 @@ export const closeDisplay = (): void => {
   display.dispose();
 };
 
-const getTimeString = (value: number): string => {
-  const h = Math.floor(value / 3600000);
-  const m = Math.floor(
-    (value - (h * 3600000))
-    /
-    60000
-  );
-  const s = Math.floor(
-    (value - (h * 3600000) - (m * 60000))
-    /
-    1000
-  );
-  return `${h !== 0 ? `${h.toString()}:` : ''}${h === 0 ? m.toString() : m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-};
-
 const renderHome = () => {
   display.setFont(Font.UbuntuMono_12ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
   if (state.running && timer >= 0) {
-    drawBitmap(0, 0, Icons.hourglass);
+    drawBitmap(0, 0, getHourglass());
     display.drawString(18, 2, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {
     drawBitmap(0, 0, Icons.clock);
@@ -176,7 +165,7 @@ const renderPresets = () => {
   display.setFont(Font.UbuntuMono_12ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
   if (state.running && timer >= 0) {
-    drawBitmap(0, 0, Icons.hourglass);
+    drawBitmap(0, 0, getHourglass());
     display.drawString(18, 2, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {
     drawBitmap(0, 0, Icons.clock);
@@ -221,8 +210,11 @@ const renderProfiles = () => {
 };
 
 const renderScripts = () => {
-  display.clearScreen();
-  drawMenu(0, ['Scripts', 'Script 1'], Icons.code_16x16);
+  const menu = state.menu?.[state.menu?.length-1];
+  if (!menu) {
+    return;
+  }
+  drawMenu(menu.current, menu.menuItems, Icons.code_16x16);
   display.refresh();
 };
 
@@ -268,25 +260,28 @@ const render = async () => {
     display.clearScreen();
     const width = (state.loadingMessage?.length || 0) * 7;
     display.drawString(64 - Math.ceil(width / 2), 16, state.loadingMessage || '', 1, Color.White, Layer.Layer0);
-    drawBitmap(56, 30, Icons.hourglass);
+    drawBitmap(56, 30, getHourglass());
     display.refresh();
     return;
   }
 
   if (state.prompt) {
-    drawConfirm();
+    renderPrompt(display);
     return;
   }
 
   if (state.textinput) {
-    const menu = state.menu?.[state.menu?.length-1];
-    drawTextInput(menu?.action || ' ');
+    renderTextInput(display);
     return;
   }
 
   if (state.numberinput) {
-    const menu = state.menu?.[state.menu?.length-1];
-    drawNumberInput(menu?.action || ' ');
+    renderNumberInput(display);
+    return;
+  }
+
+  if (state.scriptRunning) {
+    await renderRunningScript(display);
     return;
   }
 
@@ -298,6 +293,7 @@ const render = async () => {
     return;
   }  
 
+  //state.mode?
   switch (state.mode) {
   case 'profiles': {
     renderProfiles();
@@ -328,7 +324,7 @@ const renderTuning = () => {
   display.refresh();
 };
 
-const updateScreenSaverPos = (startX: number, startY: number): boolean => {
+export const updateScreenSaverPos = (startX: number, startY: number): boolean => {
   if (
     (
       ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
@@ -371,116 +367,6 @@ const updateScreenSaverPos = (startX: number, startY: number): boolean => {
   }
 };
 
-const drawNumberInput = (label: string) => {
-  if (state.numberinput?.value === undefined) {
-    return;
-  }
-
-  display.setFont(Font.UbuntuMono_10ptFontInfo);
-  const [labelFontWidth] = fontSize(Font.UbuntuMono_10ptFontInfo);
-  const labelX = Math.floor((128 - (label.length * labelFontWidth)) / 2);
-  display.drawString(labelX, 16, label, 1, Color.White, Layer.Layer0);
-
-  display.setFont(Font.UbuntuMono_16ptFontInfo);
-  const [fontWidth] = fontSize(Font.UbuntuMono_16ptFontInfo);
-  const width = state.numberinput?.value.toString().length * fontWidth;
-  if (width === 0) {
-    return;
-  }
-
-  const x = Math.floor((128 - width) / 2);
-  display.drawString(x, 29, state.numberinput?.value.toString(), 1, Color.White, Layer.Layer0);  
-  display.refresh();
-};
-
-let flashState = false;
-const drawTextInput = (label: string) => {
-  display.setFont(Font.UbuntuMono_8ptFontInfo);
-  display.drawString(0, 0, label, 1, Color.White, Layer.Layer0);
-  display.drawString(
-    0, 11, 
-    `${state.textinput?.text}${flashState === true ? '_' : ' '}${'_'.repeat(128-(state.textinput?.text?.length || 0))}`, 
-    1, Color.White, Layer.Layer0
-  );
-
-  const lines = Constants.textInput[state.textinput?.inputMode || 'lowercase'];
-  const lineLength = Math.ceil(lines.length / 2);
-  const startX = 6;
-
-  drawStringWrapped(
-    startX, 29, 
-    lines,
-    Font.UbuntuMono_8ptFontInfo, 
-    0, 
-    lineLength * 6,
-    11
-  );
-  const charPos = lines.indexOf(state.textinput?.activeChar || '--');
-  if (charPos >= 0) {
-    const x = startX + (charPos * 6) - (charPos > lineLength ? (lineLength * 6) : 0);
-    const y = 29 + (charPos >= lineLength ? 10 : 0);
-    display.drawRect(x-1, y-1, 8, 12, Color.White, Layer.Layer0);
-  }
-  
-  if (state.textinput?.activeChar === 'mode') {
-    display.fillRect(0, 55, 36, 10, Color.White, Layer.Layer0);
-  }
-  display.drawString(
-    0, 55, 
-    state.textinput?.inputMode === 'lowercase' 
-      ? 'upper'
-      : state.textinput?.inputMode === 'uppercase'
-        ? 'symbol'
-        : 'lower', 
-    1,
-    state.textinput?.activeChar === 'mode' ? Color.Inverse : Color.White, 
-    Layer.Layer0
-  );
-
-  if (state.textinput?.activeChar === 'del') {
-    display.fillRect(38, 55, 18, 10, Color.White, Layer.Layer0);
-  }
-  display.drawString(38, 55, 'Del', 1, state.textinput?.activeChar === 'del' ? Color.Inverse : Color.White, Layer.Layer0);
-  if (state.textinput?.activeChar === 'cancel') {
-    display.fillRect(64, 55, 36, 10, Color.White, Layer.Layer0);
-  }
-  display.drawString(64, 55, 'Cancel', 1, state.textinput?.activeChar === 'cancel' ? Color.Inverse : Color.White, Layer.Layer0);
-  if (state.textinput?.activeChar === 'ok') {
-    display.fillRect(108, 55, 12, 10, Color.White, Layer.Layer0);
-  }
-  display.drawString(108, 55, 'Ok', 1, state.textinput?.activeChar === 'ok' ? Color.Inverse : Color.White, Layer.Layer0);
-  display.refresh();
-  flashState = !flashState;
-};
-
-const drawConfirm = () => {
-  if (!state.prompt?.text) {
-    return;
-  }
-
-  const [fontWidth, fontHeight] = fontSize(Font.UbuntuMono_10ptFontInfo);
-  const [maxWidth, lines] = getWrappedLines(state.prompt?.text, Font.UbuntuMono_10ptFontInfo);
-  
-  const x = Math.floor((128 - (maxWidth * fontWidth))/2);
-  let y = Math.floor((64 - (fontHeight * (lines.length + 2)))/2);
-  let linePos = 0;
-  for (const line of lines) {
-    display.drawString(x, y + (linePos++ * fontHeight), line, 1, Color.White, Layer.Layer0);
-  }
-  y = y + (++linePos * fontHeight);
-  const spaces = Math.max(Math.floor((maxWidth - 11)/2), 0);
-  if (state.prompt.current) {
-    display.fillRect(x+((spaces+9)*fontWidth), y, fontWidth * 2, fontHeight, Color.White, Layer.Layer0);
-    display.drawString(x+(spaces*fontWidth), y, 'Cancel', 1, Color.White, Layer.Layer0);
-    display.drawString(x+((spaces+9)*fontWidth), y, 'Ok', 1, Color.Black, Layer.Layer0);
-  } else {
-    display.fillRect(x+(spaces*fontWidth), y, fontWidth * 6, fontHeight, Color.White, Layer.Layer0);
-    display.drawString(x+(spaces*fontWidth), y, 'Cancel', 1, Color.Black, Layer.Layer0);
-    display.drawString(x+((spaces+9)*fontWidth), y, 'Ok', 1, Color.White, Layer.Layer0);
-  }
-  display.refresh();
-};
-
 const drawMenu = (selected: number, menuItems: string[], icon?: IIcon, fixedX?: number) => {
   if (icon) {
     drawBitmap(0, 48, icon);
@@ -505,7 +391,7 @@ const drawMenu = (selected: number, menuItems: string[], icon?: IIcon, fixedX?: 
   }
 };
 
-const drawStringWrapped = (x: number, y: number, text: string, font: Font, indent = 1, fixedWidth = 0, lineSpacing = 0): number => {
+export const drawStringWrapped = (x: number, y: number, text: string, font: Font, indent = 1, fixedWidth = 0, lineSpacing = 0): number => {
   // eslint-disable-next-line prefer-const
   let [ width, height ] = fontSize(font);
   if (lineSpacing !== 0) {
@@ -525,7 +411,7 @@ const drawStringWrapped = (x: number, y: number, text: string, font: Font, inden
   return line;
 };
 
-const drawBitmap = ( xPos: number, yPos: number, { width, height, data }: { width: number, height: number, data: Uint8Array }) => {
+export const drawBitmap = ( xPos: number, yPos: number, { width, data }: { width: number, height: number, data: Uint8Array }): void => {
 //  let s = '';
   for (let pos = 0; pos < data.length; pos++) {
     for (let c = 0; c < 8; c++) {
@@ -548,12 +434,20 @@ const drawBitmap = ( xPos: number, yPos: number, { width, height, data }: { widt
   //console.log(s);
 };
 
-export const drawMessage = async (text: string, font: Font = Font.UbuntuMono_10ptFontInfo): Promise<void> => {
+export const drawMessage = async (text: string, font: Font = Font.UbuntuMono_10ptFontInfo, icon?: string): Promise<void> => {
+  let iconObj: IIcon | undefined = undefined;
+  if (icon) {
+    iconObj = (Icons as { [key: string]: IIcon })[icon];
+    if (iconObj) {
+      drawBitmap(Math.floor((128 - iconObj.width)/2), 64-iconObj.height, iconObj);
+    }
+  }
+
   display.setFont(font);
   const [ fontWidth, fontHeight ] = fontSize(font);
   const [ maxWidth, lines ] = getWrappedLines(text, font);
   const x = Math.floor((128 - (maxWidth * fontWidth))/2);
-  const y = Math.floor((64.0 - (lines.length * fontHeight)) / 2);
+  const y = Math.floor((64.0 - (iconObj?.height || 0) - (lines.length * fontHeight)) / 2);
   let linePos = 0;
   for (const line of lines) {
     display.drawString(x, y + (linePos++ * fontHeight), line, 1, Color.White, Layer.Layer0);
@@ -565,6 +459,7 @@ export const showMessage = async (text: string, font: Font = Font.UbuntuMono_10p
     isMessage = true;
     display.clearScreen();
     await drawMessage(text, font);
+    display.refresh();
     await new Promise(resolve => setTimeout(resolve, timeout));
   } finally {
     isMessage = false;
@@ -572,7 +467,7 @@ export const showMessage = async (text: string, font: Font = Font.UbuntuMono_10p
   }
 };
 
-const getWrappedLines = (text: string, font: Font): [maxWidth: number, lines: string[]] => {
+export const getWrappedLines = (text: string, font: Font): [maxWidth: number, lines: string[]] => {
   const [ fontWidth ] = fontSize(font);
   const lines = Math.ceil((text.length * fontWidth) / 128);
   let remainingText = text;
@@ -608,7 +503,7 @@ const getWrappedLines = (text: string, font: Font): [maxWidth: number, lines: st
   return [text.length, [text]];
 };
 
-const fontSize = (font: Font) => (
+export const fontSize = (font: Font): [ width: number, height: number ] => (
   font === Font.UbuntuMono_8ptFontInfo
     ? [ 6, 10 ]
     : font === Font.UbuntuMono_10ptFontInfo

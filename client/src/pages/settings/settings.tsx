@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, InputNumber, Spin, Anchor, Modal } from 'antd';
+import { Form, Input, Button, InputNumber, Spin, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
@@ -7,7 +7,6 @@ import { RootState } from '../../store/reducers/rootReducer';
 import { sendConfig, sendQuickSet } from '../../store/reducers/enailReducer';
 import { useTranslation } from 'react-i18next';
 import './settings.less';
-import { useEnsureLoaded } from '../../hooks/useEnsureLoaded';
 import { IConfig } from '../../store/state/IEnailState';
 
 interface IFormData {

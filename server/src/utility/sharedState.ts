@@ -2,7 +2,7 @@ import { IE5ccState } from '../hardware/e5cc';
 import { IIcon } from '../models/icons';
 import { Lock } from './Lock';
 
-export type ChangeFunc = (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void;
+export type ChangeFunc = (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => Promise<void>;
 
 const onChanges: { 
   [key: string]: ChangeFunc
@@ -44,6 +44,9 @@ export interface ISharedState extends IE5ccState {
   modes?: {
     [mode: string]: IMode;
   };
+  currentPreset?: number;
+  currentProfile?: number;
+  currentScript?: number;
   textinput?: {
     text: string;
     activeChar: string;
@@ -57,13 +60,17 @@ export interface ISharedState extends IE5ccState {
     step: number;
     onClick?: (value: number) => Promise<void>;
   }
-  currentPreset?: number;
   prompt?: {
     text: string;
     current: boolean;
     onOk: () => Promise<void>;
+  },
+  scriptRunning?: boolean;
+  scriptFeedback?: {
+    start: number;
+    text?: string;
+    icon?: string;
   }
-  currentProfile?: number;
 }
 
 let state: ISharedState = { menu: [], loading: false, };
@@ -83,7 +90,7 @@ export const setNextMode = (source: 'e5cc'|'api'|'self'): void => {
 
 export const registerStateChange = (
   key: string,
-  onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => void | Promise<void>,
+  onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => Promise<void>,
 ): ISharedState => {
   onChanges[key] = onChange;
   return state;

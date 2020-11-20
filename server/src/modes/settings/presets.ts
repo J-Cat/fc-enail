@@ -6,7 +6,7 @@ import { registerStateChange, setSharedState } from '../../utility/sharedState';
 import { getMenuUpdate } from '../menu';
 import { setNumberInput } from '../numberinput';
 
-let state = registerStateChange('mode-settings-presets', (oldState, newState) => {
+let state = registerStateChange('mode-settings-presets', async (oldState, newState): Promise<void> => {
   state = newState;
 });
 
