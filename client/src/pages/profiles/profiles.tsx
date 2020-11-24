@@ -174,6 +174,9 @@ const ProfilesPage: React.FC = () => {
   const prf = profiles.find(p => p.key === currentProfile);
 
   return <Form className="profile-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={updateProfile}>
+    <Form.Item className="header-row">
+      <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+    </Form.Item>
     <Form.Item label={t('profiles.profile', 'Profile')} rules={[{ required: true }]}>
       <Select value={currentProfile} onChange={selectedOnChange}>
         <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>

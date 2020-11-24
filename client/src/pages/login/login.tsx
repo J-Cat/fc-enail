@@ -54,6 +54,9 @@ const LoginPage: React.FC = () => {
       onFinish={submitLogin}
       className="login-form"
     >
+      <Form.Item className="header-row-fixed">
+        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+      </Form.Item>
       <Form.Item
         label={t('login.passcode', 'Passcode')}
         name="passcode"

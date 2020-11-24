@@ -135,7 +135,7 @@ const renderHome = () => {
     display.drawString(18, 2, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {
     drawBitmap(0, 0, Icons.clock);
-    display.drawString(18, 2, dayjs(Date.now()).format('h:mma'), 1, Color.White, Layer.Layer0);
+    display.drawString(18, 2, dayjs(Date.now()).format('h:mm'), 1, Color.White, Layer.Layer0);
   }
 
   display.setFont(Font.UbuntuMono_24ptFontInfo);
@@ -169,10 +169,10 @@ const renderPresets = () => {
     display.drawString(18, 2, getTimeString(timer), 1, Color.White, Layer.Layer0);
   } else {
     drawBitmap(0, 0, Icons.clock);
-    display.drawString(18, 2, dayjs(Date.now()).format('h:mma'), 1, Color.White, Layer.Layer0);
+    display.drawString(18, 2, dayjs(Date.now()).format('h:mm'), 1, Color.White, Layer.Layer0);
   }
 
-  display.drawString(90, 0, `${presets[state.currentPreset || 0]}F`, 1, Color.White, Layer.Layer0);
+  display.drawString(90, 2, `${presets[state.currentPreset || 0]}F`, 1, Color.White, Layer.Layer0);
 
   display.setFont(Font.UbuntuMono_24ptFontInfo);
   updateScreenSaverPos(

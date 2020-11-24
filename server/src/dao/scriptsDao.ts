@@ -6,7 +6,7 @@ import {
   deleteScript as deleteLocalDbScript,
   getScript,
 } from './localDb';
-import { setSharedState } from '../utility/sharedState';
+import { getSharedState, setSharedState } from '../utility/sharedState';
 import { IScript } from '../models/IScript';
 import { runScript as runScriptEngine } from '../utility/scriptEngine';
 
@@ -60,7 +60,15 @@ export const deleteScript = async (key: string): Promise<{ error?: string }> => 
 };
 
 export const runScript = async (key: string): Promise<void> => {
+  const state = await getSharedState();
+  if (state?.scriptRunning) {
+    setSharedState({
+      scriptRunning: false,
+      scriptFeedback: undefined,
+    });
+    return;
+  }
   const { script } = getScript(key);
-  console.log(`running ${script.title}`);
+  console.log(`Running ${script.title}`);
   runScriptEngine(script);
 };

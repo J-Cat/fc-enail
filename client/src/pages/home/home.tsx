@@ -1,5 +1,5 @@
 import { Button, Card, Col, Modal, Row, Select, Slider, Spin, Switch } from 'antd';
-import { PlaySquareOutlined } from '@ant-design/icons';
+import Icon, { BorderInnerOutlined, BorderOutlined, ClockCircleOutlined, CloudOutlined, CodeOutlined, HomeOutlined, HourglassOutlined, LockOutlined, PlaySquareOutlined, SettingOutlined, StarOutlined, WifiOutlined } from '@ant-design/icons';
 import Grid from 'antd/lib/card/Grid';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,15 +7,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { sendState } from '../../store/reducers/enailReducer';
 import { RootState } from '../../store/reducers/rootReducer';
-import { IConfig } from '../../store/state/IEnailState';
+import { IConfig, IScriptFeedback } from '../../store/state/IEnailState';
 import { AppDispatch } from '../../store/store';
 import './home.less';
 import { IProfile } from '../../store/state/IProfileState';
 import { setCurrentProfile as setProfile } from '../../store/reducers/profileReducer';
+import { IScript } from '../../models/IScript';
+import { runScript, setCurrentScript as setCurrentScriptReducer } from '../../store/reducers/scriptReducer';
+import { ReactComponent as dropSvg } from '../../assets/icons/drop.svg';
 
 const HomePage: FC = () => {
   const tuning = useSelector<RootState, boolean>(state => state.enail.state?.tuning || false);
   const loading = useSelector<RootState, boolean>(state => state.enail.loading);
+  const script = useSelector<RootState, string>(state => state.scripts.currentScript || '');
+  const scripts = useSelector<RootState, IScript[]>(state => state.scripts.scripts);
   const presentValue = useSelector<RootState, number>(state => state.enail?.state?.pv || 0);
   const setPoint = useSelector<RootState, number>(state => state.enail?.state?.sp || 0);
   const running = useSelector<RootState, boolean>(state => state.enail.state?.running || false);
@@ -40,11 +45,18 @@ const HomePage: FC = () => {
   const profile = useSelector<RootState, string>(state => state.profiles.currentProfile || '');
   const profiles = useSelector<RootState, IProfile[]>(state => state.profiles.profiles);
   const [currentProfile, setCurrentProfile] = useState(profile);
+  const [currentScript, setCurrentScript] = useState(script);
+  const scriptFeedback = useSelector<RootState, IScriptFeedback|undefined>(state => state.enail.state?.scriptFeedback);
 
   useEffect(() => {
     setCurrentProfile(profile);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
+
+  useEffect(() => {
+    console.log(`set current script: ${script}`);
+    setCurrentScript(script);
+  }, [script]);
 
   useEffect(() => {
     //presentValueChangeStart = Date.now();
@@ -128,13 +140,70 @@ const HomePage: FC = () => {
     });
   };
 
+  const getScriptStatus = (): JSX.Element => {
+    if (!scriptFeedback) {
+      return <></>;
+    }
+
+    if (scriptFeedback?.text) {
+      return <div>{scriptFeedback.text}</div>;
+    }
+    
+    return <div>Elapsed {getTimeString(Date.now() - (scriptFeedback?.start || 0))}</div>;
+  };
+
+  const getScriptIcon = (): JSX.Element => {
+    if (!scriptFeedback) {
+      return <></>;
+    }
+
+    if (!scriptFeedback?.icon) {
+      return <></>;
+    }
+
+    switch (scriptFeedback.icon) {
+    case 'clock': {
+      return <ClockCircleOutlined />;
+    }
+    case 'cloud': {
+      return <CloudOutlined />;
+    }
+    case 'code_16x16': {
+      return <CodeOutlined />;
+    }
+    case 'drop': {
+      return <Icon component={dropSvg} />;
+    }
+    case 'gear': {
+      return <SettingOutlined />;
+    }
+    case 'home': {
+      return <HomeOutlined />;
+    }
+    case 'hourglass': {
+      return <HourglassOutlined />;
+    }
+    case 'lock': {
+      return <LockOutlined />;
+    }
+    case 'star': {
+      return <StarOutlined />;
+    }
+    case 'wifi': {
+      return <WifiOutlined />;
+    }
+    }
+
+    return <></>;
+  };
+
   if (loading) {
     return <Spin />;
   }
 
   return (
     <Grid className="home-grid" hoverable={false}>
-      <Row>
+      <Row className="header-row">
         <Col span={24} className="home-grid-header">
           <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
         </Col>
@@ -208,17 +277,55 @@ const HomePage: FC = () => {
         <Col span={24}>
           <Card className="script-card">
             <div className="script-card-content">
-              <div className="script-card-content-label">
-                {t('scripts.label', 'Script')}
-              </div>
-              <div className="script-card-content-value">
-                <Select defaultValue={0}>
-                  <Select.Option value={0}>40&deg; Up-Temp</Select.Option>
-                </Select>
-              </div>
-              <div>
-                <Button type="primary" icon={<PlaySquareOutlined />} />
-              </div>
+              {!scriptRunning
+                ?
+                <><div className="script-card-content-label">
+                  {t('scripts.label', 'Script')}
+                </div><div className="script-card-content-value">
+                  <Select 
+                    value={currentScript}
+                    onChange={value => {
+                      dispatch(setCurrentScriptReducer(value));
+                    }}
+                  >
+                    {scripts.map(s => (
+                      <Select.Option key={s.key} value={s.key}>{s.title}</Select.Option>                      
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Button 
+                    disabled={scriptRunning || tuning || !running || !currentScript} 
+                    type="primary" icon={<PlaySquareOutlined />} 
+                    onClick={() => {
+                      if (!currentScript) {
+                        return;
+                      }
+                      dispatch(runScript(script));
+                    }}
+                  />
+                </div></>
+                : <>
+                  <div className="script-card-content-label">
+                    {getScriptIcon()}
+                  </div>
+                  <div className="script-card-content-value">
+                    {getScriptStatus()}
+                  </div>
+                  <div>
+                    <Button 
+                      disabled={!scriptRunning || tuning || !running || !currentScript} 
+                      type="primary" icon={<BorderOutlined />} 
+                      onClick={() => {
+                        if (!currentScript) {
+                          return;
+                        }
+                        dispatch(runScript(currentScript));
+                      }}
+                    />
+                  </div>
+                </>
+              }
             </div>
           </Card>
         </Col>

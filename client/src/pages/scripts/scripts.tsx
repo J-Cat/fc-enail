@@ -1,4 +1,4 @@
-import { Button, Dropdown, Form, Menu, Modal, Select, Spin } from 'antd';
+import { Button, Dropdown, Form, Input, Menu, Modal, Select, Spin } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { IFeedbackStep, IScript, ITimerStep, IUpdateSetPointStep, IWaitForSetPointStep, StepTypeEnum } from '../../models/IScript';
 import { RootState } from '../../store/reducers/rootReducer';
-import { deleteScript, runScript, saveScript } from '../../store/reducers/scriptReducer';
+import { deleteScript, saveScript } from '../../store/reducers/scriptReducer';
 import { AppDispatch } from '../../store/store';
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
 import { Guid } from 'guid-typescript';
@@ -23,6 +23,7 @@ const ScriptsPage: FC = () => {
   const scripts = useSelector<RootState, IScript[]>(state => state.scripts.scripts);
   const [currentScript, setCurrentScript] = useState(scripts.find(s => s.key === script));
   const [openKey, setOpenKey] = useState<string|undefined>(undefined);
+  const [renameValue, setRenameValue] = useState<string|undefined>(undefined);
   const [t] = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const formRef = useRef<FormInstance>();
@@ -67,12 +68,40 @@ const ScriptsPage: FC = () => {
         if (result.error) {
           Modal.error({
             title: t('scripts.save.error.title', 'Error'),
-            content: t('scriptss.save.error.content', 'An error occured saving the script: {{script}}', { script: currentScript.title }),
+            content: t('scripts.save.error.content', 'An error occured saving the script: {{script}}', { script: currentScript.title }),
           });
         } else {
           Modal.info({
             title: t('scripts.savesuccess.title', 'Success'),
             content: t('scripts.savesuccess.content', 'Successfully saved the script: {{script}}', { script: currentScript.title }),
+          });
+        }
+      },
+    });
+  };
+
+  const onRenameScript = async () => {
+    Modal.confirm({
+      title: t('scripts.renameConfirm', 'Rename Script?'),
+      content: <Input defaultValue={currentScript?.title} onChange={value => { setRenameValue(value.target.value); } } />,
+      onOk: async () => {
+        alert(renameValue);
+        if (!currentScript || !renameValue) {
+          return;
+        }
+        const result = await dispatch(saveScript({
+          ...currentScript,
+          title: renameValue,
+        } as IScript));  
+        if (result.error) {
+          Modal.error({
+            title: t('scripts.rename.error.title', 'Error'),
+            content: t('scripts.rename.error.content', 'An error occured renaming the script, {{script}}, to {{newTitle}}', { script: currentScript.title, newTitle: renameValue, }),
+          });
+        } else {
+          Modal.info({
+            title: t('scripts.rename.sucess.title', 'Success'),
+            content: t('scripts.rename.success.content', 'Successfully renamed the script: {{script}}', { script: renameValue }),
           });
         }
       },
@@ -95,33 +124,6 @@ const ScriptsPage: FC = () => {
           Modal.error({
             title: t('scripts.deleteScript.error.title', 'Error Deleting Script'),
             content: t('scripts.deleteScript.error.content', 'An error occured deleting the {{script}} script.', { script: currentScript.title }),
-          });
-          return;
-        }
-        if (script) {
-          setCurrentScript(scripts.find(s => s.key === script));
-        }
-      },
-    });
-  };
-
-  const onRunScript = async () => {
-    if (!currentScript) {
-      return;
-    }
-
-    Modal.confirm({
-      title: t('scripts.runScript.confirm.title', 'Run Script?'),
-      content: t('scripts.runScript.confirm.content', 'Run the {{script}} script?', { script: currentScript.title }),
-      onOk: async () => {
-        if (!currentScript) {
-          return;
-        }
-        const result = await dispatch(runScript(currentScript.key));
-        if (result.error) {
-          Modal.error({
-            title: t('scripts.runScript.error.title', 'Error Running Script'),
-            content: t('scripts.runScript.error.content', 'An error occured running the {{script}} script.', { script: currentScript.title }),
           });
           return;
         }
@@ -244,12 +246,9 @@ const ScriptsPage: FC = () => {
         {t('scripts.buttonSave', 'Save')}
       </Button>
       &nbsp;
-      <Button type="primary" htmlType="button" 
-        hidden={!currentScript || (currentScript.key === Guid.EMPTY)}
-        onClick={onRunScript}
-        disabled={tuning || scriptRunning}
-      >
-        {t('button.run', 'Run')}
+      <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}
+        onClick={onRenameScript}>
+        {t('button.rename', 'Rename')}
       </Button>
       &nbsp;
       <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}

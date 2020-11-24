@@ -143,7 +143,11 @@ const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState
   }
 
   await setSharedState(state, 'e5cc');
-  emitE5cc({ ...state,  scriptRunning: currentState.scriptRunning || false, });
+  emitE5cc({ 
+    ...state, 
+    scriptRunning: currentState.scriptRunning || false, 
+    scriptFeedback: currentState.scriptFeedback,
+  });
 };
 
 const onSharedStateChange = async (

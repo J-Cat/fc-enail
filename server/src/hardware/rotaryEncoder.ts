@@ -79,13 +79,13 @@ export const initEncoder = (
         store |= prevNextCode;
 
         if ((store&0xff) === 0x2b) {
-          if (velocity.length > 4) {
+          if (velocity.length > 3) {
             velocity.shift();
           }
           velocity.push(Date.now());
           const scale = Math.min(
             Math.max(
-              Math.round(1 / ((Date.now() - velocity?.[0]) / 1000)),
+              Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
               1
             ), 
             Config.encoder.maxVelocity
@@ -103,7 +103,7 @@ export const initEncoder = (
           velocity.push(Date.now());
           const scale = Math.min(
             Math.max(
-              Math.round(1 / ((Date.now() - velocity?.[0]) / 1000)),
+              Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
               1
             ), 
             Config.encoder.maxVelocity,

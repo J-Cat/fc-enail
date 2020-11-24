@@ -20,7 +20,8 @@ import { WifiPage } from './pages/wifi/wifi';
 import { RootState } from './store/reducers/rootReducer';
 
 export const App: React.FC = () => {
-  const authenticated = useSelector<RootState>(state => state.auth.authenticated);
+  const authenticated = useSelector<RootState, boolean>(state => state.auth.authenticated);
+  const scriptRunning = useSelector<RootState, boolean>(state => state.enail.state?.scriptRunning || false);
   const history = useHistory();
   const [t] = useTranslation();
 
@@ -66,11 +67,11 @@ export const App: React.FC = () => {
         </Content>
         <Footer className="app-footer" hidden={!authenticated}>
           <Menu className="app-menu" theme="dark" mode="horizontal" selectedKeys={getSelected()}>
-            <Menu.Item onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}`)} className="app-menu-item" key="home" icon={<HomeOutlined />} title={t('menu.home', 'Home')} />
-            <Menu.Item onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}profiles`)} className="app-menu-item" key="profiles" icon={<OrderedListOutlined />} title={t('menu.profiles', 'Profiles')} />
-            <Menu.Item onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}scripts`)} className="app-menu-item" key="scripts" icon={<CodeOutlined />} title={t('menu.scripts', 'Scripts')} />
-            <Menu.Item onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}settings`)} className="app-menu-item" key="settings" icon={<SettingOutlined />} title={t('menu.settings', 'Settings')} />
-            <Menu.Item onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}wifi`)} className="app-menu-item" key="wifi" icon={<WifiOutlined />} title={t('menu.wifi', 'WiFi')} />
+            <Menu.Item disabled={scriptRunning} onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}`)} className="app-menu-item" key="home" icon={<HomeOutlined />} title={t('menu.home', 'Home')} />
+            <Menu.Item disabled={scriptRunning} onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}profiles`)} className="app-menu-item" key="profiles" icon={<OrderedListOutlined />} title={t('menu.profiles', 'Profiles')} />
+            <Menu.Item disabled={scriptRunning} onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}scripts`)} className="app-menu-item" key="scripts" icon={<CodeOutlined />} title={t('menu.scripts', 'Scripts')} />
+            <Menu.Item disabled={scriptRunning} onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}settings`)} className="app-menu-item" key="settings" icon={<SettingOutlined />} title={t('menu.settings', 'Settings')} />
+            <Menu.Item disabled={scriptRunning} onClick={() => history.push(`${Constants.CLIENT_BASE_PATH}wifi`)} className="app-menu-item" key="wifi" icon={<WifiOutlined />} title={t('menu.wifi', 'WiFi')} />
           </Menu>
         </Footer>
       </Layout>

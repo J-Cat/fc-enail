@@ -56,26 +56,6 @@ export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose
     }
   };
 
-  const getTypeString = (): string => {
-    switch (step.type) {
-    case StepTypeEnum.SequentialStep: {
-      return 'Sequential';
-    }
-    case StepTypeEnum.FeedbackStep: {
-      return 'Feedback';
-    }
-    case StepTypeEnum.TimerStep: {
-      return 'Timer';
-    }
-    case StepTypeEnum.UpdateSetPointStep: {
-      return 'Update Set Point';
-    }
-    case StepTypeEnum.WaitForSetPointStep: {
-      return 'Wait for Set Point';
-    }
-    }  
-  };
-
   const renderFeedbackStep = (typedStep: IFeedbackStep): JSX.Element => {
     return <React.Fragment>
       <FormItem label="Text">

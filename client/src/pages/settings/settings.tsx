@@ -86,6 +86,9 @@ const SettingsPage: React.FC = () => {
       onFinish={submitSettings}
       className="settings-form"
     >
+      <Form.Item className="header-row">
+        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+      </Form.Item>
       <Form.Item
         label={t('settings.min', 'Minimum')}
         name="min"

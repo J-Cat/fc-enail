@@ -83,6 +83,9 @@ const WifiPage: React.FC = () => {
       ref={ref => { if (ref) { formRef.current = ref; }}}
       onFinish={onConnect}
     >
+      <Form.Item className="header-row-fixed">
+        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+      </Form.Item>
       <Form.Item
         label={t('wifi.mode.label', 'Mode')}
         name="mode"

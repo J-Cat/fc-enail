@@ -6,6 +6,13 @@ export interface IE5ccState {
   readonly nocoil?: boolean;
   readonly started?: number;
   readonly scriptRunning?: boolean;
+  readonly scriptFeedback?: IScriptFeedback;
+}
+
+export interface IScriptFeedback {
+  start: number;
+  text?: string;
+  icon?: string;
 }
 
 export interface IConfig {

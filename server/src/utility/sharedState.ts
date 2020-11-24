@@ -32,6 +32,12 @@ export interface IMode {
   onReallyReallyLongClick?: () => Promise<void>;
 }
 
+export interface IScriptFeedback {
+  start: number;
+  text?: string;
+  icon?: string;
+}
+
 export interface ISharedState extends IE5ccState {
   passcode?: string;
   rebooting?: boolean;
@@ -66,11 +72,7 @@ export interface ISharedState extends IE5ccState {
     onOk: () => Promise<void>;
   },
   scriptRunning?: boolean;
-  scriptFeedback?: {
-    start: number;
-    text?: string;
-    icon?: string;
-  }
+  scriptFeedback?: IScriptFeedback;
 }
 
 let state: ISharedState = { menu: [], loading: false, };
