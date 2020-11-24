@@ -14,10 +14,6 @@ fi
 
 cd ~/.fcenail
 
-if [ ! -f ~/.fcenail/.env ]; then
-  $NODE_MODULES/fcenail/generate-environment.sh
-fi
-
 if [ -f /usr/local/bin/fcenail ]; then
   rm /usr/local/bin/fcenail
 fi
