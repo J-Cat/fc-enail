@@ -5,9 +5,14 @@ do
 key="$1"
 
 INSTALL=
+UNINSTALL=
 case $key in
     -i|--install)
     INSTALL=true
+    shift # past argument
+    ;;
+    -u|--uninstall)
+    UNINSTALL=true
     shift # past argument
     ;;
     *)    # unknown option
@@ -25,6 +30,7 @@ if [ "$INSTALL" = "true" ]; then
   if [ ! -f /lib/systemd/system/fcenail.service ]; then
     cp $NODE_MODULES/fcenail/fcenail.service /lib/systemd/system
     systemctl enable fcenail.service
+    systemctl daemon-reload
   fi
 
   if [ ! -d ~/.fcenail ]; then
@@ -46,6 +52,22 @@ if [ "$INSTALL" = "true" ]; then
 
   cd $SAVE_DIR
   exit 0
+fi
+
+if [ "$UNINSTALL" = "true" ]; then
+  set -E
+  systemctl stop fcenail.service
+  systemctl disable fcenail.service
+  rm /lib/systemd/system/fcenail.service
+  systemctl daemon-reload
+
+  if [ -f /usr/local/bin/fcenail ]; then
+    rm /usr/local/bin/fcenail
+  fi
+
+  cd $SAVE_DIR
+  set -e
+  exit 0  
 fi
 
 cd ~/.fcenail
