@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Form, Input, Button, Select, Modal, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { withRouter, useHistory } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { RootState } from '../../store/reducers/rootReducer';
 import { useTranslation } from 'react-i18next';
 import './wifi.less';
-import { Constants } from '../../models/constants';
 import { connectWifi, getNetworkConfig, scanNetworks } from '../../store/reducers/networkReducer';
 import { FormInstance } from 'antd/lib/form';
 
@@ -34,7 +33,7 @@ const WifiPage: React.FC = () => {
       ssidap: ssid,
       mode,
     });
-  }, [mode, ssid])
+  }, [mode, ssid]);
 
   useEffect(() => {
     dispatch(getNetworkConfig());
@@ -42,7 +41,7 @@ const WifiPage: React.FC = () => {
   }, []);
 
   const onScan = async () => {
-    const { error, ssids } = await dispatch(scanNetworks());
+    const { error } = await dispatch(scanNetworks());
     if (error) {
       Modal.error({
         title: t('wifi.error.scan.title', 'Scan Error'),
@@ -61,20 +60,20 @@ const WifiPage: React.FC = () => {
     if (error) {
       Modal.error({
         title: t('wifi.error.connect.title', 'Connect Error'),
-        content: t('wifi.error.scan.content', 'An error occured connecting to the WiFi network, {{ssid}}: {{error}}', { ssid: newSsid }),
+        content: t('wifi.error.connect.content', 'An error occured connecting to the WiFi network, {{ssid}}: {{error}}', { ssid: newSsid }),
       });
     }
-  }
+  };
 
   const onWifiModeChange = (value: string) => {
     setWifiMode(value);
     if (value === 'ap') {
       formRef.current?.setFieldsValue({ ssidap: 'FCEnail' });
     }
-  }
+  };
 
   if (loading || scanning) {
-    return <Spin />
+    return <Spin />;
   }
 
   return (

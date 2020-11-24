@@ -12,54 +12,54 @@ export const authMiddleware: Middleware<{}, RootState> = (api: MiddlewareAPI<App
   next: AppDispatch,
 ) => <A extends PayloadAction<string | void>>(action: A): void => {
   switch (action.type) {
-    case 'AUTH/completeLogin': {
-      const token = action.payload;
-      if (!token) {
-        next(action);
-        return;
-      }
-
-      try {
-        Axios.interceptors.request.eject(authInterceptorHandle);
-        // eslint-disable-next-line no-empty
-      } catch { }
-
-      authInterceptorHandle = Axios.interceptors.request.use(
-        config => {
-          return new Promise(resolve => {
-            if (config.url && config.url.toLowerCase().startsWith('/auth/')) {
-              resolve(config);
-            } else {
-              resolve({
-                ...config,
-                headers: {
-                  ...config.headers,
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-            }
-          });
-        },
-        error => {
-          console.log(`Axios interceptor error: ${error}`);
-        },
-      );
-
-      /* ********************************************************************* */
-      /* Initialize Here!!                                                     */
-      /* ********************************************************************* */
-      next(action);    
-
-      return;
-    }
-
-    default: {
-      // if (!action.type.startsWith('AUTH/')) {
-      //   if (!api.getState().auth.authenticated)) {
-      //   }
-      // }
+  case 'AUTH/completeLogin': {
+    const token = action.payload;
+    if (!token) {
       next(action);
       return;
     }
+
+    try {
+      Axios.interceptors.request.eject(authInterceptorHandle);
+      // eslint-disable-next-line no-empty
+    } catch { }
+
+    authInterceptorHandle = Axios.interceptors.request.use(
+      config => {
+        return new Promise(resolve => {
+          if (config.url && config.url.toLowerCase().startsWith('/auth/')) {
+            resolve(config);
+          } else {
+            resolve({
+              ...config,
+              headers: {
+                ...config.headers,
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          }
+        });
+      },
+      error => {
+        console.log(`Axios interceptor error: ${error}`);
+      },
+    );
+
+    /* ********************************************************************* */
+    /* Initialize Here!!                                                     */
+    /* ********************************************************************* */
+    next(action);    
+
+    return;
+  }
+
+  default: {
+    // if (!action.type.startsWith('AUTH/')) {
+    //   if (!api.getState().auth.authenticated)) {
+    //   }
+    // }
+    next(action);
+    return;
+  }
   }
 };

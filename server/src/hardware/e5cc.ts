@@ -3,7 +3,7 @@ import { registerConfigChange } from '../config';
 import { saveProfile } from '../dao/profilesDao';
 import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
-import { getCurrentProfile, getProfile, getQuickSet } from '../utility/localDb';
+import { getCurrentProfile, getProfile, getQuickSet } from '../dao/localDb';
 import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../utility/sharedState';
 import { showMessage } from './display';

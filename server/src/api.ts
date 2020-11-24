@@ -14,6 +14,7 @@ import { stateRoute } from './routes/stateRoute';
 import { configRoute } from './routes/configRoute';
 import { profileRoute } from './routes/profileRoute';
 import { parseIntDefault } from './utility/parseIntDefault';
+import { scriptRoute } from './routes/scriptRoute';
 
 export const Api = (port = 8000, baseRoutePath = ''): Server => {
   // initialize configuration environment
@@ -103,6 +104,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(`${baseRoutePath}/state`, stateRoute);
     app.use(`${baseRoutePath}/config`, configRoute);
     app.use(`${baseRoutePath}/profiles`, profileRoute);
+    app.use(`${baseRoutePath}/scripts`, scriptRoute);
 
     // catch 404 and forward to error handler
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { getHourglass, Icons, IIcon } from '../models/icons';
 import { ISharedState, registerStateChange } from '../utility/sharedState';
 import { getNetworkInfo } from '../dao/networkDao';
-import { getQuickSet } from '../utility/localDb';
+import { getQuickSet } from '../dao/localDb';
 import { renderPrompt } from '../modes/promptinput';
 import { renderTextInput } from '../modes/textinput';
 import { renderNumberInput } from '../modes/numberinput';
@@ -128,7 +128,7 @@ export const closeDisplay = (): void => {
 };
 
 const renderHome = () => {
-  display.setFont(Font.UbuntuMono_12ptFontInfo);
+  display.setFont(Font.UbuntuMono_14ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
   if (state.running && timer >= 0) {
     drawBitmap(0, 0, getHourglass());
@@ -162,7 +162,7 @@ const renderHome = () => {
 };
 
 const renderPresets = () => {
-  display.setFont(Font.UbuntuMono_12ptFontInfo);
+  display.setFont(Font.UbuntuMono_14ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
   if (state.running && timer >= 0) {
     drawBitmap(0, 0, getHourglass());

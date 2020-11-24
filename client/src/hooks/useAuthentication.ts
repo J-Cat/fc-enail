@@ -44,7 +44,7 @@ export const useAuthentication = (): void => {
               lastLoginError = Date.now();
             }
             dispatch(logoutSoft()).then(() => {
-              history.push(`${Constants.CLIENT_BASE_PATH}login`)
+              history.push(`${Constants.CLIENT_BASE_PATH}login`);
             });
             return;
           }
@@ -61,4 +61,4 @@ export const useAuthentication = (): void => {
   if (!authenticated && !authenticating && !location.pathname.endsWith('/login')) {
     history.push(`${Constants.CLIENT_BASE_PATH}login`);
   }
-}
+};

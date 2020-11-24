@@ -2,7 +2,7 @@ import { Server as HttpServer } from 'http';
 import { validateToken } from './controllers/authController';
 import { getPidSettings, IE5ccState } from './hardware/e5cc';
 import { Server } from 'socket.io';
-import { getCurrentProfile, getProfile, IProfile } from './utility/localDb';
+import { getCurrentProfile, getProfile, IProfile } from './dao/localDb';
 import { registerStateChange } from './utility/sharedState';
 
 const io = new Server();
@@ -56,7 +56,7 @@ export const socketApi = (server: HttpServer): void => {
   });
 };
 
-export const emitE5cc = (data: IE5ccState): boolean => {
+export const emitE5cc = (data: IE5ccState & { scriptRunning: boolean }): boolean => {
   try {
     io.emit('E5CC', data);
     return true;

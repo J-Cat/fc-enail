@@ -2,10 +2,11 @@ import { runScript } from '../utility/scriptEngine';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { Icons } from '../models/icons';
 import { IModeInstance } from '../models/IModeInstance';
-import { getScripts, IScript } from '../utility/localDb';
+import { getScripts } from '../dao/localDb';
 import { IMenu, registerStateChange, setSharedState } from '../utility/sharedState';
 import { BaseMode } from './baseMode';
 import { setPromptInput } from './promptinput';
+import { IScript } from '../models/IScript';
 
 let scripts: IScript[];
 

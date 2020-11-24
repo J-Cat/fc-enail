@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { IProfile } from '../utility/localDb';
+import { IProfile } from '../dao/localDb';
 import {
   getProfiles as getProfilesDao,
   deleteProfile as deleteProfileDao,

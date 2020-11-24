@@ -67,7 +67,7 @@ const requestLogin = (): AppThunk<void> => async (dispatch: AppDispatch): Promis
     
     dispatch(setError(error));
   }
-}
+};
 
 const login = (passcode: string): AppThunk<{ result: boolean, error?: string }> => async (
   dispatch: AppDispatch,

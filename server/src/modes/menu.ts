@@ -1,5 +1,5 @@
 import { setEncoderValue } from '../hardware/rotaryEncoder';
-import { getCurrentProfile, getCurrentScript, getProfiles, getScripts } from '../utility/localDb';
+import { getCurrentProfile, getCurrentScript, getProfiles, getScripts } from '../dao/localDb';
 import { IMenu, registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
 
 let state = registerStateChange('menu', async (oldState, newState): Promise<void> => {

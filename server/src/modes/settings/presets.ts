@@ -1,7 +1,7 @@
 import { registerConfigChange } from '../../config';
 import { setEncoderValue } from '../../hardware/rotaryEncoder';
 import { Icons } from '../../models/icons';
-import { getQuickSet, setQuickSet } from '../../utility/localDb';
+import { getQuickSet, setQuickSet } from '../../dao/localDb';
 import { registerStateChange, setSharedState } from '../../utility/sharedState';
 import { getMenuUpdate } from '../menu';
 import { setNumberInput } from '../numberinput';

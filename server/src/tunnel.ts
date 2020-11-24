@@ -1,6 +1,6 @@
 import localtunnel from 'localtunnel';
 import { registerConfigChange } from './config';
-import { getUrl, setUrl } from './utility/localDb';
+import { getUrl, setUrl } from './dao/localDb';
 import { parseIntDefault } from './utility/parseIntDefault';
 import { setSharedState } from './utility/sharedState';
 

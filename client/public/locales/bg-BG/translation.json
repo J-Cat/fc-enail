@@ -3,7 +3,8 @@
     "home": "Home",
     "profiles": "Profiles",
     "scripts": "Scripts",
-    "settings": "Settings"
+    "settings": "Settings",
+    "wifi": "WiFi"
   },
   "labels": {
     "Unauthorized": "Unauthorized!"
@@ -65,7 +66,31 @@
     "buttonSave": "Save"
   },
   "scripts": {
-    "label": "Script"
+    "label": "Script",
+    "updateConfirm": "Update Script?",
+    "updateConfirmContent": "Do you want to update the script: {{script}}?",
+    "save": {
+      "error": {
+        "title": "Error"
+      }
+    },
+    "savesuccess": {
+      "title": "Success",
+      "content": "Successfully saved the script: {{script}}"
+    },
+    "deleteScript": {
+      "confirm": {
+        "title": "Delete Script?",
+        "content": "Delete the {{script}} script?"
+      },
+      "error": {
+        "title": "Error Deleting Script",
+        "content": "An error occured deleting the {{script}} script."
+      }
+    },
+    "script": "Script",
+    "title": "Script Title",
+    "buttonSave": "Save"
   },
   "login": {
     "loginError": "Login Error",
@@ -104,7 +129,15 @@
     "setActive": "Set Active",
     "delete": "Delete",
     "tune": "Auto-Tune",
-    "cancelTune": "Cancel Auto-Tune"
+    "cancelTune": "Cancel Auto-Tune",
+    "run": "Run"
+  },
+  "scriptss": {
+    "save": {
+      "error": {
+        "content": "An error occured saving the script: {{script}}"
+      }
+    }
   },
   "settings": {
     "error": {
@@ -129,6 +162,44 @@
       "Content": "Successfully saved your settings."
     }
   },
+  "wifi": {
+    "error": {
+      "scan": {
+        "title": "Scan Error",
+        "content": "An error occured connecting to the WiFi network, {{ssid}}: {{error}}"
+      },
+      "connect": {
+        "title": "Connect Error",
+        "content": "An error occured connecting to the WiFi network, {{ssid}}: {{error}}"
+      }
+    },
+    "mode": {
+      "label": "Mode"
+    },
+    "label": {
+      "client": "Client",
+      "accesspoint": "Access Point"
+    },
+    "network": {
+      "label": "Network"
+    },
+    "ssid": {
+      "validation": {
+        "required": "You must select a network to connect to."
+      },
+      "label": "SSID"
+    },
+    "passcode": {
+      "label": "Passcode",
+      "validation": {
+        "required": "Passcode is required."
+      }
+    },
+    "button": {
+      "scan": "Scan",
+      "connect": "Connect"
+    }
+  },
   "AUTH": {
     "REQUEST_LOGIN_UNKNOWN_ERROR": "An unknown error occured trying to initiate a login request: {{error}}",
     "LOGIN_FAILED": "Login failed.",
@@ -141,11 +212,23 @@
     "GET_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the quick-set values: {{error}}",
     "SEND_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to update the quick-set values: {{error}}"
   },
+  "NETWORK": {
+    "getNetworkConfigFailed": "Retrieving network information failed.",
+    "getNetworkConfigUnknownError": "An unknown error occured trying to retrieve the network configuration: {{error}}",
+    "scanNetworksUnknownError": "An unknown error occured trying to scan for nearby WiFi networks: {{error}}",
+    "connectError": "An unknown error occured trying to connect to the WiFi network, {{ssid}}: {{error}}"
+  },
   "PROFILES": {
     "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the profiles: {{error}}",
     "SAVE_PROFILE_UNKNOWN_ERROR": "An unknown error occured trying to save the profile: {{error}}",
     "TOGGLE_TUNING_ERROR": "An unknown error occured trying to change the e-nail tuning state: {{error}}",
     "SET_CURRENT_PROFILE_ERROR": "An unknown error occured trying to set the current profile: {{error}}",
-    "DELETE_PROFILE_ERROR": "An unknown error occured deleting the profile: {{error}}"
+    "DELETE_PROFILE_ERROR": "An unknown error occured deleting the profile: {{error}}",
+    "SAVE_SCRIPT_UNKNOWN_ERROR": "An unknown error occured trying to save the script: {{error}}"
+  },
+  "SCRIPTS": {
+    "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the scripts: {{error}}",
+    "SET_CURRENT_SCRIPT_ERROR": "An unknown error occured trying to set the current script: {{error}}",
+    "DELETE_SCRIPT_ERROR": "An unknown error occured deleting the script: {{error}}"
   }
 }

@@ -20,6 +20,8 @@ interface IFormData {
 }
 
 const SettingsPage: React.FC = () => {
+  const tuning = useSelector<RootState, boolean>(state => state.enail.state?.tuning || false);
+  const scriptRunning = useSelector<RootState, boolean>(state => state.enail.state?.scriptRunning || false);
   const dispatch = useDispatch<AppDispatch>();
   const loading = useSelector((state: RootState) => state.enail.loading);
   const requesting = useSelector((state: RootState) => state.enail.requesting);
@@ -186,7 +188,7 @@ const SettingsPage: React.FC = () => {
       </div>
 
       <Form.Item className="button-row">
-        <Button type="primary" htmlType="submit" disabled={requesting}>
+        <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
           {t('settings.buttonSave', 'Save')}
         </Button>
       </Form.Item>

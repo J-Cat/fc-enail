@@ -5,7 +5,7 @@ import { showMessage } from '../hardware/display';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { Icons } from '../models/icons';
 import { IModeInstance } from '../models/IModeInstance';
-import { getProfiles, IProfile } from '../utility/localDb';
+import { getProfiles, IProfile } from '../dao/localDb';
 import { IMenu, registerStateChange, setSharedState } from '../utility/sharedState';
 import { BaseMode } from './baseMode';
 import { setNumberInput } from './numberinput';

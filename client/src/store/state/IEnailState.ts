@@ -5,6 +5,7 @@ export interface IE5ccState {
   readonly tuning?: boolean;
   readonly nocoil?: boolean;
   readonly started?: number;
+  readonly scriptRunning?: boolean;
 }
 
 export interface IConfig {

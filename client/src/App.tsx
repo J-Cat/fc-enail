@@ -8,11 +8,13 @@ import { Switch, Route, useHistory } from 'react-router-dom';
 import './App.less';
 import { useAuthentication } from './hooks/useAuthentication';
 import { useEnsureLoaded } from './hooks/useEnsureLoaded';
+import { useInProgress } from './hooks/useInProgress';
 import { useSocketIO } from './hooks/useSocketIO';
 import { Constants } from './models/constants';
 import { HomePage } from './pages/home/home';
 import { LoginPage } from './pages/login/login';
 import { ProfilesPage } from './pages/profiles/profiles';
+import { ScriptsPage } from './pages/scripts/scripts';
 import { SettingsPage } from './pages/settings/settings';
 import { WifiPage } from './pages/wifi/wifi';
 import { RootState } from './store/reducers/rootReducer';
@@ -25,11 +27,12 @@ export const App: React.FC = () => {
   useAuthentication();
   useEnsureLoaded();
   useSocketIO();
+  useInProgress();
 
   const getSelected = () => {
     const key = location.pathname.replace(/^.*\/(.*)$/, '$1');
     return [key];
-  }
+  };
 
   return (
     <ConfigProvider>
@@ -45,6 +48,9 @@ export const App: React.FC = () => {
               </Route>
               <Route path={`${Constants.CLIENT_BASE_PATH}settings`}>
                 <SettingsPage />
+              </Route>
+              <Route path={`${Constants.CLIENT_BASE_PATH}scripts`}>
+                <ScriptsPage />
               </Route>
               <Route path={`${Constants.CLIENT_BASE_PATH}profiles`}>
                 <ProfilesPage />
@@ -70,4 +76,4 @@ export const App: React.FC = () => {
       </Layout>
     </ConfigProvider>
   );
-}
+};

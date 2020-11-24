@@ -19,6 +19,7 @@ const HomePage: FC = () => {
   const presentValue = useSelector<RootState, number>(state => state.enail?.state?.pv || 0);
   const setPoint = useSelector<RootState, number>(state => state.enail?.state?.sp || 0);
   const running = useSelector<RootState, boolean>(state => state.enail.state?.running || false);
+  const scriptRunning = useSelector<RootState, boolean>(state => state.enail.state?.scriptRunning || false);
   const config = useSelector<RootState, IConfig|undefined>(state => state.enail.config);
   const quickset = useSelector<RootState, number[]>(state => state.enail.quickset);
   const shutoffTimer = useSelector<RootState, number>(
@@ -146,7 +147,7 @@ const HomePage: FC = () => {
           </Card>
         </Col>
         <Col span={8} className="power-switch">
-          <Card title={<Switch checked={isRunning} onClick={onPowerChange} />} className="power-switch-card">
+          <Card title={<Switch disabled={tuning || scriptRunning} checked={isRunning} onClick={onPowerChange} />} className="power-switch-card">
             {running ? getTimeString(shutoffTimer) : <span>&nbsp;</span>}
           </Card>
         </Col>
@@ -159,13 +160,24 @@ const HomePage: FC = () => {
             max={config?.max || 1000}
             onChange={onSetPointChange} 
             onAfterChange={updateSetPoint} 
+            disabled={tuning || scriptRunning}
           />
         </Col>
       </Row>
       <Row>
         <Col span={24} className="quickset-bar">
           {quickset.map(value => {
-            return <Button type="ghost" className={setPoint === value ? 'quickset-selected' : ''} key={`quickset-${value}`} onClick={() => { onQuickSet(value); }}>{value}</Button>;
+            return (
+              <Button 
+                type="ghost" 
+                className={setPoint === value ? 'quickset-selected' : ''} 
+                key={`quickset-${value}`} 
+                onClick={() => { onQuickSet(value); }}
+                disabled={tuning || scriptRunning}
+              >
+                {value}
+              </Button>
+            );
           })}
         </Col>
       </Row>
@@ -173,9 +185,9 @@ const HomePage: FC = () => {
         <Col span={24}>
           <Card className="profile-card">
             <div className="profile-card-content">
-              <div>{t('profiles.label', 'Profile')}</div>
-              <div>
-                <Select value={currentProfile} onChange={profileOnChange} disabled={tuning}>
+              <div className="profile-card-content-label">{t('profiles.label', 'Profile')}</div>
+              <div className="profile-card-content-value">
+                <Select value={currentProfile} onChange={profileOnChange} disabled={tuning || scriptRunning}>
                   <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
                   {profiles.map(p => {
                     return (
@@ -196,10 +208,10 @@ const HomePage: FC = () => {
         <Col span={24}>
           <Card className="script-card">
             <div className="script-card-content">
-              <div>
+              <div className="script-card-content-label">
                 {t('scripts.label', 'Script')}
               </div>
-              <div>
+              <div className="script-card-content-value">
                 <Select defaultValue={0}>
                   <Select.Option value={0}>40&deg; Up-Temp</Select.Option>
                 </Select>

@@ -2,7 +2,7 @@ import { toggleTuning } from '../dao/profilesDao';
 import { updateE5ccSetPoint } from '../hardware/e5cc';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
-import { getCurrentScript, getScript } from '../utility/localDb';
+import { getCurrentScript, getScript } from '../dao/localDb';
 import { registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
 import { runScript } from '../utility/scriptEngine';
 

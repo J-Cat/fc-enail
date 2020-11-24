@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { getQuickSet as dbGetQuickSet, setQuickSet } from '../utility/localDb';
+import { getQuickSet as dbGetQuickSet, setQuickSet } from '../dao/localDb';
 import { saveConfig as saveConfigDao, getConfig as getConfigDao } from '../dao/configDao';
 import { IConfig } from '../models/IConfig';
 

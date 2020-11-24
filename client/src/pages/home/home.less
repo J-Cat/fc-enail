@@ -5,12 +5,7 @@
   height: 100%;
   box-shadow: none !important;
   height: fit-content;
-  @media only screen and (max-width: 420px) {
-    padding: 12px !important;
-  }
-  @media only screen and (max-width: 320px) {
-    padding: 4px !important;
-  }
+  padding: 0px !important;
   &-header {
     display: block;
     padding-bottom: 5px;
@@ -51,13 +46,22 @@
     &-content {
       display: flex;
       flex-direction: row;
-      width: fit-content;
       margin: auto;
-      div {
-        align-content: center;
+      max-width: 400px;
+      &-label {
         padding: 0px 5px;
-        width: fit-content;
+        //min-width: 200px;
         line-height: 32px;
+        flex: 1 auto;
+      }
+      &-value {
+        padding: 0px 5px;
+        //min-width: 200px;
+        line-height: 32px;
+        flex: 1 100%;
+        .ant-select {
+          width: 100%;
+        }
       }
     }
   }

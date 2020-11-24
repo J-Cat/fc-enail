@@ -8,15 +8,14 @@ import { RootState } from '../store/reducers/rootReducer';
 import { IE5ccState } from '../store/state/IEnailState';
 import { IProfile } from '../store/state/IProfileState';
 
-export const useSocketIO = () => {
+export const useSocketIO = (): void => {
   const token = useSelector((state: RootState) => state.auth.token);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const socket = io(Constants.SOCKET_URL, { auth: { token }});
     socket.on('E5CC', (data: IE5ccState) => {
-      dispatch(setState(data))
-    });
+      dispatch(setState(data));    });
 
     socket.on('PID', (profile: IProfile) => {
       dispatch(updateCurrentProfile(profile));
@@ -27,4 +26,4 @@ export const useSocketIO = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-}
+};

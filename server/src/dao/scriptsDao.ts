@@ -1,13 +1,14 @@
 import { 
   getScripts as getLocalDbScripts, 
-  IScript, 
   getCurrentScript,
   setCurrentScript as setLocalDbCurrentScript,
   setScript,
   deleteScript as deleteLocalDbScript,
   getScript,
-} from '../utility/localDb';
+} from './localDb';
 import { setSharedState } from '../utility/sharedState';
+import { IScript } from '../models/IScript';
+import { runScript as runScriptEngine } from '../utility/scriptEngine';
 
 export const getScripts = async (): Promise<{ error?: string, currentScript?: string, scripts?: IScript[] }> => {
   try {
@@ -61,4 +62,5 @@ export const deleteScript = async (key: string): Promise<{ error?: string }> => 
 export const runScript = async (key: string): Promise<void> => {
   const { script } = getScript(key);
   console.log(`running ${script.title}`);
+  runScriptEngine(script);
 };

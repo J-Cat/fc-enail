@@ -120,7 +120,7 @@ const slice = createSlice({
       return {
         ...state,
         loading: true,
-      }
+      };
     },
     completeGetNetworkInfo: (state: INetworkState, action: PayloadAction<{config: INetworkConfig, ssids: string[]}>): INetworkState => {
       return {
@@ -135,7 +135,7 @@ const slice = createSlice({
       return {
         ...state,
         scanning: true,
-      }
+      };
     },
     completeScanNetworks: (state: INetworkState, action: PayloadAction<string[]>): INetworkState => {
       return {

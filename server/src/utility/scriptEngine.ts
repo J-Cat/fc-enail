@@ -2,7 +2,8 @@ import { Font, Ioledjs } from 'ssd1306-i2c-js';
 import { drawMessage, showMessage } from '../hardware/display';
 import { playSound } from '../hardware/sound';
 import { getTimeString } from './getTimeString';
-import { IScript, setCurrentScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep } from './localDb';
+import { IScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep } from '../models/IScript';
+import { setCurrentScript } from '../dao/scriptsDao';
 import { registerStateChange, setSharedState } from './sharedState';
 
 let direction: 'up'|'down' = 'up';

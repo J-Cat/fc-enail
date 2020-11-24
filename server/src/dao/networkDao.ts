@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { exec } from 'child_process';
-import { getSsids, setSsids } from '../utility/localDb';
+import { getSsids, setSsids } from './localDb';
 
 export const getNetworkInfo = async (): Promise<{ error?: string, stdout?: string, stderr?: string, network?: { mode: string, ssid: string, address: string, ssids: string[] }}> => {
   return new Promise(resolve => {

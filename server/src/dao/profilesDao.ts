@@ -7,7 +7,7 @@ import {
   setCurrentProfile as setLocalDbCurrentProfile, 
   setProfile,
   deleteProfile as deleteLocalDbProfile,
-} from '../utility/localDb';
+} from './localDb';
 import { Guid } from 'guid-typescript';
 import { setSharedState } from '../utility/sharedState';
 

@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
         centered: true,
         title: t('login.loginError', 'Login Error'),
         content: error,
-      })
+      });
     }
   };
 

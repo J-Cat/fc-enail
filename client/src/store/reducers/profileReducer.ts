@@ -40,7 +40,7 @@ const getProfiles = (): AppThunk<{ error?: string, currentProfile?: string, prof
       error,
     };
   }
-}
+};
 
 const saveProfile = (profile: IProfile): AppThunk<{ error?: string, profile?: IProfile }> => async (
   dispatch: AppDispatch,
@@ -70,7 +70,7 @@ const saveProfile = (profile: IProfile): AppThunk<{ error?: string, profile?: IP
       error,
     };
   }
-}
+};
 
 const toggleTuning = (): AppThunk<{ error?: string }> => async (
   dispatch: AppDispatch,
@@ -98,7 +98,7 @@ const toggleTuning = (): AppThunk<{ error?: string }> => async (
       error,
     };
   }
-}
+};
 
 const setCurrentProfile = (key: string): AppThunk<{ error?: string }> => async (
   dispatch: AppDispatch,
@@ -129,7 +129,7 @@ const setCurrentProfile = (key: string): AppThunk<{ error?: string }> => async (
       error,
     };
   }
-}
+};
 
 const deleteProfile = (key: string): AppThunk<{ error?: string }> => async (
   dispatch: AppDispatch,
@@ -160,7 +160,7 @@ const deleteProfile = (key: string): AppThunk<{ error?: string }> => async (
       error,
     };
   }
-}
+};
 
 const slice = createSlice({
   name: 'PROFILES',

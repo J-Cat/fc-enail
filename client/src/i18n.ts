@@ -33,4 +33,4 @@ i18n
     initImmediate: false,
   });
 
-  export default i18n;
+export default i18n;

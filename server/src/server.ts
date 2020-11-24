@@ -16,7 +16,7 @@ import { HomeMode } from './modes/homeMode';
 import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
 import { PresetsMode } from './modes/presetsMode';
 import { initProfilesMenu, ProfilesMode } from './modes/profilesMode';
-import { initLocalDb } from './utility/localDb';
+import { initLocalDb } from './dao/localDb';
 import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
 
 let Config = registerConfigChange('server', newConfig => {
@@ -143,7 +143,7 @@ const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState
   }
 
   await setSharedState(state, 'e5cc');
-  emitE5cc(state);
+  emitE5cc({ ...state,  scriptRunning: currentState.scriptRunning || false, });
 };
 
 const onSharedStateChange = async (

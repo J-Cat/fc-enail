@@ -41,7 +41,7 @@ const getState = (): AppThunk<{ result: boolean, state?: ISharedState, error?: s
       error,
     };
   }
-}
+};
 
 const sendState = (newState: ISharedState): AppThunk<{ 
   result: boolean, lastState?: ISharedState, state?: ISharedState, error?: string 
@@ -74,7 +74,7 @@ const sendState = (newState: ISharedState): AppThunk<{
       error,
     };
   }
-}
+};
 
 const getConfig = (): AppThunk<{ result: boolean, config?: IConfig, error?: string }> => async (
   dispatch: AppDispatch,
@@ -104,7 +104,7 @@ const getConfig = (): AppThunk<{ result: boolean, config?: IConfig, error?: stri
       error,
     };
   }
-}
+};
 
 const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string }> => async (
   dispatch: AppDispatch,
@@ -134,7 +134,7 @@ const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string
       error,
     };
   }
-}
+};
 
 const getQuickSet = (): AppThunk<{ result: boolean, values?: number[], error?: string }> => async (
   dispatch: AppDispatch,
@@ -164,7 +164,7 @@ const getQuickSet = (): AppThunk<{ result: boolean, values?: number[], error?: s
       error,
     };
   }
-}
+};
 
 const sendQuickSet = (values: number[]): AppThunk<{ result: boolean, error?: string }> => async (
   dispatch: AppDispatch,
@@ -194,7 +194,7 @@ const sendQuickSet = (values: number[]): AppThunk<{ result: boolean, error?: str
       error,
     };
   }
-}
+};
 
 const slice = createSlice({
   name: 'ENAIL',
