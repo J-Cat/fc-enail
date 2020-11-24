@@ -4,7 +4,10 @@ if [ "$USER" != "root" ]; then
 fi
 
 SAVE_DIR=$PWD
-NODE_MODULES=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')/lib/node_modules
+NODE_PATH=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')
+NODE_MODULES="$NODE_PATH/lib/node_modules"
+
+echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
 
 if [ ! -f /lib/systemd/system/fcenail.service ]; then
   cp $NODE_MODULES/fcenail/fcenail.service /lib/systemd/system
