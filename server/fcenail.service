@@ -8,6 +8,7 @@ Type=simple
 User=pi
 WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail
+EnvironmentFile=/etc/systemd/systemd/fcenail.env
 Restart=on-failure
 
 [Install]
