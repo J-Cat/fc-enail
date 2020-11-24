@@ -1,0 +1,14 @@
+[Unit]
+Description=FC E-Nail - A smart e-nail controller!
+Documentation=https://github.com/J-Cat/fc-enail
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/fc-enail/server
+ExecStart=/usr/bin/node /home/pi/fc-enail/server/dist/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
