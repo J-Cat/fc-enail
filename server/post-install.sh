@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ "$USER" != "root" ]; then
+  exit 0;
+fi
+
 SAVE_DIR=$PWD
 NODE_MODULES=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')/lib/node_modules
 
