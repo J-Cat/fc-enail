@@ -37,7 +37,7 @@
     "react-scripts": "4.0.0",
     "redux": "^4.0.5",
     "socket.io-client": "^3.0.1",
-    "typescript": "^4.0.3",
+    "typescript": "4.0.5",
     "web-vitals": "^0.2.4",
     "workbox-background-sync": "^5.1.3",
     "workbox-broadcast-update": "^5.1.3",

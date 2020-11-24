@@ -1,11 +1,11 @@
 {
   "name": "fcenail",
-  "version": "0.9.0",
+  "version": "1.0.0-beta",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
   "author": "J-Cat",
-  "homepage": "https://github.com/J-Cat/fc-enail",  
+  "homepage": "https://github.com/J-Cat/fc-enail",
   "bin": {
     "fcenail": "./fcenail.sh"
   },

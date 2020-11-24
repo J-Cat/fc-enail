@@ -1,5 +1,5 @@
 import { Button, Card, Col, Modal, Row, Select, Slider, Spin, Switch } from 'antd';
-import Icon, { BorderInnerOutlined, BorderOutlined, ClockCircleOutlined, CloudOutlined, CodeOutlined, HomeOutlined, HourglassOutlined, LockOutlined, PlaySquareOutlined, SettingOutlined, StarOutlined, WifiOutlined } from '@ant-design/icons';
+import Icon, { BorderOutlined, ClockCircleOutlined, CloudOutlined, CodeOutlined, HomeOutlined, HourglassOutlined, LockOutlined, PlaySquareOutlined, SettingOutlined, StarOutlined, WifiOutlined } from '@ant-design/icons';
 import Grid from 'antd/lib/card/Grid';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,6 @@ const HomePage: FC = () => {
   }, [profile]);
 
   useEffect(() => {
-    console.log(`set current script: ${script}`);
     setCurrentScript(script);
   }, [script]);
 

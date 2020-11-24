@@ -73,7 +73,7 @@ export const runStep = async (step: IStep): Promise<void> => {
     break;
   }
   case StepTypeEnum.WaitForSetPointStep: {
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       const checkSetPoint = async (): Promise<boolean> => {
         if (!state.pv || !state.sp) {
           return false;

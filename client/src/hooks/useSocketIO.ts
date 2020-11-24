@@ -9,10 +9,14 @@ import { IE5ccState } from '../store/state/IEnailState';
 import { IProfile } from '../store/state/IProfileState';
 
 export const useSocketIO = (): void => {
-  const token = useSelector((state: RootState) => state.auth.token);
+  const token = useSelector<RootState, string|undefined>(state => state.auth.token);
+  const authenticated = useSelector<RootState, boolean>(state => state.auth.authenticated);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!authenticated) {
+      return;
+    }
     const socket = io(Constants.SOCKET_URL, { auth: { token }});
     socket.on('E5CC', (data: IE5ccState) => {
       dispatch(setState(data));    });
@@ -24,6 +28,7 @@ export const useSocketIO = (): void => {
     return () => { 
       socket.disconnect();
     };
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authenticated]);
 };

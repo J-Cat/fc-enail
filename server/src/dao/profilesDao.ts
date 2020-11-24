@@ -25,6 +25,7 @@ export const getProfiles = async (): Promise<{ error?: string, currentProfile?: 
         });
         profiles = [profile];
         currentProfile = profile.key;
+        await saveProfile(profile);
         await setLocalDbCurrentProfile(currentProfile);
       }
     }

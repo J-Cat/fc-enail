@@ -30,7 +30,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
     }));
     let newEnv = '';
     if (exists) {
-      await new Promise(resolve => readFile('./.env', { encoding: 'utf8' }, (err, data) => {
+      await new Promise<void>(resolve => readFile('./.env', { encoding: 'utf8' }, (err, data) => {
         if (!err) {
           const lines = data.split('\n');
           for (const line of lines) {
@@ -59,7 +59,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
       + `ENCODER_MAX_VALUE=${config.max}\n`
       + `LOCALTUNNEL_SUBDOMAIN=${config.localtunnel || ''}\n`;
     
-    await new Promise(resolve => writeFile('./.env', newEnv, { encoding: 'utf8' }, err => {
+    await new Promise<void>(resolve => writeFile('./.env', newEnv, { encoding: 'utf8' }, err => {
       if (err) {
         throw err;
       }

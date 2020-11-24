@@ -59,7 +59,7 @@ export const loadConfig = (newEnv?: string): void => {
       S: parseIntDefault(process.env.ENCODER_S, 22),
       maxVelocity: parseIntDefault(process.env.ENCODER_MAX_VELOCITY, 100),
       minValue: parseIntDefault(process.env.ENCODER_MIN_VALUE, 0),
-      maxValue: parseIntDefault(process.env.ENCODER_MAX_VALUE, 800),
+      maxValue: parseIntDefault(process.env.ENCODER_MAX_VALUE, 850),
       frequency: parseIntDefault(process.env.ENCODER_FREQUENCY, 100),
     },
     display: {
@@ -70,7 +70,7 @@ export const loadConfig = (newEnv?: string): void => {
     e5cc: {
       device: process.env.E5CC_DEVICE || '/dev/ttyAMA0',
       interval: parseIntDefault(process.env.E5CC_INTERVAL, 500),
-      autoShutoff: parseIntDefault(process.env.E5CC_AUTOSHUTOFF, 30),
+      autoShutoff: parseIntDefault(process.env.E5CC_AUTOSHUTOFF, 60),
       commandTimeout: parseIntDefault(process.env.E5CC_COMMAND_TIMEOUT, 2000),
       connectOptions: {
         baudRate: parseIntDefault(process.env.E5CC_BAUDRATE, 57600),
