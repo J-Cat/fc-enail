@@ -126,9 +126,15 @@ export const setCurrentProfile = async (key: string): Promise<void> => {
   return db.set('currentProfile', key).write();
 };
 
-export const getProfile = (key: string): { index: number; profile: IProfile } => {
+export const getProfile = (key: string): { index?: number; profile?: IProfile } => {
   const profiles = db.get('profiles').value();
-  const index = profiles.findIndex(p => p.key === key);
+  let index = profiles.findIndex(p => p.key === key);
+  if (index < 0 && profiles.length > 0) {
+    index = 0;
+  }
+  if (index < 0) {
+    return {};
+  }
   return { index, profile: profiles[index] };
 };
 

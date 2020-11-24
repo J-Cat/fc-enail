@@ -23,6 +23,10 @@ registerStateChange('e5cc', async (oldState, newState, source) => {
     }
     const key = getCurrentProfile();
     const { profile } = getProfile(key);
+    if (!profile) {
+      return;
+    }
+    
     await saveProfile({
       ...profile, 
       ...pid,
