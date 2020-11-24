@@ -9,7 +9,10 @@ yarn
 yarn build
 
 cd ../server
-rm -f -R dist/ src/
+cp ../README.md .
 
 yarn pack
-yarn publish --tag beta
+#yarn publish --tag beta
+
+rm ./README.md
+cd ..

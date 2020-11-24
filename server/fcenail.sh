@@ -19,10 +19,11 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 SAVE_DIR=$PWD
+NODE_MODULES=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')/lib/node_modules
 
 if [ "$INSTALL" = "true" ]; then
   if [ ! -f /lib/systemd/system/fcenail.service ]; then
-    cp /usr/lib/node_modules/fcenail-server/fcenail.service /lib/systemd/system
+    cp $NODE_MODULES/fcenail/fcenail.service /lib/systemd/system
     systemctl enable fcenail.service
   fi
 
@@ -33,7 +34,7 @@ if [ "$INSTALL" = "true" ]; then
   cd ~/.fcenail
 
   if [ ! -f ~/.fcenail/.env ]; then
-    /usr/lib/node_modules/fcenail-server/generate-environment.sh
+    $NODE_MODULES/fcenail/generate-environment.sh
   fi
 
   systemctl start fcenail.service
@@ -41,6 +42,6 @@ if [ "$INSTALL" = "true" ]; then
 fi
 
 NODE=$(whereis node | sed -E 's/^.*: ([^ ]+).*$/\1/gi')
-$NODE /usr/lib/node_modules/fcenail-server/dist/server.js
+$NODE $NODE_MODULES/fcenail/dist/server.js
 
 cd $SAVE_DIR
