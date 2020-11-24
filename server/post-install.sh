@@ -17,6 +17,7 @@ fi
 
 if [ ! -d ~/.fcenail ]; then
   mkdir ~/.fcenail
+  ln -s $NODE_MODULES/fcenail/sounds sounds
 fi
 
 cd ~/.fcenail
