@@ -10,6 +10,8 @@
     "fcenail": "./fcenail.sh"
   },
   "scripts": {
+    "postinstall": "./post-install.sh",
+    "preuninstall": "./pre-uninstall.sh",
     "build": "tsc",
     "watch": "tsc -w",
     "start": "node dist/server.js",
