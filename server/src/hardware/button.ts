@@ -12,7 +12,7 @@ registerStateChange('button', async (oldState, newState) => {
   }
 });
 
-export type ClickFunc = () => void;
+export type ClickFunc = () => Promise<void>;
 
 const button = new Gpio(Config.button.buttonPin, 'in', 'both');
 const led = new Gpio(Config.button.ledPin, 'out');

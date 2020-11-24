@@ -85,12 +85,32 @@ const onLongButtonClick = async () => {
 }; 
 
 // restart service on really long click
-const onReallyLongButtonClick = () => {
+const onReallyLongButtonClick = async () => {
   if (!processAction()) {
     return;
   }
-  // restart service
-};
+  await setSharedState({ rebooting: true }, 'self');
+  let count = 0;
+  const restartTimer = async () => {
+    if (cancel) {
+      cancel = false;
+      return;
+    }
+
+    await playSound(Sounds.beep);
+    setLed(true);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    setLed(false);
+    await new Promise(resolve => setTimeout(resolve, 250));
+
+    if (count >= 5) {
+      exec('sudo systemctl restart fcenail');
+      return;
+    }
+    count++;
+    restartTimer();
+  };
+  restartTimer();};
 
 // reboot on super long click
 const onReallyReallyLongButonClick = async () => {

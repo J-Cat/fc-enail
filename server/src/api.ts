@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import nocache from 'nocache';
 import logger from 'morgan';
-import { Server, createServer } from 'http';
+import { Server, createServer } from 'https';
 import bodyParser from 'body-parser';
 import path from 'path';
 import HttpStatusCode from 'http-status-codes';
@@ -158,7 +158,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   verifyToken(app);
   routes(app);
 
-  const server = createServer(app);
+  const server = createServer({ cert: process.env.API_JWT_PUBLIC_CERT, key: process.env.API_JWT_PRIVATE_KEY }, app);
   listen(server);
 
   handleExceptions();
