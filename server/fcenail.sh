@@ -37,11 +37,20 @@ if [ "$INSTALL" = "true" ]; then
     $NODE_MODULES/fcenail/generate-environment.sh
   fi
 
+  if [ -f /usr/local/bin/fcenail ]; then
+    rm /usr/local/bin/fcenail
+  fi
+  ln -s $NODE_MODULES/fcenail/fcenail.sh /usr/local/bin/fcenail
+
   systemctl start fcenail.service
+
+  cd $SAVE_DIR
   exit 0
 fi
 
+cd ~/.fcenail
 NODE=$(whereis node | sed -E 's/^.*: ([^ ]+).*$/\1/gi')
+
 $NODE $NODE_MODULES/fcenail/dist/server.js
 
 cd $SAVE_DIR

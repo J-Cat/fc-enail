@@ -28,31 +28,44 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Omron E5CC-QX2ASM-802
 * Raspberry Pi Zero running Raspbian
 * misc modules/components - I need to document the components and schematic/assembly instructions and required hardware in detail.  I may eventually provide a pre-built kit for the hardware to make people's lives easier, depending if I can get the circuit board built in such a way to make everything pluggable and quick to assemble.
+* Raspbeery Pi Pin Configuration:
+
+  Button
+  - button: PIN 31 (GPIO 6)
+  - led: PIN 29 (GPIO 5)
+  - grounds: 30, 39
+
+  Speaker
+  - PIN 33 (GPIO 13)
+  - 5V or 3.3V (PIN 2)
+  - ground: 34
+
+  OLED:
+  - 3.3V (PIN 1)
+  - SDA (PIN 3, GPIO 2)
+  - SCL (PIN 5, GPIO 3)
+  - ground: 9
+
+  RS-485
+  - 3.3V (PIN 17)
+  - ground: PIN 14
+  - TXD (PIN 10, UART0 RX)
+  - RXD (PIN 8, UART0 TX)
+
+  Rotary Encoder
+  - 5V (PIN 2)
+  - Channel A: PIN 18 (GPIO 24)
+  - Channel B: PIN 16 (GPIO 23)
+  - ground: PIN 20
+  - Button: PIN 15 (GPIO 22), GROUND PIN: 25
+
 
 ### Installing
 
-#### Device
 * install Raspbian
-* install NodeJS
-* npm install
-* node_modules\\.bin\tsc
-
-#### Client
-* can be hosted on a web server like any other ReactJS application (could probably setup on NGINX on the device itself)
-* can be installed on Android devices or iOS devices (Mac is required for iOS)
-* npm install (installs dependencies)
-* npm run build (builds typescript project)
-* ln -s build www (link www to build folder for Cordova as Cordova wants the build in the www folder)
-* cordova run ios --device --debug (or --release)
-* cordova run android --device --debug (or --release)
-* cordova build ios --device --debug (or --release) - builds IPA for distribution
-* cordova build android --device --debug (or --release) - builds APK for distribution
-
-## Deployment
-
-* copy files to Raspberry Pi
-* npm install
-* node build/app.js
+* install NodeJS 14.x
+* npm install -g fcenail --unsafe
+* fcenail --install
 
 ## Built With
 

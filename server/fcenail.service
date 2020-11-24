@@ -6,8 +6,8 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/fc-enail/server
-ExecStart=/usr/bin/node /home/pi/fc-enail/server/dist/server.js
+WorkingDirectory=/root/.fcenail
+ExecStart=/usr/local/bin/fcenail
 Restart=on-failure
 
 [Install]
