@@ -85,13 +85,11 @@ export const getVolume = async (): Promise<number> => {
         console.error(stderr);
         return;
       }
-      console.log(stdout);
       const value = parseInt(stdout);
       if (isNaN(value)) {
         resolve(100);
         return;
       }
-      console.log(value);
       resolve(Math.round((value - 65) / 33 * 100));
     });
   });
