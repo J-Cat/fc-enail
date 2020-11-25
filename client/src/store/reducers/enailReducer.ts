@@ -196,6 +196,62 @@ const sendQuickSet = (values: number[]): AppThunk<{ result: boolean, error?: str
   }
 };
 
+const reboot = (): AppThunk<{ error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/system/reboot',
+      method: 'POST',
+    });
+
+    dispatch(completeRequest());
+    return {};
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.REBOOT_UNKNOWN_ERROR', 
+      'An unknown error occured trying to reboot the FC E-Nail: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+};
+
+const restartService = (): AppThunk<{ error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/system/restart',
+      method: 'POST',
+    });
+
+    dispatch(completeRequest());
+    return {};
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.RESTART_UNKNOWN_ERROR', 
+      'An unknown error occured trying to restart the FC E-Nail service: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+};
+
 const slice = createSlice({
   name: 'ENAIL',
   initialState,
@@ -278,6 +334,8 @@ export {
   sendState,
   sendConfig,
   sendQuickSet,
+  restartService,
+  reboot,
 };
 
 export const {

@@ -18,6 +18,7 @@ import { PresetsMode } from './modes/presetsMode';
 import { initProfilesMenu, ProfilesMode } from './modes/profilesMode';
 import { initLocalDb } from './dao/localDb';
 import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
+import { reboot, restartService } from './dao/systemDao';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
@@ -30,7 +31,6 @@ registerStateChange('server', async (lastState, newState): Promise<void> => {
 const lock = new Lock();
 
 let initialized = false;
-let cancel = false;
 let currentState: ISharedState = {};
 
 // capture interrupts and cleanup on exit
@@ -57,7 +57,11 @@ const cleanup = () => {
 
 const processAction = (): boolean => {
   if (currentState.rebooting) {
-    cancel = true;
+    setSharedState({
+      cancel: true,
+      rebooting: false,
+    });
+    return false;
   }
   if (currentState.loading) {
     return false;
@@ -86,54 +90,19 @@ const onLongButtonClick = async () => {
 
 // restart service on really long click
 const onReallyLongButtonClick = async () => {
-  await setSharedState({ rebooting: true }, 'self');
-  let count = 0;
-  const restartTimer = async () => {
-    if (cancel) {
-      cancel = false;
-      return;
-    }
-
-    await playSound(Sounds.beep);
-    setLed(true);
-    await new Promise(resolve => setTimeout(resolve, 250));
-    setLed(false);
-    await new Promise(resolve => setTimeout(resolve, 250));
-
-    if (count >= 5) {
-      exec('sudo systemctl restart fcenail');
-      return;
-    }
-    count++;
-    restartTimer();
-  };
-  restartTimer();
+  if (!processAction()) {
+    return;
+  }
+  restartService();
 };
 
 // reboot on super long click
 const onReallyReallyLongButonClick = async () => {
-  await setSharedState({ rebooting: true }, 'self');
-  let count = 0;
-  const rebootTimer = async () => {
-    if (cancel) {
-      cancel = false;
-      return;
-    }
+  if (!processAction()) {
+    return;
+  }
 
-    await playSound(Sounds.beep);
-    setLed(true);
-    await new Promise(resolve => setTimeout(resolve, 125));
-    setLed(false);
-    await new Promise(resolve => setTimeout(resolve, 125));
-
-    if (count >= 10) {
-      exec('sudo reboot');
-      return;
-    }
-    count++;
-    rebootTimer();
-  };
-  rebootTimer();
+  reboot();
 };
 
 const onEncoderChange = async (value: number) => {

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { RootState } from '../../store/reducers/rootReducer';
-import { sendConfig, sendQuickSet } from '../../store/reducers/enailReducer';
+import { reboot, restartService, sendConfig, sendQuickSet } from '../../store/reducers/enailReducer';
 import { useTranslation } from 'react-i18next';
 import './settings.less';
 import { IConfig } from '../../store/state/IEnailState';
@@ -76,6 +76,26 @@ const SettingsPage: React.FC = () => {
     Modal.info({
       title: t('success.savedConfig.Title', 'Success'),
       content: t('success.savedConfig.Content', 'Successfully saved your settings.'),
+    });
+  };
+
+  const onRestart = async (): Promise<void> => {
+    Modal.confirm({
+      title: t('settings.restartConfirm', 'Restart Service?'),
+      content: t('settings.restartConfirmContent', 'Are you sure you want to restart the FC E-Nail service?'),
+      onOk: async () => {
+        dispatch(restartService());
+      },
+    });
+  };
+
+  const onReboot = async (): Promise<void> => {
+    Modal.confirm({
+      title: t('settings.rebootConfirm', 'Reboot Device?'),
+      content: t('settings.rebootConfirmContent', 'Are you sure you want to reboot the FC E-Nail controller?'),
+      onOk: async () => {
+        dispatch(reboot());
+      },
     });
   };
 
@@ -211,6 +231,20 @@ const SettingsPage: React.FC = () => {
         <Form.Item className="button-row">
           <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
             {t('settings.buttonSave', 'Save')}
+          </Button>
+          &nbsp;
+          <Button 
+            type="primary" htmlType="button" disabled={requesting || tuning || scriptRunning}
+            onClick={onRestart}
+          >
+            {t('settings.buttonRestart', 'Restart Service')}
+          </Button>
+          &nbsp;
+          <Button 
+            type="primary" htmlType="button" disabled={requesting || tuning || scriptRunning}
+            onClick={onReboot}
+          >
+            {t('settings.buttonReboot', 'Reboot')}
           </Button>
         </Form.Item>
       </Form>

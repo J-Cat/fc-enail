@@ -3,22 +3,42 @@ import { Sounds } from '../models/sounds';
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
   return new Promise(resolve => {
-    exec(`aplay "./sounds/${filename}"`, (error, stdout, stderr) => {
-      if (error) {
-        resolve({
-          error: new Error(error.message),
-          stderr,
-        });
-      }
-      resolve({});
-    });
+    exec(
+      ` \
+        amixer set Headphone on; \
+        aplay "./sounds/${filename}"; \
+        amixer set Headphone off; \
+      `, (error, stdout, stderr) => {
+        if (error) {
+          resolve({
+            error: new Error(error.message),
+            stderr,
+          });
+        }
+        resolve({});
+      },
+    );
   });
 };
 
 export const playBeep = async (repeat: number): Promise<void> => {
-  for (let i = 0; i < repeat; i++) {
-    await playSound(Sounds.beep);
-    await new Promise(resolve => setTimeout(resolve, 750));
+  try {
+    await new Promise(resolve => {
+      exec('amixer set Headphone on', resolve);
+    });
+
+    for (let i = 0; i < repeat; i++) {
+      await new Promise(resolve => {
+        exec(`aplay "./sounds/${Sounds.beep}"`, resolve);
+      });
+      if (i > repeat - 1) {
+        await new Promise(resolve => setTimeout(resolve, 750));
+      }
+    }  
+  } finally {
+    await new Promise(resolve => {
+      exec('amixer set Headphone off', resolve);
+    });
   }
 };
 
