@@ -17,7 +17,7 @@ export interface IMenu {
   menuItems: string[];
   icon?: IIcon;
   isMoving?: boolean;
-  onClick: (index: number, action?: string) => void;
+  onClick: (index: number, action?: string) => Promise<void>;
   onLongClick?: (index: number) => Promise<void>;
   onMove?: () => Promise<void>;
 }

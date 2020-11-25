@@ -124,7 +124,7 @@ const editProfile = async (profile: IProfile): Promise<void> => {
           `I:     ${profile.i}`,
           `D:     ${profile.d}`,
         ],
-        onClick: (editIndex) => {
+        onClick: (editIndex): Promise<void> => {
           switch (editIndex) {
           case 0: {
             setTextInput('Profile Name', profile.title, async (text: string): Promise<void> => {
@@ -151,6 +151,8 @@ const editProfile = async (profile: IProfile): Promise<void> => {
             break;
           }
           }          
+
+          return Promise.resolve();
         },
       }
     ]

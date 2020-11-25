@@ -59,7 +59,7 @@ export const useMenuLongClick = async (): Promise<void> => {
 
 export const useMenuClick = async (): Promise<void> => {
   const menu = state.menu?.[state.menu?.length - 1];
-  menu?.onClick(menu.current, menu.action);
+  await menu?.onClick(menu.current, menu.action);
 };
 
 export const useMenuEncoderClick = async (): Promise<boolean> => {

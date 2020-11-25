@@ -1,6 +1,6 @@
 import { Button, Dropdown, Form, Input, Menu, Modal, Select, Spin } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -15,18 +15,16 @@ import './scripts.less';
 import { Step } from '../../components/Step';
 
 const ScriptsPage: FC = () => {
-  const tuning = useSelector<RootState, boolean>(state => state.enail.state?.tuning || false);
-  const scriptRunning = useSelector<RootState, boolean>(state => state.enail.state?.scriptRunning || false);
   const loading = useSelector<RootState, boolean>(state => state.scripts.loading);
   const requesting = useSelector<RootState, boolean>(state => state.scripts.requesting);
   const script = useSelector<RootState, string | undefined>(state => state.scripts.currentScript);
   const scripts = useSelector<RootState, IScript[]>(state => state.scripts.scripts);
   const [currentScript, setCurrentScript] = useState(scripts.find(s => s.key === script));
   const [openKey, setOpenKey] = useState<string|undefined>(undefined);
-  const [renameValue, setRenameValue] = useState<string|undefined>(undefined);
   const [t] = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const formRef = useRef<FormInstance>();
+  const renameValue = useRef<string>();
 
   useEffect(() => {
     if (script && script !== currentScript?.key) {
@@ -57,25 +55,32 @@ const ScriptsPage: FC = () => {
   const onSaveScript = async () => {
     Modal.confirm({
       title: t('scripts.updateConfirm', 'Update Script?'),
-      content: t('scripts.updateConfirmContent', 'Do you want to update the script: {{script}}?', { script: currentScript?.title }),
+      content: <div>
+        <div>{t('scripts.updateConfirmContent', 'Do you want to update the script?')}</div>
+        <div>
+          <Input defaultValue={currentScript?.title} onChange={value => { renameValue.current = value.target.value; } } />
+        </div>
+      </div>,
       onOk: async () => {
         if (!currentScript) {
           return;
         }
         const result = await dispatch(saveScript({
           ...currentScript,
-        } as IScript));  
+          title: renameValue.current || currentScript.title,
+        } as IScript));
         if (result.error) {
           Modal.error({
             title: t('scripts.save.error.title', 'Error'),
-            content: t('scripts.save.error.content', 'An error occured saving the script: {{script}}', { script: currentScript.title }),
+            content: t('scripts.save.error.content', 'An error occured saving the script: {{script}}', { script: renameValue.current || currentScript.title }),
           });
         } else {
           Modal.info({
             title: t('scripts.savesuccess.title', 'Success'),
-            content: t('scripts.savesuccess.content', 'Successfully saved the script: {{script}}', { script: currentScript.title }),
+            content: t('scripts.savesuccess.content', 'Successfully saved the script: {{script}}', { script: renameValue.current || currentScript.title }),
           });
-        }
+        }  
+        renameValue.current = '';
       },
     });
   };
@@ -83,15 +88,14 @@ const ScriptsPage: FC = () => {
   const onRenameScript = async () => {
     Modal.confirm({
       title: t('scripts.renameConfirm', 'Rename Script?'),
-      content: <Input defaultValue={currentScript?.title} onChange={value => { setRenameValue(value.target.value); } } />,
+      content: <Input defaultValue={currentScript?.title} onChange={value => { renameValue.current = value.target.value; } } />,
       onOk: async () => {
-        alert(renameValue);
         if (!currentScript || !renameValue) {
           return;
         }
         const result = await dispatch(saveScript({
           ...currentScript,
-          title: renameValue,
+          title: renameValue.current,
         } as IScript));  
         if (result.error) {
           Modal.error({
@@ -101,9 +105,10 @@ const ScriptsPage: FC = () => {
         } else {
           Modal.info({
             title: t('scripts.rename.sucess.title', 'Success'),
-            content: t('scripts.rename.success.content', 'Successfully renamed the script: {{script}}', { script: renameValue }),
+            content: t('scripts.rename.success.content', 'Successfully renamed the script: {{script}}', { script: renameValue.current }),
           });
         }
+        renameValue.current = '';
       },
     });
   };

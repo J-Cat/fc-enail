@@ -6,7 +6,7 @@ import { IConfig } from '../models/IConfig';
 
 export const getConfig = async (req: Request, res: Response): Promise<Response> => {
   try {
-    return res.status(HttpStatusCode.OK).json(getConfigDao());
+    return res.status(HttpStatusCode.OK).json(await getConfigDao());
   } catch (e) {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
       .json({ error: e.message });

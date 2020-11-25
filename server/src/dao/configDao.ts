@@ -1,3 +1,4 @@
+import { exec } from 'child_process';
 import { readFile, stat, writeFile } from 'fs';
 import { registerConfigChange, loadConfig } from '../config';
 import { IConfig } from '../models/IConfig';
@@ -6,7 +7,7 @@ let Config = registerConfigChange('config-dao', newConfig => {
   Config = newConfig;
 });
 
-export const getConfig = (): IConfig => {
+export const getConfig = async (): Promise<IConfig> => {
   const config = {
     autoShutoff: Config.e5cc.autoShutoff,
     screenSaverTimeout: Config.display.screenSaverTimeout,
@@ -14,6 +15,7 @@ export const getConfig = (): IConfig => {
     max: Config.encoder.maxValue,
     min: Config.encoder.minValue,
     localtunnel: Config.localtunnel.subdomain,
+    volume: await getVolume(),
   };
 
   return config;
@@ -66,9 +68,46 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
       resolve();
     }));
 
+    await setVolume(config.volume);
+  
     loadConfig(newEnv);
     return {};
   } catch (e) {
     return { error: e.message };
   }
+};
+
+export const getVolume = async (): Promise<number> => {
+  const volume = await new Promise<number>(resolve => {
+    exec('amixer get Headphone | grep -E \'^ *Mono:\' | sed -E \'s/^ *Mono: Playback -?[0-9]+ \\[([0-9]+)%\\].*$/\\1/gi\'', (error, stdout, stderr) => {
+      if (error) {
+        resolve(100);
+        console.error(stderr);
+        return;
+      }
+      console.log(stdout);
+      const value = parseInt(stdout);
+      if (isNaN(value)) {
+        resolve(100);
+        return;
+      }
+      console.log(value);
+      resolve(Math.round((value - 65) / 33 * 100));
+    });
+  });
+  return volume;
+};
+
+export const setVolume = async (value: number): Promise<void> => {
+  // set volume
+  const volume = ((value / 100) * 33) + 65;
+  let onoff = 'on';
+  if (value === 0) {
+    onoff = 'off';
+  }
+  await new Promise<void>(resolve => {
+    exec(`amixer set Headphone ${onoff} ${volume}%`, () => {
+      resolve();
+    });
+  });
 };

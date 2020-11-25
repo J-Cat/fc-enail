@@ -25,8 +25,9 @@ export const initWifi = async (): Promise<void> => {
         min: 0,
         max: (ssids?.ssids?.length || 1) - 1,
         menuItems: ssids.ssids || [],
-        onClick: () => {
+        onClick: (): Promise<void> => {
           setTextInput('Passcode', '', connectWifi);
+          return Promise.resolve();
         },
       },
     ]

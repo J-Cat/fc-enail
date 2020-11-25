@@ -119,7 +119,7 @@ const sendConfig = (config: IConfig): AppThunk<{ result: boolean, error?: string
       data: config,
     });
 
-    dispatch(completeRequest());
+    dispatch(completeSendConfig(config));
     return { result: true };
   } catch (e) {
     const error = i18n.t(
@@ -236,6 +236,13 @@ const slice = createSlice({
         config: action.payload,
       };
     },
+    completeSendConfig: (state: IEnailState, action: PayloadAction<IConfig>): IEnailState => {
+      return {
+        ...state,
+        requesting: false,
+        config: action.payload,
+      };
+    },
     completeGetQuickSet: (state: IEnailState, action: PayloadAction<number[]>): IEnailState => {
       return {
         ...state,
@@ -279,6 +286,7 @@ export const {
   completeRequest,
   completeGetState,
   completeGetConfig,
+  completeSendConfig,
   completeGetQuickSet,
   setState,
   setError,

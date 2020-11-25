@@ -4,5 +4,6 @@ export interface IConfig {
   screenOffTimeout: number;
   max: number;
   min: number;
+  volume: number;
   localtunnel?: string;
 }

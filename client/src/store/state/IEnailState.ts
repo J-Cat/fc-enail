@@ -21,6 +21,7 @@ export interface IConfig {
   readonly screenOffTimeout: number;
   readonly max: number;
   readonly min: number;
+  readonly volume: number;
   readonly localtunnel: string;
 }
 

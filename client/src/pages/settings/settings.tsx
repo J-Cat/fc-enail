@@ -15,6 +15,7 @@ interface IFormData {
   screenOffTimeout?: number;
   max?: number;
   min?: number;
+  volume?: number;
   localtunnel?: string;
   quickset?: string;
 }
@@ -38,6 +39,7 @@ const SettingsPage: React.FC = () => {
       || (formData.screenSaverTimeout === undefined) 
       || (formData.screenOffTimeout === undefined) 
       || (formData.autoShutoff === undefined)
+      || (formData.volume === undefined)
     ) {
       Modal.error({
         title: t('settings.error.title', 'Error'),
@@ -53,6 +55,7 @@ const SettingsPage: React.FC = () => {
       screenSaverTimeout: formData.screenSaverTimeout,
       screenOffTimeout: formData.screenOffTimeout,
       localtunnel: formData.localtunnel || '',
+      volume: formData.volume || 100
     }));
 
     if (result.error) {
@@ -90,6 +93,19 @@ const SettingsPage: React.FC = () => {
       >
         <Form.Item className="header-row">
           <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+        </Form.Item>
+        <Form.Item
+          label={t('settings.volume', 'Volume')}
+          name="volume"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 0,
+            max: 100,
+          }]}
+          initialValue={config?.volume}
+        >
+          <InputNumber disabled={requesting} />
         </Form.Item>
         <Form.Item
           label={t('settings.min', 'Minimum')}
