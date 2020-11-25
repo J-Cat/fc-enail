@@ -81,121 +81,125 @@ const SettingsPage: React.FC = () => {
   }
 
   return (
-    <Form
-      name="basic"
-      onFinish={submitSettings}
-      className="settings-form"
-    >
-      <Form.Item className="header-row">
-        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
-      </Form.Item>
-      <Form.Item
-        label={t('settings.min', 'Minimum')}
-        name="min"
-        rules={[{ 
-          required: true, 
-          type: 'number',
-          min: 0,
-          max: 400,
-        }]}
-        initialValue={config?.min}
+    <div className="settings-container">
+      <div className="spacer" />
+      <Form
+        name="basic"
+        onFinish={submitSettings}
+        className="settings-form"
       >
-        <InputNumber disabled={requesting} />
-      </Form.Item>
+        <Form.Item className="header-row">
+          <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+        </Form.Item>
+        <Form.Item
+          label={t('settings.min', 'Minimum')}
+          name="min"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 0,
+            max: 400,
+          }]}
+          initialValue={config?.min}
+        >
+          <InputNumber disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.max', 'Maximum')}
-        name="max"
-        rules={[{ 
-          required: true, 
-          type: 'number',
-          min: 500,
-          max: 1200,
-        }]}
-        initialValue={config?.max}
-      >
-        <InputNumber disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.max', 'Maximum')}
+          name="max"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 500,
+            max: 1200,
+          }]}
+          initialValue={config?.max}
+        >
+          <InputNumber disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.presets', 'Presets')}
-        name="quickset"
-        rules={[{ required: true },
-          { type: 'regexp' },
-          { 
-            pattern: /^\d+((,\d+)|(,(\d+,)+\d+))$/,
-            message: t('settings.presetsError', 'Presets must be a comma separated list of numbers.'),
-          },
-        ]}
-        initialValue={quickset.join(',')}
-      >
-        <Input disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.presets', 'Presets')}
+          name="quickset"
+          rules={[{ required: true },
+            { type: 'regexp' },
+            { 
+              pattern: /^\d+((,\d+)|(,(\d+,)+\d+))$/,
+              message: t('settings.presetsError', 'Presets must be a comma separated list of numbers.'),
+            },
+          ]}
+          initialValue={quickset.join(',')}
+        >
+          <Input disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.autoshutoff', 'Auto Shutoff (in minutes)')}
-        name="autoShutoff"
-        rules={[{ 
-          required: true, 
-          type: 'number',
-          min: 15,
-          max: 480,
-        }]}
-        initialValue={config?.autoShutoff}
-      >
-        <InputNumber disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.autoshutoff', 'Auto Shutoff (in minutes)')}
+          name="autoShutoff"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 15,
+            max: 480,
+          }]}
+          initialValue={config?.autoShutoff}
+        >
+          <InputNumber disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.screenSaverTimeout', 'Screen Saver Timeout (in minutes)')}
-        name="screenSaverTimeout"
-        rules={[{ 
-          required: true, 
-          type: 'number',
-          min: 1,
-          max: 10,
-        }]}
-        initialValue={config?.screenSaverTimeout}
-      >
-        <InputNumber disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.screenSaverTimeout', 'Screen Saver Timeout (in minutes)')}
+          name="screenSaverTimeout"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 1,
+            max: 10,
+          }]}
+          initialValue={config?.screenSaverTimeout}
+        >
+          <InputNumber disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.screenOffTimeout', 'Screen Off Timeout (in minutes)')}
-        name="screenOffTimeout"
-        rules={[{ 
-          required: true, 
-          type: 'number',
-          min: 1,
-          max: 60,
-        }]}
-        initialValue={config?.screenOffTimeout}
-      >
-        <InputNumber disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.screenOffTimeout', 'Screen Off Timeout (in minutes)')}
+          name="screenOffTimeout"
+          rules={[{ 
+            required: true, 
+            type: 'number',
+            min: 1,
+            max: 60,
+          }]}
+          initialValue={config?.screenOffTimeout}
+        >
+          <InputNumber disabled={requesting} />
+        </Form.Item>
 
-      <Form.Item
-        label={t('settings.localtunnel', 'LocalTunnel.me Subdomain')}
-        name="localtunnel"
-        rules={[{ 
-          type: 'string',
-        }]}
-        initialValue={config?.localtunnel}
-        className="last-row"
-      >
-        <Input disabled={requesting} />
-      </Form.Item>
+        <Form.Item
+          label={t('settings.localtunnel', 'LocalTunnel.me Subdomain')}
+          name="localtunnel"
+          rules={[{ 
+            type: 'string',
+          }]}
+          initialValue={config?.localtunnel}
+          className="last-row"
+        >
+          <Input disabled={requesting} />
+        </Form.Item>
 
-      <div hidden={!url} className="localtunnel-me-link">
-        <a href={url}>{url}</a>
-      </div>
+        <div hidden={!url} className="localtunnel-me-link">
+          <a href={url}>{url}</a>
+        </div>
 
-      <Form.Item className="button-row">
-        <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
-          {t('settings.buttonSave', 'Save')}
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item className="button-row">
+          <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
+            {t('settings.buttonSave', 'Save')}
+          </Button>
+        </Form.Item>
+      </Form>
+      <div className="spacer" />
+    </div>
   );
 };
 

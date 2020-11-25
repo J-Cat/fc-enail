@@ -201,135 +201,139 @@ const HomePage: FC = () => {
   }
 
   return (
-    <Grid className="home-grid" hoverable={false}>
-      <Row className="header-row">
-        <Col span={24} className="home-grid-header">
-          <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
-        </Col>
-      </Row>
+    <div className="home-container">
+      <div className="spacer" />
+      <Grid className="home-grid" hoverable={false}>
+        <Row className="header-row">
+          <Col span={24} className="home-grid-header">
+            <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col span={16}>
-          <Card title={`${presentValue.toFixed(0)}\u00B0F`} className="temp-card">
-            {setPoint.toFixed(0)}&deg;F
-          </Card>
-        </Col>
-        <Col span={8} className="power-switch">
-          <Card title={<Switch disabled={tuning || scriptRunning} checked={isRunning} onClick={onPowerChange} />} className="power-switch-card">
-            {running ? getTimeString(shutoffTimer) : <span>&nbsp;</span>}
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24}>
-          <Slider 
-            value={setPointLocal} 
-            min={config?.min || 0}
-            max={config?.max || 1000}
-            onChange={onSetPointChange} 
-            onAfterChange={updateSetPoint} 
-            disabled={tuning || scriptRunning}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24} className="quickset-bar">
-          {quickset.map(value => {
-            return (
-              <Button 
-                type="ghost" 
-                className={setPoint === value ? 'quickset-selected' : ''} 
-                key={`quickset-${value}`} 
-                onClick={() => { onQuickSet(value); }}
-                disabled={tuning || scriptRunning}
-              >
-                {value}
-              </Button>
-            );
-          })}
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24}>
-          <Card className="profile-card">
-            <div className="profile-card-content">
-              <div className="profile-card-content-label">{t('profiles.label', 'Profile')}</div>
-              <div className="profile-card-content-value">
-                <Select value={currentProfile} onChange={profileOnChange} disabled={tuning || scriptRunning}>
-                  <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
-                  {profiles.map(p => {
-                    return (
-                      <Select.Option 
-                        key={p.key} value={p.key}
-                      >
-                        {p.title}
-                      </Select.Option>
-                    );
-                  })}
-                </Select>
-              </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24}>
-          <Card className="script-card">
-            <div className="script-card-content">
-              {!scriptRunning
-                ?
-                <><div className="script-card-content-label">
-                  {t('scripts.label', 'Script')}
-                </div><div className="script-card-content-value">
-                  <Select 
-                    value={currentScript}
-                    onChange={value => {
-                      dispatch(setCurrentScriptReducer(value));
-                    }}
-                  >
-                    {scripts.map(s => (
-                      <Select.Option key={s.key} value={s.key}>{s.title}</Select.Option>                      
-                    ))}
+        <Row>
+          <Col span={16}>
+            <Card title={`${presentValue.toFixed(0)}\u00B0F`} className="temp-card">
+              {setPoint.toFixed(0)}&deg;F
+            </Card>
+          </Col>
+          <Col span={8} className="power-switch">
+            <Card title={<Switch disabled={tuning || scriptRunning} checked={isRunning} onClick={onPowerChange} />} className="power-switch-card">
+              {running ? getTimeString(shutoffTimer) : <span>&nbsp;</span>}
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Slider 
+              value={setPointLocal} 
+              min={config?.min || 0}
+              max={config?.max || 1000}
+              onChange={onSetPointChange} 
+              onAfterChange={updateSetPoint} 
+              disabled={tuning || scriptRunning}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24} className="quickset-bar">
+            {quickset.map(value => {
+              return (
+                <Button 
+                  type="ghost" 
+                  className={setPoint === value ? 'quickset-selected' : ''} 
+                  key={`quickset-${value}`} 
+                  onClick={() => { onQuickSet(value); }}
+                  disabled={tuning || scriptRunning}
+                >
+                  {value}
+                </Button>
+              );
+            })}
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Card className="profile-card">
+              <div className="profile-card-content">
+                <div className="profile-card-content-label">{t('profiles.label', 'Profile')}</div>
+                <div className="profile-card-content-value">
+                  <Select value={currentProfile} onChange={profileOnChange} disabled={tuning || scriptRunning}>
+                    <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
+                    {profiles.map(p => {
+                      return (
+                        <Select.Option 
+                          key={p.key} value={p.key}
+                        >
+                          {p.title}
+                        </Select.Option>
+                      );
+                    })}
                   </Select>
                 </div>
-                <div>
-                  <Button 
-                    disabled={scriptRunning || tuning || !running || !currentScript} 
-                    type="primary" icon={<PlaySquareOutlined />} 
-                    onClick={() => {
-                      if (!currentScript) {
-                        return;
-                      }
-                      dispatch(runScript(script));
-                    }}
-                  />
-                </div></>
-                : <>
-                  <div className="script-card-content-label">
-                    {getScriptIcon()}
-                  </div>
-                  <div className="script-card-content-value">
-                    {getScriptStatus()}
+              </div>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Card className="script-card">
+              <div className="script-card-content">
+                {!scriptRunning
+                  ?
+                  <><div className="script-card-content-label">
+                    {t('scripts.label', 'Script')}
+                  </div><div className="script-card-content-value">
+                    <Select 
+                      value={currentScript}
+                      onChange={value => {
+                        dispatch(setCurrentScriptReducer(value));
+                      }}
+                    >
+                      {scripts.map(s => (
+                        <Select.Option key={s.key} value={s.key}>{s.title}</Select.Option>                      
+                      ))}
+                    </Select>
                   </div>
                   <div>
                     <Button 
-                      disabled={!scriptRunning || tuning || !running || !currentScript} 
-                      type="primary" icon={<BorderOutlined />} 
+                      disabled={scriptRunning || tuning || !running || !currentScript} 
+                      type="primary" icon={<PlaySquareOutlined />} 
                       onClick={() => {
                         if (!currentScript) {
                           return;
                         }
-                        dispatch(runScript(currentScript));
+                        dispatch(runScript(script));
                       }}
                     />
-                  </div>
-                </>
-              }
-            </div>
-          </Card>
-        </Col>
-      </Row>
-    </Grid>
+                  </div></>
+                  : <>
+                    <div className="script-card-content-label">
+                      {getScriptIcon()}
+                    </div>
+                    <div className="script-card-content-value">
+                      {getScriptStatus()}
+                    </div>
+                    <div>
+                      <Button 
+                        disabled={!scriptRunning || tuning || !running || !currentScript} 
+                        type="primary" icon={<BorderOutlined />} 
+                        onClick={() => {
+                          if (!currentScript) {
+                            return;
+                          }
+                          dispatch(runScript(currentScript));
+                        }}
+                      />
+                    </div>
+                  </>
+                }
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </Grid>
+      <div className="spacer" />
+    </div>
   );
 };
 

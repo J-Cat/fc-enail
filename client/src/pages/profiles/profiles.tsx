@@ -173,58 +173,62 @@ const ProfilesPage: React.FC = () => {
 
   const prf = profiles.find(p => p.key === currentProfile);
 
-  return <Form className="profile-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={updateProfile}>
-    <Form.Item className="header-row">
-      <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
-    </Form.Item>
-    <Form.Item label={t('profiles.profile', 'Profile')} rules={[{ required: true }]}>
-      <Select value={currentProfile} onChange={selectedOnChange}>
-        <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
-        {profiles.map(p => {
-          return (
-            <Select.Option 
-              key={p.key} value={p.key}
-            >
-              {p.title}{p.key === profile ? t('active-tag', '(active)') : ''}
-            </Select.Option>
-          );
-        })}
-      </Select>
-    </Form.Item>
-    <Form.Item label={t('profiles.title', 'Profile Title')} rules={[{ required: true }]} name="title" initialValue={prf?.title}>
-      <Input />
-    </Form.Item>
-    <Form.Item name="p" label={t('label.proportionalBand', 'Proportional Band (P)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={(prf?.p || 0) / 10}>
-      <InputNumber />
-    </Form.Item>
-    <Form.Item name="i" label={t('label.integralTime', 'Integral Time (I)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={prf?.i}>
-      <InputNumber />
-    </Form.Item>
-    <Form.Item name="d" label={t('label.derivativeTime', 'Derivative Time (D)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={prf?.d}>
-      <InputNumber />
-    </Form.Item>
+  return <div className="profile-container">
+    <div className="spacer" />
+    <Form className="profile-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={updateProfile}>
+      <Form.Item className="header-row">
+        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+      </Form.Item>
+      <Form.Item label={t('profiles.profile', 'Profile')} rules={[{ required: true }]}>
+        <Select value={currentProfile} onChange={selectedOnChange}>
+          <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
+          {profiles.map(p => {
+            return (
+              <Select.Option 
+                key={p.key} value={p.key}
+              >
+                {p.title}{p.key === profile ? t('active-tag', '(active)') : ''}
+              </Select.Option>
+            );
+          })}
+        </Select>
+      </Form.Item>
+      <Form.Item label={t('profiles.title', 'Profile Title')} rules={[{ required: true }]} name="title" initialValue={prf?.title}>
+        <Input />
+      </Form.Item>
+      <Form.Item name="p" label={t('label.proportionalBand', 'Proportional Band (P)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={(prf?.p || 0) / 10}>
+        <InputNumber />
+      </Form.Item>
+      <Form.Item name="i" label={t('label.integralTime', 'Integral Time (I)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={prf?.i}>
+        <InputNumber />
+      </Form.Item>
+      <Form.Item name="d" label={t('label.derivativeTime', 'Derivative Time (D)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={prf?.d}>
+        <InputNumber />
+      </Form.Item>
 
-    <Form.Item className="button-row">
-      <Button type="primary" htmlType="submit" disabled={requesting || tuning}>
-        {t('profiles.buttonSave', 'Save')}
-      </Button>
+      <Form.Item className="button-row">
+        <Button type="primary" htmlType="submit" disabled={requesting || tuning}>
+          {t('profiles.buttonSave', 'Save')}
+        </Button>
         &nbsp;
-      <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
-        onClick={setActive}>
-        {t('button.setActive', 'Set Active')}
-      </Button>
+        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
+          onClick={setActive}>
+          {t('button.setActive', 'Set Active')}
+        </Button>
         &nbsp;
-      <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
-        onClick={onDeleteProfile}>
-        {t('button.delete', 'Delete')}
-      </Button>
+        <Button type="primary" htmlType="button" hidden={(!currentProfile || (currentProfile === profile)) && (currentProfile !== 'new-profile')} disabled={tuning}
+          onClick={onDeleteProfile}>
+          {t('button.delete', 'Delete')}
+        </Button>
         &nbsp;
-      <Button type="primary" htmlType="button" hidden={currentProfile !== profile}
-        onClick={onAutoTune}>
-        {!tuning ? t('button.tune', 'Auto-Tune') : t('button.cancelTune', 'Cancel Auto-Tune')}
-      </Button>
-    </Form.Item>
-  </Form>;
+        <Button type="primary" htmlType="button" hidden={currentProfile !== profile}
+          onClick={onAutoTune}>
+          {!tuning ? t('button.tune', 'Auto-Tune') : t('button.cancelTune', 'Cancel Auto-Tune')}
+        </Button>
+      </Form.Item>
+    </Form>
+    <div className="spacer" />
+  </div>;
 };
 
 const profilesPage = withRouter(ProfilesPage);

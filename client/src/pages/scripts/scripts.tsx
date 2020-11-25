@@ -138,225 +138,229 @@ const ScriptsPage: FC = () => {
     return <Spin />;
   }
 
-  return <Form className="script-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={onSaveScript}>
-    <Form.Item label={t('scripts.script', 'Script')} rules={[{ required: true }]}>
-      <Select value={currentScript?.key} onChange={selectedOnChange}>
-        <Select.Option key={Guid.EMPTY} value={Guid.EMPTY}>-New-</Select.Option>
-        {scripts.map(p => {
-          return (
-            <Select.Option 
-              key={p.key} value={p.key}
-            >
-              {p.title}{p.key === script ? t('active-tag', '(active)') : ''}
-            </Select.Option>
-          );
-        })}
-      </Select>
-    </Form.Item>
-    <Form.Item>
-      <DragDropContext onDragEnd={result => { 
-        if (!currentScript?.rootStep.steps || !result.destination) {
-          return;
-        }
-        const saveKey = openKey;
-        const newSteps = [...currentScript?.rootStep.steps];
-        newSteps.splice(result.destination.index, 0, newSteps.splice(result.source.index, 1)[0]);
-        setCurrentScript({
-          ...currentScript,
-          rootStep: {
-            ...currentScript?.rootStep,
-            steps: [...newSteps],
-          },
-        });
-        setOpenKey(saveKey);
-      }}>
-        <Droppable droppableId="root">
-          {(provided) => {
+  return <div className="script-container">
+    <div className="spacer" />
+    <Form className="script-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={onSaveScript}>
+      <Form.Item label={t('scripts.script', 'Script')} rules={[{ required: true }]}>
+        <Select value={currentScript?.key} onChange={selectedOnChange}>
+          <Select.Option key={Guid.EMPTY} value={Guid.EMPTY}>-New-</Select.Option>
+          {scripts.map(p => {
             return (
-              <div 
-                ref={provided.innerRef}
-                {...provided.droppableProps}
+              <Select.Option 
+                key={p.key} value={p.key}
               >
-                {
-                  currentScript?.rootStep.steps.map((stepInfo, index) => {
-                    return (
-                      <Draggable key={`step-${index}`} index={index} draggableId={`step-${index}`}>
-                        {(provided) => {
-                          return (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              <Step 
-                                key={`step-${index}`} step={stepInfo} 
-                                isOpen={stepInfo.key === openKey}
-                                onChange={step => {
-                                  const foundStep = currentScript.rootStep.steps.findIndex(s => s.key === step.key);
-                                  if (foundStep < 0) {
-                                    return;
-                                  }
-                                  const newSteps = [
-                                    ...(foundStep > 0 ? currentScript.rootStep.steps.slice(0, foundStep) : []),
-                                    step,
-                                    ...(foundStep < currentScript.rootStep.steps.length - 1 ? currentScript.rootStep.steps.slice(foundStep + 1) : []),
-                                  ];
-                                  setCurrentScript({
-                                    ...currentScript,
-                                    rootStep: {
-                                      ...currentScript.rootStep,
-                                      steps: newSteps,
-                                    },
-                                  });
-                                }} 
-                                onOpenClose={(isOpen, key) => {
-                                  if (isOpen) {
-                                    setOpenKey(key);
-                                  } else {
-                                    setOpenKey(undefined);
-                                  }
-                                }}
-                                onDelete={key => {
-                                  setCurrentScript({
-                                    ...currentScript,
-                                    rootStep: {
-                                      ...currentScript.rootStep,
-                                      steps: currentScript.rootStep.steps.filter(s => s.key !== key),
-                                    },
-                                  });
-                                }}
-                              />
-                            </div>
-                          );
-                        }}
-                      </Draggable>
-                    );
-                  })
-                }
-              </div>
+                {p.title}{p.key === script ? t('active-tag', '(active)') : ''}
+              </Select.Option>
             );
-          }}
-        </Droppable>
-      </DragDropContext>
+          })}
+        </Select>
+      </Form.Item>
+      <Form.Item>
+        <DragDropContext onDragEnd={result => { 
+          if (!currentScript?.rootStep.steps || !result.destination) {
+            return;
+          }
+          const saveKey = openKey;
+          const newSteps = [...currentScript?.rootStep.steps];
+          newSteps.splice(result.destination.index, 0, newSteps.splice(result.source.index, 1)[0]);
+          setCurrentScript({
+            ...currentScript,
+            rootStep: {
+              ...currentScript?.rootStep,
+              steps: [...newSteps],
+            },
+          });
+          setOpenKey(saveKey);
+        }}>
+          <Droppable droppableId="root">
+            {(provided) => {
+              return (
+                <div 
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {
+                    currentScript?.rootStep.steps.map((stepInfo, index) => {
+                      return (
+                        <Draggable key={`step-${index}`} index={index} draggableId={`step-${index}`}>
+                          {(provided) => {
+                            return (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Step 
+                                  key={`step-${index}`} step={stepInfo} 
+                                  isOpen={stepInfo.key === openKey}
+                                  onChange={step => {
+                                    const foundStep = currentScript.rootStep.steps.findIndex(s => s.key === step.key);
+                                    if (foundStep < 0) {
+                                      return;
+                                    }
+                                    const newSteps = [
+                                      ...(foundStep > 0 ? currentScript.rootStep.steps.slice(0, foundStep) : []),
+                                      step,
+                                      ...(foundStep < currentScript.rootStep.steps.length - 1 ? currentScript.rootStep.steps.slice(foundStep + 1) : []),
+                                    ];
+                                    setCurrentScript({
+                                      ...currentScript,
+                                      rootStep: {
+                                        ...currentScript.rootStep,
+                                        steps: newSteps,
+                                      },
+                                    });
+                                  }} 
+                                  onOpenClose={(isOpen, key) => {
+                                    if (isOpen) {
+                                      setOpenKey(key);
+                                    } else {
+                                      setOpenKey(undefined);
+                                    }
+                                  }}
+                                  onDelete={key => {
+                                    setCurrentScript({
+                                      ...currentScript,
+                                      rootStep: {
+                                        ...currentScript.rootStep,
+                                        steps: currentScript.rootStep.steps.filter(s => s.key !== key),
+                                      },
+                                    });
+                                  }}
+                                />
+                              </div>
+                            );
+                          }}
+                        </Draggable>
+                      );
+                    })
+                  }
+                </div>
+              );
+            }}
+          </Droppable>
+        </DragDropContext>
       
-    </Form.Item>
+      </Form.Item>
 
-    <Form.Item className="button-row">
-      <Button type="primary" htmlType="submit" disabled={requesting}>
-        {t('scripts.buttonSave', 'Save')}
-      </Button>
+      <Form.Item className="button-row">
+        <Button type="primary" htmlType="submit" disabled={requesting}>
+          {t('scripts.buttonSave', 'Save')}
+        </Button>
       &nbsp;
-      <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}
-        onClick={onRenameScript}>
-        {t('button.rename', 'Rename')}
-      </Button>
+        <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}
+          onClick={onRenameScript}>
+          {t('button.rename', 'Rename')}
+        </Button>
       &nbsp;
-      <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}
-        onClick={onDeleteScript}>
-        {t('button.delete', 'Delete')}
-      </Button>
+        <Button type="primary" htmlType="button" hidden={!currentScript || (scripts.length === 0) || (currentScript.key === Guid.EMPTY)}
+          onClick={onDeleteScript}>
+          {t('button.delete', 'Delete')}
+        </Button>
       &nbsp;
-      <Dropdown 
-        placement="topRight"
-        trigger={['click']}
-        overlay={<Menu>
-          <Menu.Item key="menu-update-sp" onClick={() => {
-            console.log(JSON.stringify(currentScript, null, ' '));
-            if (!currentScript) {
-              return;
-            }
+        <Dropdown 
+          placement="topRight"
+          trigger={['click']}
+          overlay={<Menu>
+            <Menu.Item key="menu-update-sp" onClick={() => {
+              console.log(JSON.stringify(currentScript, null, ' '));
+              if (!currentScript) {
+                return;
+              }
 
-            const newScript = {
-              ...currentScript,
-              rootStep: {
-                ...currentScript.rootStep,
-                steps: [
-                  ...currentScript.rootStep.steps,
+              const newScript = {
+                ...currentScript,
+                rootStep: {
+                  ...currentScript.rootStep,
+                  steps: [
+                    ...currentScript.rootStep.steps,
                   {
                     key: Guid.create().toString(),
                     type: StepTypeEnum.UpdateSetPointStep,
                     updateType: 'increment',
                     value: 10,
                   } as IUpdateSetPointStep,
-                ],
-              },
-            };
-            setCurrentScript(newScript);
-          }}>
-            {t('button.updateSP', 'Update Set Point')}
-          </Menu.Item>
-          <Menu.Item key="menu-wait-sp" onClick={() => {
-            if (!currentScript) {
-              return;
-            }
+                  ],
+                },
+              };
+              setCurrentScript(newScript);
+            }}>
+              {t('button.updateSP', 'Update Set Point')}
+            </Menu.Item>
+            <Menu.Item key="menu-wait-sp" onClick={() => {
+              if (!currentScript) {
+                return;
+              }
 
-            setCurrentScript({
-              ...currentScript,
-              rootStep: {
-                ...currentScript.rootStep,
-                steps: [
-                  ...currentScript.rootStep.steps,
+              setCurrentScript({
+                ...currentScript,
+                rootStep: {
+                  ...currentScript.rootStep,
+                  steps: [
+                    ...currentScript.rootStep.steps,
                   {
                     key: Guid.create().toString(),
                     type: StepTypeEnum.WaitForSetPointStep,
                   } as IWaitForSetPointStep,
-                ],
-              },
-            });
-          }}>
-            {t('button.waitForSP', 'Wait for Set Point')}
-          </Menu.Item>
-          <Menu.Item key="menu-feedback" onClick={() => {
-            if (!currentScript) {
-              return;
-            }
+                  ],
+                },
+              });
+            }}>
+              {t('button.waitForSP', 'Wait for Set Point')}
+            </Menu.Item>
+            <Menu.Item key="menu-feedback" onClick={() => {
+              if (!currentScript) {
+                return;
+              }
 
-            setCurrentScript({
-              ...currentScript,
-              rootStep: {
-                ...currentScript.rootStep,
-                steps: [
-                  ...currentScript.rootStep.steps,
+              setCurrentScript({
+                ...currentScript,
+                rootStep: {
+                  ...currentScript.rootStep,
+                  steps: [
+                    ...currentScript.rootStep.steps,
                   {
                     key: Guid.create().toString(),
                     type: StepTypeEnum.FeedbackStep,
                   } as IFeedbackStep,
-                ],
-              },
-            });
-          }}>
-            {t('button.feedback', 'Feedback')}
-          </Menu.Item>
-          <Menu.Item key="menu-timer" onClick={() => {
-            if (!currentScript) {
-              return;
-            }
+                  ],
+                },
+              });
+            }}>
+              {t('button.feedback', 'Feedback')}
+            </Menu.Item>
+            <Menu.Item key="menu-timer" onClick={() => {
+              if (!currentScript) {
+                return;
+              }
 
-            setCurrentScript({
-              ...currentScript,
-              rootStep: {
-                ...currentScript.rootStep,
-                steps: [
-                  ...currentScript.rootStep.steps,
+              setCurrentScript({
+                ...currentScript,
+                rootStep: {
+                  ...currentScript.rootStep,
+                  steps: [
+                    ...currentScript.rootStep.steps,
                   {
                     key: Guid.create().toString(),
                     type: StepTypeEnum.TimerStep,
                     duration: 5,
                   } as ITimerStep,
-                ],
-              },
-            });
-          }}>
-            {t('button.timer', 'Timer')}
-          </Menu.Item>
-        </Menu>
-        }
-      >
-        <Button type="primary" htmlType="button">{t('button.addstep', 'Add Step')}</Button>
-      </Dropdown>
+                  ],
+                },
+              });
+            }}>
+              {t('button.timer', 'Timer')}
+            </Menu.Item>
+          </Menu>
+          }
+        >
+          <Button type="primary" htmlType="button">{t('button.addstep', 'Add Step')}</Button>
+        </Dropdown>
       &nbsp;
-    </Form.Item>
-  </Form>;
+      </Form.Item>
+    </Form>
+    <div className="spacer" />
+  </div>;
 };
 
 const scriptsPage = withRouter(ScriptsPage);
