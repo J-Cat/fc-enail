@@ -71,12 +71,26 @@
     "updateConfirmContent": "Do you want to update the script: {{script}}?",
     "save": {
       "error": {
-        "title": "Error"
+        "title": "Error",
+        "content": "An error occured saving the script: {{script}}"
       }
     },
     "savesuccess": {
       "title": "Success",
       "content": "Successfully saved the script: {{script}}"
+    },
+    "renameConfirm": "Rename Script?",
+    "rename": {
+      "error": {
+        "title": "Error",
+        "content": "An error occured renaming the script, {{script}}, to {{newTitle}}"
+      },
+      "sucess": {
+        "title": "Success"
+      },
+      "success": {
+        "content": "Successfully renamed the script: {{script}}"
+      }
     },
     "deleteScript": {
       "confirm": {
@@ -89,7 +103,6 @@
       }
     },
     "script": "Script",
-    "title": "Script Title",
     "buttonSave": "Save"
   },
   "login": {
@@ -130,14 +143,12 @@
     "delete": "Delete",
     "tune": "Auto-Tune",
     "cancelTune": "Cancel Auto-Tune",
-    "run": "Run"
-  },
-  "scriptss": {
-    "save": {
-      "error": {
-        "content": "An error occured saving the script: {{script}}"
-      }
-    }
+    "rename": "Rename",
+    "updateSP": "Update Set Point",
+    "waitForSP": "Wait for Set Point",
+    "feedback": "Feedback",
+    "timer": "Timer",
+    "addstep": "Add Step"
   },
   "settings": {
     "error": {
@@ -146,6 +157,7 @@
       "sendconfig": "An error occured saving the configuration.",
       "sendquicksets": "An error occured saving the presets."
     },
+    "volume": "Volume",
     "min": "Minimum",
     "max": "Maximum",
     "presets": "Presets",
@@ -223,11 +235,12 @@
     "SAVE_PROFILE_UNKNOWN_ERROR": "An unknown error occured trying to save the profile: {{error}}",
     "TOGGLE_TUNING_ERROR": "An unknown error occured trying to change the e-nail tuning state: {{error}}",
     "SET_CURRENT_PROFILE_ERROR": "An unknown error occured trying to set the current profile: {{error}}",
-    "DELETE_PROFILE_ERROR": "An unknown error occured deleting the profile: {{error}}",
-    "SAVE_SCRIPT_UNKNOWN_ERROR": "An unknown error occured trying to save the script: {{error}}"
+    "DELETE_PROFILE_ERROR": "An unknown error occured deleting the profile: {{error}}"
   },
   "SCRIPTS": {
     "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the scripts: {{error}}",
+    "SAVE_SCRIPT_UNKNOWN_ERROR": "An unknown error occured trying to save the script: {{error}}",
+    "RUN_SCRIPT_ERROR": "An unknown error occured trying to run the script: {{error}}",
     "SET_CURRENT_SCRIPT_ERROR": "An unknown error occured trying to set the current script: {{error}}",
     "DELETE_SCRIPT_ERROR": "An unknown error occured deleting the script: {{error}}"
   }

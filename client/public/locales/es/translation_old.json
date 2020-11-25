@@ -238,5 +238,21 @@
         "whiteBG": "\u001b[47mAn error occured saving the profile: {{profile}}\u001b[49m"
       }
     }
+  },
+  "scripts": {
+    "title": "Script Title"
+  },
+  "button": {
+    "run": "Run"
+  },
+  "scriptss": {
+    "save": {
+      "error": {
+        "content": "An error occured saving the script: {{script}}"
+      }
+    }
+  },
+  "PROFILES": {
+    "SAVE_SCRIPT_UNKNOWN_ERROR": "An unknown error occured trying to save the script: {{error}}"
   }
 }
