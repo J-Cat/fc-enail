@@ -86,9 +86,6 @@ const onLongButtonClick = async () => {
 
 // restart service on really long click
 const onReallyLongButtonClick = async () => {
-  if (!processAction()) {
-    return;
-  }
   await setSharedState({ rebooting: true }, 'self');
   let count = 0;
   const restartTimer = async () => {
@@ -110,7 +107,8 @@ const onReallyLongButtonClick = async () => {
     count++;
     restartTimer();
   };
-  restartTimer();};
+  restartTimer();
+};
 
 // reboot on super long click
 const onReallyReallyLongButonClick = async () => {
@@ -124,9 +122,9 @@ const onReallyReallyLongButonClick = async () => {
 
     await playSound(Sounds.beep);
     setLed(true);
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 125));
     setLed(false);
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 125));
 
     if (count >= 10) {
       exec('sudo reboot');
