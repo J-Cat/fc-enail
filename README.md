@@ -27,7 +27,12 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
 * Omron E5CC-QX2ASM-802
 * Raspberry Pi Zero running Raspbian
-* misc modules/components - I need to document the components and schematic/assembly instructions and required hardware in detail.  I may eventually provide a pre-built kit for the hardware to make people's lives easier, depending if I can get the circuit board built in such a way to make everything pluggable and quick to assemble.
+* Button w/ 3V LED
+* Rotary Encoder (Quadrature Encoder), with button
+* Class D Mono Amplifier and 1-3W speaker (eg. Adafruit PAM8303A)
+* 128x64 I2C OLED Display
+* RS-485 to UART converter w/ auto direction control (ie. something w/ a MAX13487E chip)
+* 5V Power Supply, 500mA
 * Raspbeery Pi Pin Configuration:
 
   Button
@@ -66,6 +71,47 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * install NodeJS 14.x
 * npm install -g fcenail --unsafe
 * fcenail --install
+
+1. Run raspi-config
+    a. Hostname: fcenail
+    b. Set localization options: America/Toronto, en-US
+    c. Enable SPI, I2C
+    d. Disable serial console, enable serial
+
+2. Update /boot/config.txt
+
+    gpio=15,16,18,22=pu
+    dtoverlay=disable-bt
+    dtoverlay=pwm-2chan,pin=13,func=2,pin2=13,func2=4
+    audio_pwm_mode=2
+
+3. Install NodeJS
+
+   * Download unnofficial distribution for ARMv6
+   * Create folder: /usr/local/lib/nodejs
+   * Uncompress to /usr/local/lib/nodejs
+   * Create symbolic link to /usr/local/lib/nodejs/current
+   * Update profile/path (Add to /etc/profile)
+     NODE_PATH=/usr/local/lib/nodejs/current
+     PATH=$NODE_PATH/bin:$PATH
+   * Run visudo and remove "secure_path"
+
+4. Install NetworkManager
+
+   sudo apt-get install network-manager
+
+   Create connections, wifi-wlan0 and Hotspot
+   set priorities to 100 and 1 for wifi-wlan0 and Hotspot respectively.
+   eg. sudo nmcli c mod wifi-wlan0 device.autoconnect-priority 100
+
+4. Install Git
+
+   sudo apt-get install git
+
+5. Install fcenail
+
+   sudo npm install -g fcenail --unsafe
+
 
 ## Built With
 
