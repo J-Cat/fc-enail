@@ -82,6 +82,7 @@ export const initProfilesMenu = (): IMenu => {
                     p: 350, 
                     i: 21, 
                     d: 4,
+                    offset: 0,
                   });
                   if (updated) {
                     await editProfile(updated);
@@ -117,12 +118,13 @@ const editProfile = async (profile: IProfile): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 3,
+        max: 4,
         menuItems: [
-          `Title: ${profile.title}`,
-          `P:     ${profile.p}`,
-          `I:     ${profile.i}`,
-          `D:     ${profile.d}`,
+          `Title:  ${profile.title}`,
+          `P:      ${profile.p}`,
+          `I:      ${profile.i}`,
+          `D:      ${profile.d}`,
+          `Offset: ${profile.offset}`,
         ],
         onClick: (editIndex): Promise<void> => {
           switch (editIndex) {
@@ -147,6 +149,12 @@ const editProfile = async (profile: IProfile): Promise<void> => {
           case 3: {
             setNumberInput('Derivative Time', 0, 2000, profile.d, async (value: number): Promise<void> => {
               await saveProfileLocal({...profile, d: value});
+            });
+            break;
+          }
+          case 4: {
+            setNumberInput('Offset', -500, 500, profile.offset, async (value: number): Promise<void> => {
+              await saveProfileLocal({...profile, offset: value});
             });
             break;
           }

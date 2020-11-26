@@ -15,6 +15,7 @@ interface IFormData {
   p: number;
   i: number;
   d: number;
+  offset: number;
   title: string;
 }
 
@@ -57,6 +58,7 @@ const ProfilesPage: React.FC = () => {
       p: prf.p / 10,
       i: prf.i,
       d: prf.d,
+      offset: prf.offset,
     });
   };
 
@@ -203,6 +205,9 @@ const ProfilesPage: React.FC = () => {
         <InputNumber />
       </Form.Item>
       <Form.Item name="d" label={t('label.derivativeTime', 'Derivative Time (D)')} rules={[{ required: true, type: 'number', min: 0 }]} initialValue={prf?.d}>
+        <InputNumber />
+      </Form.Item>
+      <Form.Item name="offset" label={t('label.offset', 'Offset')} rules={[{ required: true, type: 'number', min: -500, max: 500 }]} initialValue={prf?.offset}>
         <InputNumber />
       </Form.Item>
 

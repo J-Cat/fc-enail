@@ -8,6 +8,7 @@ import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../utility/sharedState';
 import { showMessage } from './display';
 import { playSound } from './sound';
+import { stringify } from 'querystring';
 
 let Config = registerConfigChange('e5cc', newConfig => {
   Config = newConfig;
@@ -231,14 +232,20 @@ export  const toggleE5ccTuning = async (percent: 40|100 = 100): Promise<void> =>
   }
 };
 
-export const getPidSettings = async (): Promise<{ p: number, i: number, d: number}|undefined> => {
+export const getPidSettings = async (): Promise<{ p: number, i: number, d: number, offset: number}|undefined> => {
   try {
     await lock.acquire();
 
+    let offset = (await modbus.readHoldingRegisters(Constants.e5cc.variables.inputShift, 1))?.data?.[0] || 0;
+    if (offset > 9999) {
+      offset -= 0x10000;
+    }
+    offset = Math.round(offset / 10);
     return {
       p: (await modbus.readHoldingRegisters(Constants.e5cc.variables.p, 1))?.data?.[0] || 0,
       i: (await modbus.readHoldingRegisters(Constants.e5cc.variables.i, 1))?.data?.[0] || 0,
       d: (await modbus.readHoldingRegisters(Constants.e5cc.variables.d, 1))?.data?.[0] || 0,
+      offset,
     };
   } catch (e) {
     console.error(`Error getting PID settings: ${e.message}`);
@@ -247,15 +254,19 @@ export const getPidSettings = async (): Promise<{ p: number, i: number, d: numbe
   }
 };
 
-export const setPidSettings = async (p: number, i: number, d: number): Promise<void> => {
+export const setPidSettings = async (p: number, i: number, d: number, offset: number): Promise<void> => {
   try {
     await lock.acquire();
     
+    const realOffset = offset < 0
+      ? (offset * 10) + 0x10000
+      : offset * 10;
     await modbus.writeRegister(Constants.e5cc.variables.p, p);
     await modbus.writeRegister(Constants.e5cc.variables.i, i);
     await modbus.writeRegister(Constants.e5cc.variables.d, d);
+    await modbus.writeRegister(Constants.e5cc.variables.inputShift, realOffset);
   } catch (e) {
-    console.error(`Error getting PID settings: ${e.message}`);
+    console.error(`Error setting PID settings: ${e.message}`);
   } finally {
     lock.release();
   }

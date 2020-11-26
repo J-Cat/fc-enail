@@ -9,6 +9,7 @@ export interface IProfile {
   p: number;
   i: number;
   d: number;  
+  offset: number;
 }
 
 export interface ILocalDb {

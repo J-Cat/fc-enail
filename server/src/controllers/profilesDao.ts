@@ -40,7 +40,7 @@ export const saveProfile = async (profile: IProfile): Promise<{ error?: string, 
     const currentProfile = getCurrentProfile();
     const updated = await setProfile(profile);
     if (currentProfile === profile.key) {
-      await setPidSettings(profile.p, profile.i, profile.d);      
+      await setPidSettings(profile.p, profile.i, profile.d, profile.offset);      
     }
     return { updated };
   } catch (e) {
@@ -55,7 +55,7 @@ export const setCurrentProfile = async (key: string): Promise<{ error?: string }
       throw new Error('The profile you specified does not exist.');
     }
     await setLocalDbCurrentProfile(key);
-    await setPidSettings(profile.p, profile.i, profile.d);
+    await setPidSettings(profile.p, profile.i, profile.d, profile.offset);
     await setSharedState({
       currentProfile: index,
     });

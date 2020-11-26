@@ -7,6 +7,7 @@ export const Constants = {
       p: 0x2A00,
       i: 0x2A01,
       d: 0x2A02,
+      inputShift: 0x2723,
     },
     commands: {
       run: 0x0000,
