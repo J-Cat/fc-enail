@@ -5,10 +5,9 @@ import { Constants } from '../models/Constants';
 import { Sounds } from '../models/sounds';
 import { getCurrentProfile, getProfile, getQuickSet } from '../dao/localDb';
 import { Lock } from '../utility/Lock';
-import { registerStateChange } from '../utility/sharedState';
+import { registerStateChange } from '../dao/sharedState';
 import { showMessage } from './display';
 import { playSound } from './sound';
-import { stringify } from 'querystring';
 
 let Config = registerConfigChange('e5cc', newConfig => {
   Config = newConfig;

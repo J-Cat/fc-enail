@@ -2,14 +2,14 @@ import { getPidSettings, setPidSettings, toggleE5ccTuning } from '../hardware/e5
 import { 
   getCurrentProfile, 
   getProfile, 
-  getProfiles as getLocalDbProfiles, 
-  IProfile, 
+  getProfiles as getLocalDbProfiles,  
   setCurrentProfile as setLocalDbCurrentProfile, 
   setProfile,
   deleteProfile as deleteLocalDbProfile,
 } from '../dao/localDb';
 import { Guid } from 'guid-typescript';
-import { setSharedState } from '../utility/sharedState';
+import { setSharedState } from '../dao/sharedState';
+import { IProfile } from '../models/IProfile';
 
 export const getProfiles = async (): Promise<{ error?: string, currentProfile?: string, profiles?: IProfile[] }> => {
   try {

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { getSharedState, ISharedState, setSharedState } from '../utility/sharedState';
+import { getSharedState, setSharedState } from '../dao/sharedState';
+import { ISharedState } from '../models/ISharedState';
 
 export const getState = async (req: Request, res: Response): Promise<Response> => {
   try {

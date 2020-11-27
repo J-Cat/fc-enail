@@ -2,7 +2,7 @@ import { toggleTuning } from '../dao/profilesDao';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
 import { getCurrentScript, getQuickSet, getScript } from '../dao/localDb';
-import { registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setNextMode, setSharedState } from '../dao/sharedState';
 import { runScript } from '../utility/scriptEngine';
 
 let presets: number[] = [];

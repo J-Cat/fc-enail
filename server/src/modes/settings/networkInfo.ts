@@ -1,4 +1,5 @@
-import { IMenu, registerStateChange, setSharedState } from '../../utility/sharedState';
+import { registerStateChange, setSharedState } from '../../dao/sharedState';
+import { IMenu } from '../../models/IMenu';
 
 let state = registerStateChange('mode-settings-networkinfo', async (oldState, newState): Promise<void> => {
   state = newState;

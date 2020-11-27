@@ -1,6 +1,6 @@
 import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
-import { registerStateChange } from '../utility/sharedState';
+import { registerStateChange } from '../dao/sharedState';
 
 let Config = registerConfigChange('button', newConfig => {
   Config = newConfig;

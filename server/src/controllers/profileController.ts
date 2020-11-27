@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
-import { IProfile } from '../dao/localDb';
 import {
   getProfiles as getProfilesDao,
   deleteProfile as deleteProfileDao,
@@ -8,6 +7,7 @@ import {
   setCurrentProfile as setCurrentProfileDao,
   toggleTuning as toggleTuningDao,
 } from '../dao/profilesDao';
+import { IProfile } from '../models/IProfile';
 
 export const getProfiles = async (req: Request, res: Response): Promise<Response> => {
   try {

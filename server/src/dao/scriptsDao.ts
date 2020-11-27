@@ -6,7 +6,7 @@ import {
   deleteScript as deleteLocalDbScript,
   getScript,
 } from './localDb';
-import { getSharedState, setSharedState } from '../utility/sharedState';
+import { getSharedState, setSharedState } from './sharedState';
 import { IScript } from '../models/IScript';
 import { runScript as runScriptEngine } from '../utility/scriptEngine';
 

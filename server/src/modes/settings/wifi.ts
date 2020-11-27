@@ -4,7 +4,7 @@ import { showMessage } from '../../hardware/display';
 import { playSound } from '../../hardware/sound';
 import { Icons } from '../../models/icons';
 import { Sounds } from '../../models/sounds';
-import { setSharedState, registerStateChange } from '../../utility/sharedState';
+import { setSharedState, registerStateChange } from '../../dao/sharedState';
 import { setTextInput } from '../textinput';
 
 let state = registerStateChange('mode-settings-wifi', async (oldState, newState): Promise<void> => {

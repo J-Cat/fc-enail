@@ -135,6 +135,19 @@ export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose
           } as IWaitForSetPointStep);
         }} />
       </FormItem>
+      <FormItem label="Offset">
+        <InputNumber 
+          defaultValue={typedStep.offset} 
+          min={0}
+          max={10}
+          onBlur={(value) => {
+            onChange?.({
+              ...step, 
+              offset: parseIntDefault(value.target.value, typedStep.offset),
+            } as IWaitForSetPointStep);
+          }} 
+        />
+      </FormItem>
     </React.Fragment>;    
   };
 

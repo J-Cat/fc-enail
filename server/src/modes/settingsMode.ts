@@ -1,6 +1,7 @@
 import { Icons } from '../models/icons';
 import { IModeInstance } from '../models/IModeInstance';
-import { IMenu, registerStateChange } from '../utility/sharedState';
+import { registerStateChange } from '../dao/sharedState';
+import { IMenu } from '../models/IMenu';
 import { BaseMode } from './baseMode';
 import { initGeneral } from './settings/general';
 import { initNetworkInfo } from './settings/networkInfo';

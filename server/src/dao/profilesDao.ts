@@ -3,13 +3,13 @@ import {
   getCurrentProfile, 
   getProfile, 
   getProfiles as getLocalDbProfiles, 
-  IProfile, 
   setCurrentProfile as setLocalDbCurrentProfile, 
   setProfile,
   deleteProfile as deleteLocalDbProfile,
 } from './localDb';
 import { Guid } from 'guid-typescript';
-import { setSharedState } from '../utility/sharedState';
+import { setSharedState } from './sharedState';
+import { IProfile } from '../models/IProfile';
 
 export const getProfiles = async (): Promise<{ error?: string, currentProfile?: string, profiles?: IProfile[] }> => {
   try {

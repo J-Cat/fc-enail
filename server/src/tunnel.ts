@@ -2,7 +2,7 @@ import localtunnel from 'localtunnel';
 import { registerConfigChange } from './config';
 import { getUrl, setUrl } from './dao/localDb';
 import { parseIntDefault } from './utility/parseIntDefault';
-import { setSharedState } from './utility/sharedState';
+import { setSharedState } from './dao/sharedState';
 
 let Config = registerConfigChange('localtunnel', newConfig => {
   Config = newConfig;
@@ -14,17 +14,32 @@ export const initTunnel = async (): Promise<void> => {
       return;
     }
 
-    const tunnel = await localtunnel({ 
-      port: parseIntDefault(process.env.API_PORT, 8000),
-      subdomain: Config.localtunnel.subdomain, 
-      allow_invalid_cert: true,  
+    await new Promise<void>((resolve, reject) => {
+      try {
+        setTimeout(() => { reject('Connection to localtunnel.me timed out.'); }, 10000);
+
+        localtunnel({ 
+          port: parseIntDefault(process.env.API_PORT, 8000),
+          subdomain: Config.localtunnel.subdomain, 
+          allow_invalid_cert: true,  
+        }).then(tunnel => {
+          console.log(`localtunnel.me URL: ${tunnel.url}`);
+          setSharedState({ url: tunnel.url }, 'self').then(() => {
+            if (getUrl() !== tunnel.url) {
+              setUrl(tunnel.url).then(() => {
+                resolve();
+              });
+            } else {
+              resolve();  
+            }
+          });
+        }).catch(reason => {
+          reject(reason);
+        });
+      } catch (e) {
+        reject(e);        
+      }
     });
-    console.log(`localtunnel.me URL: ${tunnel.url}`);
-    await setSharedState({ url: tunnel.url }, 'self');
-    // if url changed, send e-mail
-    if (getUrl() !== tunnel.url) {
-      await setUrl(tunnel.url);
-    }
 
     // don't need to send e-mail with localtunnel, just NGROK
     //   if (Config.email.address?.length && Config.email.sendgridApiKey?.length) {

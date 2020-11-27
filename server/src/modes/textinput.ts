@@ -2,7 +2,7 @@ import { Color, Font, Ioledjs, Layer } from 'ssd1306-i2c-js';
 import { drawStringWrapped } from '../hardware/display';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { Constants } from '../models/Constants';
-import { registerStateChange, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 import { getMenuUpdate } from './menu';
 
 let state = registerStateChange('text-input', async (oldState, newState): Promise<void> => {

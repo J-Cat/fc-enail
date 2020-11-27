@@ -1,10 +1,12 @@
 import { Server as HttpServer } from 'http';
 import { validateToken } from './controllers/authController';
-import { getPidSettings, IE5ccState } from './hardware/e5cc';
+import { getPidSettings } from './hardware/e5cc';
+import { IE5ccState } from './models/IE5ccState';
 import { Server } from 'socket.io';
-import { getCurrentProfile, getProfile, IProfile } from './dao/localDb';
-import { IScriptFeedback, registerStateChange } from './utility/sharedState';
-
+import { getCurrentProfile, getProfile } from './dao/localDb';
+import { registerStateChange } from './dao/sharedState';
+import { IProfile } from './models/IProfile';
+import { IScriptFeedback } from './models/IScriptFeedback';
 const io = new Server();
 
 registerStateChange('socketio', async (oldState, newState): Promise<void> => {

@@ -1,6 +1,6 @@
 import { Color, Font, Ioledjs, Layer } from 'ssd1306-i2c-js';
 import { fontSize, getWrappedLines } from '../hardware/display';
-import { registerStateChange, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 
 let state = registerStateChange('prompt-input',async (oldState, newState): Promise<void> => {
   state = newState;

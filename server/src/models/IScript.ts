@@ -38,6 +38,7 @@ export interface ITimerStep extends IStep {
 
 export interface IWaitForSetPointStep extends IStep {
   timeout: number;
+  offset: number;
 }
 
 export type StepType = ISequentialStep | IUpdateSetPointStep | IFeedbackStep | ITimerStep | IWaitForSetPointStep;

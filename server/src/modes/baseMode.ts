@@ -1,7 +1,7 @@
 import { toggleTuning } from '../dao/profilesDao';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
-import { registerStateChange, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 import { useMenuClick, useMenuLongClick, useMenuEncoderClick, useMenuEncoderChange } from './menu';
 import { processNumberInput, useNumberInputClick, useNumberInputEncoderChange, useNumberInputEncoderClick } from './numberinput';
 import { usePromptClick, usePromptEncoderChange, usePromptEncoderClick } from './promptinput';

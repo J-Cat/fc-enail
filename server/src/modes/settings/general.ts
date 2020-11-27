@@ -3,7 +3,7 @@ import { registerConfigChange } from '../../config';
 import { getVolume, saveConfig } from '../../dao/configDao';
 import { showMessage } from '../../hardware/display';
 import { IConfig } from '../../models/IConfig';
-import { registerStateChange, setSharedState } from '../../utility/sharedState';
+import { registerStateChange, setSharedState } from '../../dao/sharedState';
 import { getMenuUpdate } from '../menu';
 import { setNumberInput } from '../numberinput';
 import { setTextInput } from '../textinput';

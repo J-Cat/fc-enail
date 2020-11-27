@@ -2,10 +2,9 @@ import { exec } from 'child_process';
 import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
 import { Sounds } from '../models/sounds';
-import { ISharedState, registerStateChange, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setSharedState } from './sharedState';
 
-let state: ISharedState;
-registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
+let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
   state = newState;
 });
 
@@ -24,9 +23,8 @@ export const restartService = async (): Promise<void> => {
     setLed(true);
     await new Promise(resolve => setTimeout(resolve, 250));
     setLed(false);
-    await new Promise(resolve => setTimeout(resolve, 250));
 
-    if (count >= 5) {
+    if (count > 5) {
       exec('sudo systemctl restart fcenail');
       return;
     }
@@ -51,9 +49,8 @@ export const reboot = async (): Promise<void> => {
     setLed(true);
     await new Promise(resolve => setTimeout(resolve, 125));
     setLed(false);
-    await new Promise(resolve => setTimeout(resolve, 125));
 
-    if (count >= 10) {
+    if (count > 10) {
       exec('sudo reboot');
       return;
     }

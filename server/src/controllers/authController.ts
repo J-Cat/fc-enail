@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-import { getSharedState, setSharedState } from '../utility/sharedState';
+import { getSharedState, setSharedState } from '../dao/sharedState';
 import { generate } from 'generate-password';
 
 const BEARER_PREFIX = 'bearer ';

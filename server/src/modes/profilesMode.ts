@@ -5,12 +5,14 @@ import { showMessage } from '../hardware/display';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { Icons } from '../models/icons';
 import { IModeInstance } from '../models/IModeInstance';
-import { getProfiles, IProfile } from '../dao/localDb';
-import { IMenu, registerStateChange, setSharedState } from '../utility/sharedState';
+import { getProfiles } from '../dao/localDb';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
+import { IMenu } from '../models/IMenu';
 import { BaseMode } from './baseMode';
 import { setNumberInput } from './numberinput';
 import { setPromptInput } from './promptinput';
 import { setTextInput } from './textinput';
+import { IProfile } from '../models/IProfile';
 
 let profiles: IProfile[] = [];
 

@@ -2,9 +2,9 @@ import { Font, Ioledjs } from 'ssd1306-i2c-js';
 import { drawMessage, showMessage } from '../hardware/display';
 import { playSound } from '../hardware/sound';
 import { getTimeString } from './getTimeString';
-import { IScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep } from '../models/IScript';
+import { IScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep, IWaitForSetPointStep } from '../models/IScript';
 import { setCurrentScript } from '../dao/scriptsDao';
-import { registerStateChange, setSharedState } from './sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 
 let direction: 'up'|'down' = 'up';
 
@@ -73,15 +73,21 @@ export const runStep = async (step: IStep): Promise<void> => {
     break;
   }
   case StepTypeEnum.WaitForSetPointStep: {
+    const typedStep = step as IWaitForSetPointStep;
+    const waitStart = Date.now();
+
     await new Promise<void>(resolve => {
       const checkSetPoint = async (): Promise<boolean> => {
         if (!state.pv || !state.sp) {
           return false;
         }
 
-        if ((direction === 'up') && (state.pv >= state.sp)) {
+        if (typedStep.timeout && ((Date.now() - waitStart) > (typedStep.timeout * 1000))) {
           return true;
-        } else if ((direction === 'down') && (state.pv <= state.sp)) {
+        }
+        if ((direction === 'up') && ((state.pv - typedStep.offset) >= state.sp)) {
+          return true;
+        } else if ((direction === 'down') && ((state.pv + typedStep.offset) <= state.sp)) {
           return true;
         }
 

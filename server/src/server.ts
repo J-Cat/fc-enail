@@ -1,16 +1,14 @@
 import dotenv from 'dotenv';
 import { closeDisplay } from './hardware/display';
-import { closeE5cc, IE5ccState, initE5cc } from './hardware/e5cc';
+import { closeE5cc, initE5cc } from './hardware/e5cc';
+import { IE5ccState } from './models/IE5ccState';
 import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEncoder';
 import { registerConfigChange } from './config';
 import { Api } from './api';
-import { ISharedState, registerStateChange, setSharedState } from './utility/sharedState';
+import { registerStateChange, setSharedState } from './dao/sharedState';
 import { emitE5cc, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
-import { exec } from 'child_process';
 import { Lock } from './utility/Lock';
-import { playSound } from './hardware/sound';
-import { Sounds } from './models/sounds';
 import { initTunnel } from './tunnel';
 import { HomeMode } from './modes/homeMode';
 import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
@@ -19,6 +17,7 @@ import { initProfilesMenu, ProfilesMode } from './modes/profilesMode';
 import { initLocalDb } from './dao/localDb';
 import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
 import { reboot, restartService } from './dao/systemDao';
+import { ISharedState } from './models/ISharedState';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;

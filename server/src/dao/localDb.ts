@@ -2,25 +2,8 @@ import Lowdb, { LowdbAsync } from 'lowdb';
 import FileAsync from 'lowdb/adapters/FileAsync';
 import { Guid } from 'guid-typescript';
 import { IUpdateSetPointStep, IFeedbackStep, ITimerStep, IWaitForSetPointStep, IScript, StepTypeEnum } from '../models/IScript';
-
-export interface IProfile {
-  key: string;
-  title: string;
-  p: number;
-  i: number;
-  d: number;  
-  offset: number;
-}
-
-export interface ILocalDb {
-  url?: string;
-  quickSet: number[];
-  profiles: IProfile[];
-  scripts: IScript[];
-  currentProfile?: string;
-  currentScript?: string;
-  ssids: string[];
-}
+import { ILocalDb } from '../models/ILocalDb';
+import { IProfile } from '../models/IProfile';
 
 const defaultValue = {
   quickSet: [465, 485, 495, 505, 510, 515, 530],
@@ -49,6 +32,7 @@ const defaultValue = {
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
         } as IWaitForSetPointStep,
         {
           key: Guid.create().toString(),
@@ -69,7 +53,8 @@ const defaultValue = {
         } as IUpdateSetPointStep,
         {
           key: Guid.create().toString(),
-          type: StepTypeEnum.WaitForSetPointStep
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
         } as IWaitForSetPointStep,
         {
           key: Guid.create().toString(),

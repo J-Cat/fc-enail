@@ -3,7 +3,7 @@ import { updateE5ccSetPoint } from '../hardware/e5cc';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
 import { getCurrentScript, getScript } from '../dao/localDb';
-import { registerStateChange, setNextMode, setSharedState } from '../utility/sharedState';
+import { registerStateChange, setNextMode, setSharedState } from '../dao/sharedState';
 import { runScript } from '../utility/scriptEngine';
 
 let state = registerStateChange('mode-home', async (oldState, newState): Promise<void> => {
