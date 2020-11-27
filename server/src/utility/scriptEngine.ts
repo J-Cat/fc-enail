@@ -85,9 +85,9 @@ export const runStep = async (step: IStep): Promise<void> => {
         if (typedStep.timeout && ((Date.now() - waitStart) > (typedStep.timeout * 1000))) {
           return true;
         }
-        if ((direction === 'up') && ((state.pv - typedStep.offset) >= state.sp)) {
+        if ((direction === 'up') && ((state.pv + typedStep.offset) >= state.sp)) {
           return true;
-        } else if ((direction === 'down') && ((state.pv + typedStep.offset) <= state.sp)) {
+        } else if ((direction === 'down') && ((state.pv - typedStep.offset) <= state.sp)) {
           return true;
         }
 
