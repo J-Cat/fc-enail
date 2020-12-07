@@ -3,7 +3,7 @@ import { scan, updateNetwork } from '../../dao/networkDao';
 import { showMessage } from '../../hardware/display';
 import { playSound } from '../../hardware/sound';
 import { Icons } from '../../models/icons';
-import { Sounds } from '../../models/sounds';
+import { getSounds } from '../../models/sounds';
 import { setSharedState, registerStateChange } from '../../dao/sharedState';
 import { setTextInput } from '../textinput';
 
@@ -39,7 +39,7 @@ const connectWifi = async (passcode: string): Promise<void> => {
   const menu = menus.pop();
   const ssid = menu?.menuItems[menu.current];
   if (!ssid) {
-    playSound(Sounds.beep);
+    playSound((await getSounds()).beep);
     setSharedState({
       textinput: undefined,
     });
@@ -52,7 +52,7 @@ const connectWifi = async (passcode: string): Promise<void> => {
   });
   const result = await updateNetwork('infrastructure', ssid, passcode);
   if (result.error) {
-    playSound(Sounds.beep);
+    playSound((await getSounds()).beep);
     console.error(result.error);
     showMessage(result.error, Font.UbuntuMono_8ptFontInfo);
     setSharedState({

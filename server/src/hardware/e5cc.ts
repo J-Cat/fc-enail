@@ -2,7 +2,7 @@ import ModbusRTU from 'modbus-serial';
 import { registerConfigChange } from '../config';
 import { saveProfile } from '../dao/profilesDao';
 import { Constants } from '../models/Constants';
-import { Sounds } from '../models/sounds';
+import { getSounds } from '../models/sounds';
 import { getCurrentProfile, getProfile, getQuickSet } from '../dao/localDb';
 import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../dao/sharedState';
@@ -131,7 +131,7 @@ export const initE5cc = async (
         )
       ) {
         for (let i = 0; i < 3; i++) {
-          playSound(Sounds.beep);
+          playSound((await getSounds()).beep);
           await new Promise(resolve => setTimeout(resolve, 750));
         }
         await toggleE5ccState();

@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
-import { Sounds } from '../models/sounds';
+import { getSounds } from '../models/sounds';
 import { registerStateChange, setSharedState } from './sharedState';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
@@ -19,7 +19,7 @@ export const restartService = async (): Promise<void> => {
       return;
     }
 
-    await playSound(Sounds.beep);
+    await playSound((await getSounds()).beep);
     setLed(true);
     await new Promise(resolve => setTimeout(resolve, 250));
     setLed(false);
@@ -45,7 +45,7 @@ export const reboot = async (): Promise<void> => {
       return;
     }
 
-    await playSound(Sounds.beep);
+    await playSound((await getSounds()).beep);
     setLed(true);
     await new Promise(resolve => setTimeout(resolve, 125));
     setLed(false);
