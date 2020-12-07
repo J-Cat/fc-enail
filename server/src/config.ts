@@ -34,6 +34,9 @@ export interface IServerConfig {
   localtunnel: {
     subdomain: string;
   };
+  settings: {
+    startupSound: string;
+  };
 }
 
 const onChanges: {
@@ -88,6 +91,9 @@ export const loadConfig = (newEnv?: string): void => {
     },
     localtunnel: {
       subdomain: process.env.LOCALTUNNEL_SUBDOMAIN || '',
+    },
+    settings: {
+      startupSound: process.env.STARTUP_SOUND || 'appear.wav',
     },
   };
 

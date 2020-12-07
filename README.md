@@ -41,7 +41,7 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
   - grounds: 30, 39
 
   Speaker
-  - PIN 33 (GPIO 13)
+  - PIN 32 (GPIO 12)
   - 5V or 3.3V (PIN 2)
   - ground: 34
 

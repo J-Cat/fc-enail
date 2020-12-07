@@ -43,7 +43,7 @@ export const playBeep = async (repeat: number): Promise<void> => {
 };
 
 (async () => {
-  const result = await playSound(Sounds.appear);
+  const result = await playSound(Sounds[process.env.STARTUP_SOUND || 'appear']);
   if (result.error) {
     console.error(result.stderr);
   }

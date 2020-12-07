@@ -23,7 +23,7 @@ export const initGeneral = async (): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 5,
+        max: 7,
         menuItems: await getGeneralMenuItems(),
         onClick: processGeneralClick,
       },
@@ -40,6 +40,7 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
     `Screen Saver: ${Config.display.screenSaverTimeout}`,
     `Screen Off  : ${Config.display.screenOffTimeout}`,
     `LT Subdomain: ${Config.localtunnel.subdomain}`,
+    `Start Sound : ${Config.settings.startupSound}`,
   ];
 };
 
@@ -53,6 +54,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     screenOffTimeout: Config.display.screenOffTimeout,
     localtunnel: Config.localtunnel.subdomain,
     volume,
+    startupSound: Config.settings.startupSound,
   };
   switch (index) {
   case 0: {
@@ -158,6 +160,22 @@ const processGeneralClick = async (index: number): Promise<void> => {
         }),
       });
     });
+    break;
+  }
+  case 7: {
+    setTextInput('Startup Sound', Config.settings.startupSound, async (text: string): Promise<void> => {
+      const result = await saveConfig({ ...config, startupSound: text });
+      if (result.error) {
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+      }
+      setSharedState({
+        menu: getMenuUpdate({
+          menuItems: await getGeneralMenuItems(),
+          action: undefined,
+        }),
+      });
+    });
+    break;
   }
   }
 };

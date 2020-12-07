@@ -16,6 +16,7 @@ export const getConfig = async (): Promise<IConfig> => {
     min: Config.encoder.minValue,
     localtunnel: Config.localtunnel.subdomain,
     volume: await getVolume(),
+    startupSound: Config.settings.startupSound,
   };
 
   return config;
@@ -44,6 +45,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
               [
                 'E5CC_AUTOSHUTOFF', 'DISPLAY_SCREEN_SAVER', 'DISPLAY_SCREEN_OFF', 
                 'ENCODER_MIN_VALUE', 'ENCODER_MAX_VALUE', 'LOCALTUNNEL_SUBDOMAIN',
+                'STARTUP_SOUND',
               ].includes(key.trim())
             ) {
               continue;
@@ -59,7 +61,8 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
       + `DISPLAY_SCREEN_OFF=${config.screenOffTimeout}\n`
       + `ENCODER_MIN_VALUE=${config.min}\n`
       + `ENCODER_MAX_VALUE=${config.max}\n`
-      + `LOCALTUNNEL_SUBDOMAIN=${config.localtunnel || ''}\n`;
+      + `LOCALTUNNEL_SUBDOMAIN=${config.localtunnel || ''}\n`
+      + `STARTUP_SOUND=${config.startupSound || 'appear'}\n`;
     
     await new Promise<void>(resolve => writeFile('./.env', newEnv, { encoding: 'utf8' }, err => {
       if (err) {

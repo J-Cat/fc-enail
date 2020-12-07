@@ -4,6 +4,7 @@ declare global {
       NODE_ENV: 'development' | 'production';
 
       LOCALTUNNEL_SUBDOMAIN?: string;
+      STARTUP_SOUND?: string;
 
       API_PORT?: string;
       API_BASE_ROUTE_PATH?: string;

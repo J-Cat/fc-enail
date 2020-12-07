@@ -6,4 +6,5 @@ export interface IConfig {
   min: number;
   volume: number;
   localtunnel?: string;
+  startupSound?: string;
 }
