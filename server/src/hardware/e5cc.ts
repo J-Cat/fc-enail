@@ -2,7 +2,7 @@ import ModbusRTU from 'modbus-serial';
 import { registerConfigChange } from '../config';
 import { saveProfile } from '../dao/profilesDao';
 import { Constants } from '../models/Constants';
-import { getSounds } from '../models/sounds';
+import { getSounds } from '../dao/soundsDao';
 import { getCurrentProfile, getProfile, getQuickSet } from '../dao/localDb';
 import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../dao/sharedState';

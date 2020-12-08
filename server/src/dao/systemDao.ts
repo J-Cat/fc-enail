@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
-import { getSounds } from '../models/sounds';
+import { getSounds } from '../dao/soundsDao';
 import { registerStateChange, setSharedState } from './sharedState';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {

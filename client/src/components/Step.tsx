@@ -1,8 +1,10 @@
 import { Button, Collapse, Form, Input, InputNumber, Select } from 'antd';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Icons, IIcon } from '../models/icons';
 import { IStep, StepTypeEnum, ISequentialStep, IFeedbackStep, ITimerStep, IUpdateSetPointStep, IWaitForSetPointStep } from '../models/IScript';
-import { Sounds } from '../models/sounds';
+import { ISounds } from '../models/ISounds';
+import { RootState } from '../store/reducers/rootReducer';
 
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
@@ -25,6 +27,7 @@ export const parseIntDefault = (value: string, defaultValue: number): number => 
 };
 
 export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose, onDelete }: IStepProps) => {
+  const Sounds = useSelector<RootState, ISounds>(state => state.sounds.sounds);
   const getString = () => {
     switch (step.type) {
     case StepTypeEnum.SequentialStep: {

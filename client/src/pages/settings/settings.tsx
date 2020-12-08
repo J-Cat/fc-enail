@@ -1,5 +1,5 @@
-import React from 'react';
-import { Form, Input, Button, InputNumber, Spin, Modal } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Form, Input, Button, InputNumber, Spin, Modal, Select, Upload } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
@@ -8,6 +8,11 @@ import { reboot, restartService, sendConfig, sendQuickSet } from '../../store/re
 import { useTranslation } from 'react-i18next';
 import './settings.less';
 import { IConfig } from '../../store/state/IEnailState';
+import { RcFile } from 'antd/lib/upload';
+import { deleteSound, uploadSound } from '../../store/reducers/soundsReducer';
+import { IncludedSounds, ISounds } from '../../models/ISounds';
+import { DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { FormInstance } from 'antd/lib/form';
 
 interface IFormData {
   autoShutoff?: number;
@@ -18,6 +23,7 @@ interface IFormData {
   volume?: number;
   localtunnel?: string;
   quickset?: string;
+  startupSound?: string;
 }
 
 const SettingsPage: React.FC = () => {
@@ -29,7 +35,10 @@ const SettingsPage: React.FC = () => {
   const config = useSelector<RootState, IConfig|undefined>(state => state.enail.config);
   const url = useSelector<RootState, string>(state => state.enail.state?.url || '');
   const quickset = useSelector<RootState, number[]>(state => state.enail.quickset);
+  const sounds = useSelector<RootState, ISounds>(state => state.sounds.sounds);
   const [t] = useTranslation();
+  const [currentStartupSound, setCurrentStartupSound] = useState<string|undefined>(config?.startupSound);
+  const formRef = useRef<FormInstance>();
 
   const submitSettings = async (formData: IFormData) => {
     if (
@@ -40,6 +49,7 @@ const SettingsPage: React.FC = () => {
       || (formData.screenOffTimeout === undefined) 
       || (formData.autoShutoff === undefined)
       || (formData.volume === undefined)
+      || (formData.startupSound === undefined)
     ) {
       Modal.error({
         title: t('settings.error.title', 'Error'),
@@ -55,7 +65,8 @@ const SettingsPage: React.FC = () => {
       screenSaverTimeout: formData.screenSaverTimeout,
       screenOffTimeout: formData.screenOffTimeout,
       localtunnel: formData.localtunnel || '',
-      volume: formData.volume || 100
+      volume: formData.volume || 100,
+      startupSound: formData.startupSound,
     }));
 
     if (result.error) {
@@ -99,6 +110,39 @@ const SettingsPage: React.FC = () => {
     });
   };
 
+  const onUpload = async (file: RcFile): Promise<void> => {
+    const result = await dispatch(uploadSound(file.name, file as Blob));
+    if (result.error) {
+      Modal.error({
+        title: t('settings.error.title', 'Error'),
+        content: t('settings.error.upload', 'An error occured uploading the sound file.'),
+      });
+    }  
+  };
+
+  const onDeleteSound = async (): Promise<void> => {
+    if (!currentStartupSound) {
+      return;
+    }
+
+    Modal.confirm({
+      title: t('settings.deleteSoundConfirmTitle', 'Delete Sound File?'),
+      content: t('settings.rebootConfirmContent', 'Are you sure you want to delete the sound file, {{sound}}?', { sound: currentStartupSound }),
+      onOk: async () => {
+        const result = await dispatch(deleteSound(currentStartupSound));
+        if (result.error) {
+          Modal.error({
+            title: t('settings.error.title', 'Error'),
+            content: t('settings.error.deleteSound', 'An error occured deleting the sound file.'),
+          });
+          return;
+        }  
+        setCurrentStartupSound('appear');
+        formRef.current?.setFieldsValue({ startupSound: 'appear' });
+      },
+    });
+  };
+
   if (loading) {
     return <Spin />;
   }
@@ -107,6 +151,7 @@ const SettingsPage: React.FC = () => {
     <div className="settings-container">
       <div className="spacer" />
       <Form
+        ref={ref => { if (ref) { formRef.current = ref; }}}
         name="basic"
         onFinish={submitSettings}
         className="settings-form"
@@ -210,6 +255,26 @@ const SettingsPage: React.FC = () => {
           initialValue={config?.screenOffTimeout}
         >
           <InputNumber disabled={requesting} />
+        </Form.Item>
+
+        <Form.Item
+          label={t('settings.startupSound', 'Startup Sound')}
+          name="startupSound"
+          initialValue={config?.startupSound}
+        >
+          <Select onChange={value => { setCurrentStartupSound(value.toString()); }}>
+            {Object.keys(sounds).map(key => {
+              return <Select.Option key={key} value={key}>{key[0].toUpperCase()}{key.substring(1)}</Select.Option>;
+            })}
+          </Select>
+        </Form.Item>
+
+        <Form.Item label=" " colon={false}>
+          <Button disabled={IncludedSounds.findIndex(f => f.toLowerCase() === currentStartupSound?.toLowerCase()) >= 0} onClick={onDeleteSound} icon={<DeleteOutlined />} type="primary">{t('settings.deletesound', 'Delete Sound')}</Button>
+          &nbsp;
+          <Upload beforeUpload={onUpload} type="select" accept=".wav" showUploadList={false}>
+            <Button icon={<UploadOutlined />} type="primary">{t('settings.upload', 'Upload Sound')}</Button>
+          </Upload>
         </Form.Item>
 
         <Form.Item

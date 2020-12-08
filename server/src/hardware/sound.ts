@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { getSounds } from '../models/sounds';
+import { getSounds } from '../dao/soundsDao';
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
   return new Promise(resolve => {

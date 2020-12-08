@@ -4,6 +4,7 @@ import { getState, getConfig, getQuickSet } from '../store/reducers/enailReducer
 import { getProfiles } from '../store/reducers/profileReducer';
 import { RootState } from '../store/reducers/rootReducer';
 import { getScripts } from '../store/reducers/scriptReducer';
+import { getSounds } from '../store/reducers/soundsReducer';
 import { AppDispatch } from '../store/store';
 
 export const useEnsureLoaded = (): void => {
@@ -21,6 +22,7 @@ export const useEnsureLoaded = (): void => {
     dispatch(getQuickSet());
     dispatch(getProfiles());
     dispatch(getScripts());
+    dispatch(getSounds());
   };
 
   useEffect(() => {

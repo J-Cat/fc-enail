@@ -23,6 +23,7 @@ export interface IConfig {
   readonly min: number;
   readonly volume: number;
   readonly localtunnel: string;
+  readonly startupSound: string;
 }
 
 export interface ISharedState extends IE5ccState {

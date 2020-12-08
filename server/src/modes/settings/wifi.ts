@@ -3,7 +3,7 @@ import { scan, updateNetwork } from '../../dao/networkDao';
 import { showMessage } from '../../hardware/display';
 import { playSound } from '../../hardware/sound';
 import { Icons } from '../../models/icons';
-import { getSounds } from '../../models/sounds';
+import { getSounds } from '../../dao/soundsDao';
 import { setSharedState, registerStateChange } from '../../dao/sharedState';
 import { setTextInput } from '../textinput';
 

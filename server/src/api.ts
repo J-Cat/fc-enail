@@ -16,6 +16,8 @@ import { profileRoute } from './routes/profileRoute';
 import { parseIntDefault } from './utility/parseIntDefault';
 import { scriptRoute } from './routes/scriptRoute';
 import { systemRoute } from './routes/systemRoute';
+import { soundsRoute } from './routes/soundsRoute';
+import fileUpload from 'express-fileupload';
 
 export const Api = (port = 8000, baseRoutePath = ''): Server => {
   // initialize configuration environment
@@ -40,6 +42,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(logger('dev'));
     app.use(bodyParser.json({ limit: '50mb' }));
     app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(fileUpload());
   };
 
   // static files (client)
@@ -107,6 +110,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(`${baseRoutePath}/profiles`, profileRoute);
     app.use(`${baseRoutePath}/scripts`, scriptRoute);
     app.use(`${baseRoutePath}/system`, systemRoute);
+    app.use(`${baseRoutePath}/sounds`, soundsRoute);
 
     // catch 404 and forward to error handler
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

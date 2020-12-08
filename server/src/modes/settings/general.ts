@@ -7,6 +7,8 @@ import { registerStateChange, setSharedState } from '../../dao/sharedState';
 import { getMenuUpdate } from '../menu';
 import { setNumberInput } from '../numberinput';
 import { setTextInput } from '../textinput';
+import { getSounds } from '../../dao/soundsDao';
+import { IMenu } from '../../models/IMenu';
 
 let state = registerStateChange('mode-settings-general', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -163,17 +165,37 @@ const processGeneralClick = async (index: number): Promise<void> => {
     break;
   }
   case 7: {
-    setTextInput('Startup Sound', Config.settings.startupSound, async (text: string): Promise<void> => {
-      const result = await saveConfig({ ...config, startupSound: text });
-      if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
-      }
-      setSharedState({
-        menu: getMenuUpdate({
-          menuItems: await getGeneralMenuItems(),
-          action: undefined,
-        }),
-      });
+    const sounds = Object.keys((await getSounds()));
+    if (sounds.length <= 0) {
+      break;
+    }
+    setSharedState({
+      menu: [
+        ...(state.menu || []),
+        {
+          current: 0,
+          min: 0,
+          max: sounds.length - 1,
+          menuItems: sounds,
+          onClick: async index => {
+            const result = await saveConfig({...config, startupSound: sounds[index]});
+            if (result.error) {
+              showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+            }
+            const menus = [...(state.menu || [])];
+            menus.pop();
+            const menu = menus.pop() as IMenu;
+            setSharedState({
+              menu: [
+                ...menus, {
+                  ...menu, 
+                  menuItems: await getGeneralMenuItems(),
+                },
+              ],
+            });      
+          },
+        }
+      ],
     });
     break;
   }
