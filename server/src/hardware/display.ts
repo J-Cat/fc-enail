@@ -46,7 +46,7 @@ const init = async (): Promise<void> => {
   display.turnOn();
   display.setFont(Font.UbuntuMono_24ptFontInfo);
   display.clearScreen();
-  drawBitmap(32, 0, Icons.stealie);
+  drawBitmap(0, 0, Icons.fcenail);
   display.refresh();
   
   await new Promise(resolve => setTimeout(resolve, 5000));
