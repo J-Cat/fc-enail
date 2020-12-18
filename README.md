@@ -72,20 +72,34 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * npm install -g fcenail --unsafe
 * fcenail --install
 
-1. Run raspi-config
+1. Update d:\config.txt
+
+    start_x=0
+    enable_uart=1
+    dtoverlay=disable-bt
+    gpio=15,16,18,22=pu
+    dtoverlay=audremap
+    audio_pwm_mode=2
+    hdmi_ignore_edid_audio=1
+    
+2. Create d:\wpa_supplicant.conf
+
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=CA
+    
+    network={
+     ssid="<SSID>"
+     psk="<password>"
+    }
+    
+3. Boot and run raspi-config
     a. Hostname: fcenail
     b. Set localization options: America/Toronto, en-US
     c. Enable SPI, I2C
     d. Disable serial console, enable serial
 
-2. Update /boot/config.txt
-
-    gpio=15,16,18,22=pu
-    dtoverlay=disable-bt
-    dtoverlay=pwm-2chan,pin=13,func=2,pin2=13,func2=4
-    audio_pwm_mode=2
-
-3. Install NodeJS
+4. Install NodeJS
 
    * Download unnofficial distribution for ARMv6
    * Create folder: /usr/local/lib/nodejs
@@ -96,7 +110,7 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
      PATH=$NODE_PATH/bin:$PATH
    * Run visudo and remove "secure_path"
 
-4. Install NetworkManager
+5. Install NetworkManager
 
    sudo apt-get install network-manager
 
@@ -104,11 +118,11 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
    set priorities to 100 and 1 for wifi-wlan0 and Hotspot respectively.
    eg. sudo nmcli c mod wifi-wlan0 device.autoconnect-priority 100
 
-4. Install Git
+6. Install Git
 
    sudo apt-get install git
 
-5. Install fcenail
+7. Install fcenail
 
    sudo npm install -g fcenail --unsafe
 
