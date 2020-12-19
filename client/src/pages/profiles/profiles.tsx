@@ -179,7 +179,8 @@ const ProfilesPage: React.FC = () => {
     <div className="spacer" />
     <Form className="profile-form" ref={ref => { if (ref) { formRef.current = ref; } }} onFinish={updateProfile}>
       <Form.Item className="header-row">
-        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+        <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>{t('FC E-Nail', 'FC E-Nail')}</h1>
+        <br/><h3>{t('by J-Cat', 'by J-Cat')}</h3>
       </Form.Item>
       <Form.Item label={t('profiles.profile', 'Profile')} rules={[{ required: true }]}>
         <Select value={currentProfile} onChange={selectedOnChange}>

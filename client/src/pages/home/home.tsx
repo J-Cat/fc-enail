@@ -206,7 +206,8 @@ const HomePage: FC = () => {
       <Grid className="home-grid" hoverable={false}>
         <Row className="header-row">
           <Col span={24} className="home-grid-header">
-            <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>FC E-Nail</h1>
+            <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>{t('FC E-Nail', 'FC E-Nail')}</h1>
+            <br/><h3>{t('by J-Cat', 'by J-Cat')}</h3>
           </Col>
         </Row>
 

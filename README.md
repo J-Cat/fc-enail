@@ -115,6 +115,26 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
    sudo apt-get install network-manager
 
    Create connections, wifi-wlan0 and Hotspot
+
+   ````
+   sudo nmcli c add type wifi con-name wifi-wlan0 ifname wlan0 ssid <ssid> wifi-sec.key-mgmt wpa-psk wifi-sec.psk <password> 
+   ````
+
+   Edit /etc/NetworkManager/NetworkManager.conf
+
+   `````
+   [main]
+   plugins=ifupdown,keyfile
+   dhcp=internal
+   
+   [ifupdown]
+   managed=true
+   ````
+
+   Reboot and add hotspot
+   
+   nmcli c add type wifi ifname wlan0 con-name Hotspot autoconnect no ssid hotspot-ssid
+       
    set priorities to 100 and 1 for wifi-wlan0 and Hotspot respectively.
    eg. sudo nmcli c mod wifi-wlan0 device.autoconnect-priority 100
 
