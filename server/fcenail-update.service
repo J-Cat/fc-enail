@@ -1,0 +1,15 @@
+[Unit]
+Description=FC E-Nail Update Service - Keeps your e-nail up-to-date.
+Documentation=https://github.com/J-Cat/fc-enail
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/.fcenail
+ExecStart=/usr/local/bin/fcenail-updater
+EnvironmentFile=/etc/systemd/fcenail.conf
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

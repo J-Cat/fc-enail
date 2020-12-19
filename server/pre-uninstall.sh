@@ -10,7 +10,7 @@ set -E
 systemctl stop fcenail.service
 systemctl disable fcenail.service
 rm /lib/systemd/system/fcenail.service
-systemctl daemon-reload
+# systemctl daemon-reload
 
 if [ -f /usr/local/bin/fcenail ]; then
   rm /usr/local/bin/fcenail

@@ -15,6 +15,12 @@ if [ ! -f /lib/systemd/system/fcenail.service ]; then
   systemctl daemon-reload
 fi
 
+if [ ! -f /lib/systemd/system/fcenail-update.service ]; then
+  cp $NODE_MODULES/fcenail/fcenail-update.service /lib/systemd/system
+  systemctl enable fcenail-update.service
+  systemctl daemon-reload
+fi
+
 if [ ! -d ~/.fcenail ]; then
   mkdir ~/.fcenail
   ln -s $NODE_MODULES/fcenail/sounds ~/.fcenail/sounds
@@ -28,5 +34,6 @@ fi
 ln -s $NODE_MODULES/fcenail/fcenail.sh /usr/local/bin/fcenail
 
 systemctl start fcenail.service
+systemctl start fcenail-update.service
 
 cd $SAVE_DIR
