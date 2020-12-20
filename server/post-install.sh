@@ -1,10 +1,11 @@
 #!/bin/bash
+set -E
 if [ "$USER" != "root" ]; then
   exit 0;
 fi
 
 SAVE_DIR=$PWD
-NODE_PATH=/usr/local/lib/nodejs/current
+NODE_PATH=$(readlink -f /usr/local/lib/nodejs/current)
 NODE_MODULES="$NODE_PATH/lib/node_modules"
 
 echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
@@ -45,3 +46,4 @@ systemctl start fcenail.service
 systemctl start fcenail-update.service
 
 cd $SAVE_DIR
+set -e

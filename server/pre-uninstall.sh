@@ -4,7 +4,8 @@ if [ "$USER" != "root" ]; then
 fi
 
 SAVE_DIR=$PWD
-NODE_MODULES=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')/lib/node_modules
+NODE_PATH=$(readlink -f /usr/local/lib/nodejs/current)
+NODE_MODULES="$NODE_PATH/lib/node_modules"
 
 set -E
 systemctl stop fcenail.service

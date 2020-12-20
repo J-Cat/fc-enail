@@ -2,6 +2,7 @@
 SAVE_DIR=$PWD
 
 cd ~/.fcenail
+NODE_PATH=$(readlink -f /usr/local/lib/nodejs/current)
 
 if [ ! -f ~/.fcenail/.env ]; then
   echo 'Generating private key/certificate pair on first launch ...'
