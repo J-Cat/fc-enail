@@ -6,6 +6,7 @@ Wants=fcenail-update.timer
 [Service]
 Type=oneshot
 User=root
+RemainAfterExit=true
 WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-updater
 EnvironmentFile=/etc/systemd/fcenail.conf
