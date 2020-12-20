@@ -15,13 +15,18 @@ if [ ! -f /lib/systemd/system/fcenail.service ]; then
   systemctl daemon-reload
 fi
 
+if [ ! -f /usr/local/bin/fcenail-updater ]; then
+  ln -s $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
+fi
+
 if [ ! -f /lib/systemd/system/fcenail-update.service ]; then
   cp $NODE_MODULES/fcenail/fcenail-update.service /lib/systemd/system
-  if [ ! -f /usr/local/bin/fcenail-updater ]; then
-    ln -s $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
-  fi
   systemctl enable fcenail-update.service
   systemctl daemon-reload
+fi
+
+if [ ! -f /etc/systemd/system/fcenail-update.timer ]; then
+  cp $NODE_MODULES/fcenail/fcenail-update.timer /etc/systemd/system
 fi
 
 if [ ! -d ~/.fcenail ]; then

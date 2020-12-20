@@ -1,0 +1,11 @@
+[Unit]
+Description=Run FC E-Nail Updater Service at boot and daily
+Requires=fcenail-update.service
+
+[Timer]
+Unit=fcenail-update.service
+OnBootSec=5min
+OnUnitActiveSec=1d
+
+[Install]
+WantedBy=timers.target
