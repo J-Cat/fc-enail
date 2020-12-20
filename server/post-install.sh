@@ -4,7 +4,7 @@ if [ "$USER" != "root" ]; then
 fi
 
 SAVE_DIR=$PWD
-NODE_PATH=$(whereis npm | sed -E 's/^.*: ([^ ]+)\/bin\/npm.*$/\1/gi')
+NODE_PATH=/usr/local/lib/nodejs/current
 NODE_MODULES="$NODE_PATH/lib/node_modules"
 
 echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
