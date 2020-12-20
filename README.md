@@ -35,7 +35,7 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * 5V Power Supply, 500mA
 * Raspbeery Pi Pin Configuration:
 
-  Button
+  Button (are pins reversed?)
   - button: PIN 31 (GPIO 6)
   - led: PIN 29 (GPIO 5)
   - grounds: 30, 39
@@ -70,7 +70,6 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * install Raspbian
 * install NodeJS 14.x
 * npm install -g fcenail --unsafe
-* fcenail --install
 
 1. Update d:\config.txt
 
@@ -109,6 +108,12 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
      NODE_PATH=/usr/local/lib/nodejs/current
      PATH=$NODE_PATH/bin:$PATH
    * Run visudo and remove "secure_path"
+   * Create symbolic links for node, npm, and npx:
+     ````
+     sudo ln -s /usr/local/lib/nodejs/current/bin/node /usr/local/bin/node
+     sudo ln -s /usr/local/lib/nodejs/current/bin/npm /usr/local/bin/npm
+     sudo ln -s /usr/local/lib/nodejs/current/bin/npx /usr/local/bin/npx
+     ````
 
 5. Install NetworkManager
 
