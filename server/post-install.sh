@@ -1,5 +1,6 @@
 #!/bin/bash
 set -E
+env
 if [ "$USER" != "root" ]; then
   echo "FC E-Nail must be installed as root!"
   exit 1;
