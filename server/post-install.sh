@@ -3,7 +3,7 @@ set -E
 env
 if [ "$USER" != "root" ]; then
   echo "FC E-Nail must be installed as root!"
-  exit 1;
+  exit 0;
 fi
 
 SAVE_DIR=$PWD
