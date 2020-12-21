@@ -1,4 +1,5 @@
 #!/bin/bash
+set -E
 
 if [ "$USER" != "root" ]; then
   echo "FC E-Nail Updater must be run as root!"
@@ -22,3 +23,4 @@ else
 fi
 
 cd $SAVE_DIR
+set -e

@@ -205,9 +205,13 @@ const HomePage: FC = () => {
       <div className="spacer" />
       <Grid className="home-grid" hoverable={false}>
         <Row className="header-row">
-          <Col span={24} className="home-grid-header">
-            <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />&nbsp;<h1>{t('FC E-Nail', 'FC E-Nail')}</h1>
-            <br/><h3>{t('by J-Cat', 'by J-Cat')}</h3>
+          <Col span={24} className="header-col">
+            <img src={`${process.env.PUBLIC_URL}/favicon.ico`} />
+            <div>
+              <h1>{t('FC E-Nail', 'FC E-Nail')}</h1>
+              <br/>
+              <h3>{t('by J-Cat', 'by J-Cat')}</h3>
+            </div>
           </Col>
         </Row>
 

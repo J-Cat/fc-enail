@@ -1,6 +1,5 @@
 #!/bin/bash
 set -E
-env
 if [ "$USER" != "root" ]; then
   echo "FC E-Nail must be installed as root!"
   exit 0;
@@ -18,9 +17,7 @@ if [ ! -f /lib/systemd/system/fcenail.service ]; then
   systemctl daemon-reload
 fi
 
-if [ ! -f /usr/local/bin/fcenail-updater ]; then
-  ln -s $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
-fi
+cp -b $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
 
 if [ ! -f /lib/systemd/system/fcenail-update.service ]; then
   cp $NODE_MODULES/fcenail/fcenail-update.service /lib/systemd/system
