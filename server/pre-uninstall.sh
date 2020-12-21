@@ -1,6 +1,7 @@
 #!/bin/bash
 if [ "$USER" != "root" ]; then
-  exit 0;
+  echo "FC E-Nail must be un-installed as root!"
+  exit 1;
 fi
 
 SAVE_DIR=$PWD
