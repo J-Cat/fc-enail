@@ -181,7 +181,7 @@ const onSharedStateChange = async (
   const server = Api();
   socketApi(server);
 
-  await initTunnel();
+  const tunnel = await initTunnel();
 
   await initButton(onButtonClick, onLongButtonClick, onReallyLongButtonClick, onReallyReallyLongButonClick);
 
@@ -189,5 +189,31 @@ const onSharedStateChange = async (
 
   initE5cc(onE5ccChange);
 
-  //await showMessage('Connected to Linamar', Font.UbuntuMono_10ptFontInfo);
+  process.stdin.resume();//so the program will not close instantly
+
+  const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
+    if (options.cleanup) {
+      console.log('Cleaning up before exit.');
+      tunnel?.close();
+    }
+    if (exitCode || exitCode === 0) {
+      console.log(exitCode);
+    }
+    if (options.exit) {
+      process.exit();
+    }
+  };
+  
+  //do something when app is closing
+  process.on('exit', exitHandler.bind(null,{cleanup:true}));
+  
+  //catches ctrl+c event
+  process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+  
+  // catches "kill pid" (for example: nodemon restart)
+  process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+  process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+  
+  //catches uncaught exceptions
+  process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 })();

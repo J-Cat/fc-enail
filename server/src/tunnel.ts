@@ -8,13 +8,13 @@ let Config = registerConfigChange('localtunnel', newConfig => {
   Config = newConfig;
 });
 
-export const initTunnel = async (): Promise<void> => {
+export const initTunnel = async (): Promise<localtunnel.Tunnel | undefined> => {
   try {
     if (!Config.localtunnel.subdomain) {
       return;
     }
 
-    await new Promise<void>((resolve, reject) => {
+    await new Promise<localtunnel.Tunnel>((resolve, reject) => {
       try {
         setTimeout(() => { reject('Connection to localtunnel.me timed out.'); }, 10000);
 
@@ -27,10 +27,10 @@ export const initTunnel = async (): Promise<void> => {
           setSharedState({ url: tunnel.url }, 'self').then(() => {
             if (getUrl() !== tunnel.url) {
               setUrl(tunnel.url).then(() => {
-                resolve();
+                resolve(tunnel);
               });
             } else {
-              resolve();  
+              resolve(tunnel);  
             }
           });
         }).catch(reason => {

@@ -35,9 +35,9 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * 5V Power Supply, 500mA
 * Raspbeery Pi Pin Configuration:
 
-  Button (are pins reversed?)
-  - button: PIN 31 (GPIO 6)
-  - led: PIN 29 (GPIO 5)
+  Button
+  - button: PIN 39 (GPIO 5)
+  - led: PIN 31 (GPIO 6)
   - grounds: 30, 39
 
   Speaker
@@ -119,7 +119,71 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
    sudo apt-get install network-manager
 
-   Create connections, wifi-wlan0 and Hotspot
+   Create connections, wifi-wlan0 and Hotspot:
+
+   * /etc/NetworkManager/system-connections/wifi-wlan0.nmconnection
+     ````
+     [connection]
+     id=wifi-wlan0
+     uuid=ccaac89e-a2db-4412-ba51-b551d75712f0
+     type=wifi
+     autoconnect-priority=100
+     autoconnect-retries=3
+     interface-name=wlan0
+     permissions=
+     timestamp=1608730297
+     
+     [wifi]
+     mac-address-blacklist=
+     mode=infrastructure
+     seen-bssids=74:83:C2:3A:E3:AA;74:83:C2:2D:62:6E;
+     ssid=Linamar
+     
+     [wifi-security]
+     key-mgmt=wpa-psk
+     psk=L1n@m@r+23
+     
+     [ipv4]
+     dns-search=
+     method=auto
+     
+     [ipv6]
+     addr-gen-mode=stable-privacy
+     dns-search=
+     method=ignore
+     ````
+
+   * /etc/NetworkManager/system-connections/Hotspot.nmconnection
+     ````
+     [connection]
+     id=Hotspot
+     uuid=9be42a41-2c0a-42f4-a646-c9bd3b380874
+     type=wifi
+     autoconnect-priority=1
+     interface-name=wlan0
+     permissions=
+     timestamp=1608320053
+     
+     [wifi]
+     mac-address-blacklist=
+     mode=ap
+     seen-bssids=B8:27:EB:24:83:71;
+     ssid=fcenail
+     
+     [wifi-security]
+     key-mgmt=wpa-psk
+     psk=1234567890
+     
+     [ipv4]
+     address1=10.20.30.1/24
+     dns-search=
+     method=shared
+     
+     [ipv6]
+     addr-gen-mode=stable-privacy
+     dns-search=
+     method=ignore
+     ````
 
    ````
    sudo nmcli c add type wifi con-name wifi-wlan0 ifname wlan0 ssid <ssid> wifi-sec.key-mgmt wpa-psk wifi-sec.psk <password> 
