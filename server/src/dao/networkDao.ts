@@ -39,14 +39,11 @@ export const scan = async (): Promise<{error?: string, stdout?: string, stderr?:
     try {
       exec(
         ` \
+          sudo nmcli c mod Hotspot autoconnect no; \
           ACTIVE_IF=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
-          if [ "$ACTIVE_IF" = "Hotspot" ]; then \
-            sudo nmcli c down $ACTIVE_IF > /dev/null 2>&1; \
-          else \
-            sudo nmcli c down $ACTIVE_IF > /dev/null 2>&1; \
-            sudo nmcli c down Hotspot > /dev/null 2>&1; \
-          fi; \
-          nmcli --terse d wifi list | sed -E 's/^[^:]*:?([^:]+).*$/\\1/g' | grep -v -e '^ *$' | sort | uniq; \
+          sudo nmcli c down $ACTIVE_IF > /dev/null 2>&1; \
+          sudo nmcli --terse d wifi list | sed -E 's/^[^:]*:?([^:]+).*$/\\1/g' | grep -v -e '^ *$' | sort | uniq; \
+          sudo nmcli c mod Hotspot autoconnect yes; \
           sudo nmcli c up $ACTIVE_IF > /dev/null 2>&1; \
         `, 
         { encoding: 'utf8' }, async (error, stdout, stderr) => {

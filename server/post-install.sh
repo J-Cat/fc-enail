@@ -27,6 +27,8 @@ fi
 
 if [ ! -f /etc/systemd/system/fcenail-update.timer ]; then
   cp $NODE_MODULES/fcenail/fcenail-update.timer /etc/systemd/system
+  systemctl enable fcenail-update.timer
+  systemctl daemon-reload
 fi
 
 if [ ! -d ~/.fcenail ]; then

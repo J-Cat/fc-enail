@@ -17,9 +17,9 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Ability to connect device to WiFi network through device UI
 * Automatic discovery of device on local networks, but ability to configure if not found or on different subnets
 
-![Device](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device1.jpg)
+![Device - Wood Enclosure #1](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device1.jpg) ![Device - Wood Enclosure #2](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device2.jpg) ![Device - Wood Enclosure #3](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device3.jpg) ![Device - Aluminum Enclosure](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device3.jpg)
 
-![Mobile App - Home Screen](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile1.png) ![Mobile App - Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile2.png) ![Mobile App - Script Editor](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile3.png) ![Mobile App - Script Editor 2](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/mobile4.png)
+![App - Home Screen](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app1-home.png) ![App - Profiles](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app2-profiles.png) ![App - Script Editor](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app3-scripts.png) ![App - Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app4-settings.png) ![App - WiFi Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app5-wifi.png)
 
 ## Getting Started
 
@@ -34,6 +34,8 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * RS-485 to UART converter w/ auto direction control (ie. something w/ a MAX13487E chip)
 * 5V Power Supply, 500mA
 * Raspbeery Pi Pin Configuration:
+
+  ![Raspberry Pi Pinout](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/pinout.png)
 
   Button
   - button: PIN 29 (GPIO 5)
