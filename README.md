@@ -17,7 +17,9 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Ability to connect device to WiFi network through device UI
 * Automatic discovery of device on local networks, but ability to configure if not found or on different subnets
 
-![Device - Wood Enclosure #1](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device1.jpg) ![Device - Wood Enclosure #2](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device2.jpg) ![Device - Wood Enclosure #3](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device3.jpg) ![Device - Aluminum Enclosure](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/device3.jpg)
+![Device - Wood Enclosure #1](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-device1.jpg) ![Device - Wood Enclosure #2](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-device2.jpg) ![Device - Wood Enclosure #3](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-device3.jpg) ![Device - Aluminum Enclosure](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-device4.jpg)
+
+![Device - Internals](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-internals.jpg)
 
 ![App - Home Screen](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app1-home.png) ![App - Profiles](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app2-profiles.png) ![App - Script Editor](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app3-scripts.png) ![App - Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app4-settings.png) ![App - WiFi Settings](https://raw.githubusercontent.com/J-Cat/fc-enail/master/pictures/fcenail-app5-wifi.png)
 
