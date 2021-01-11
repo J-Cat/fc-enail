@@ -36,14 +36,15 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Raspbeery Pi Pin Configuration:
 
   Button
-  - button: PIN 39 (GPIO 5)
+  - button: PIN 29 (GPIO 5)
   - led: PIN 31 (GPIO 6)
   - grounds: 30, 39
 
-  Speaker
+  Speaker/Amp
   - PIN 32 (GPIO 12)
   - 5V or 3.3V (PIN 2)
   - ground: 34
+  - 5V joined w/ encoder 5V
 
   OLED:
   - 3.3V (PIN 1)
@@ -56,14 +57,14 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
   - ground: PIN 14
   - TXD (PIN 10, UART0 RX)
   - RXD (PIN 8, UART0 TX)
-
+  
   Rotary Encoder
   - 5V (PIN 2)
   - Channel A: PIN 18 (GPIO 24)
   - Channel B: PIN 16 (GPIO 23)
   - ground: PIN 20
   - Button: PIN 15 (GPIO 22), GROUND PIN: 25
-
+  
 
 ### Installing
 

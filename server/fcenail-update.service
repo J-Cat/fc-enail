@@ -4,9 +4,8 @@ Documentation=https://github.com/J-Cat/fc-enail
 Wants=fcenail-update.timer
 
 [Service]
-Type=oneshot
+Type=simple
 User=root
-RemainAfterExit=true
 WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-updater
 EnvironmentFile=/etc/systemd/fcenail.conf
