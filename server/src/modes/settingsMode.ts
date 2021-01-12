@@ -1,6 +1,6 @@
 import { Icons } from '../models/icons';
 import { IModeInstance } from '../models/IModeInstance';
-import { registerStateChange } from '../dao/sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 import { IMenu } from '../models/IMenu';
 import { BaseMode } from './baseMode';
 import { initGeneral } from './settings/general';
@@ -10,6 +10,7 @@ import { initWifi } from './settings/wifi';
 import { setPromptInput } from './promptinput';
 import { updateNetwork } from '../dao/networkDao';
 import { showMessage } from '../hardware/display';
+import { checkForUpdates } from '../dao/systemDao';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -22,7 +23,7 @@ export const SettingsMode: IModeInstance = {
 
 export const initSettingsMenu = (): IMenu => {
   return {
-    current: 0, min: 0, max: 3,
+    current: 0, min: 0, max: 5,
     icon: Icons.gear,
     menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info'],
     onClick: async (index: number): Promise<void> => {
@@ -50,14 +51,31 @@ export const initSettingsMenu = (): IMenu => {
             const { error } = await updateNetwork('ap', 'FCEnail', '1234567890');
             if (error) {
               await showMessage(error);
-              return;
             }
+            setSharedState({
+              prompt: undefined,
+            });
           },
         );        
         break;
       }
       case 4: { // network info
         await initNetworkInfo();
+        break;
+      }
+      case 5: { // check for updates
+        await setPromptInput(
+          'Check for updates?',
+          async (): Promise<void> => {
+            const { error } = await checkForUpdates();
+            if (error) {
+              await showMessage(error);
+            }
+            setSharedState({
+              prompt: undefined,
+            });
+          },
+        );        
         break;
       }
       }

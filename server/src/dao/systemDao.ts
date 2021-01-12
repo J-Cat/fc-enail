@@ -59,3 +59,24 @@ export const reboot = async (): Promise<void> => {
   };
   rebootTimer();
 };
+
+export const checkForUpdates = async(): Promise<{ error?: string, stdout?: string, stderr?: string }> => {
+  return new Promise(resolve => {
+    try {
+      exec(
+        'sudo systemctl start fcenail-update.service',
+        { encoding: 'utf8' }, (error, stdout, stderr) => {
+          resolve({
+            error: error?.message,
+            stdout,
+            stderr,
+          });
+        }
+      );
+    } catch (e) {
+      resolve({
+        error: e.message,
+      });
+    }
+  });
+};
