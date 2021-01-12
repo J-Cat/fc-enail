@@ -7,6 +7,9 @@ import { initGeneral } from './settings/general';
 import { initNetworkInfo } from './settings/networkInfo';
 import { initPresets } from './settings/presets';
 import { initWifi } from './settings/wifi';
+import { setPromptInput } from './promptinput';
+import { updateNetwork } from '../dao/networkDao';
+import { showMessage } from '../hardware/display';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -21,7 +24,7 @@ export const initSettingsMenu = (): IMenu => {
   return {
     current: 0, min: 0, max: 3,
     icon: Icons.gear,
-    menuItems: ['Presets', 'General', 'Connect WiFi', 'Network Info'],
+    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info'],
     onClick: async (index: number): Promise<void> => {
       const menus = [...(state.menu || [])];
       if (menus.length === 0) {
@@ -40,7 +43,20 @@ export const initSettingsMenu = (): IMenu => {
         await initWifi();
         break;
       }
-      case 3: { // network info
+      case 3: { // hotspot
+        await setPromptInput(
+          'Enable FC-Enail Hotspot?',
+          async (): Promise<void> => {
+            const { error } = await updateNetwork('ap', 'FCEnail', '1234567890');
+            if (error) {
+              await showMessage(error);
+              return;
+            }
+          },
+        );        
+        break;
+      }
+      case 4: { // network info
         await initNetworkInfo();
         break;
       }

@@ -11,7 +11,7 @@ openssl genrsa -des3 -passout pass:1234567890abcdefg -out $OUTDIR/$PACKAGE_NAME.
 openssl rsa -passin pass:1234567890abcdefg -in $OUTDIR/$PACKAGE_NAME.pass.key -out $OUTDIR/$PACKAGE_NAME.key
 rm $OUTDIR/$PACKAGE_NAME.pass.key
 openssl req -new -key $OUTDIR/$PACKAGE_NAME.key -out $OUTDIR/$PACKAGE_NAME.csr -subj "/C=CA/ST=ON/L=Kapuskasing/O=JCat/OU=IT/CN=$PACKAGE_NAME.jcatvapes.com"
-openssl x509 -sha256 -req -days 3650 -in $OUTDIR/$PACKAGE_NAME.csr -signkey $OUTDIR/$PACKAGE_NAME.key -out $OUTDIR/$PACKAGE_NAME.crt
+openssl x509 -sha256 -req -days 36500 -in $OUTDIR/$PACKAGE_NAME.csr -signkey $OUTDIR/$PACKAGE_NAME.key -out $OUTDIR/$PACKAGE_NAME.crt
 
 API_JWT_PUBLIC_CERT=`cat $OUTDIR/$PACKAGE_NAME.crt | sed -E ':a; N; s/\n/\\\\n/; ta'`
 API_JWT_PRIVATE_KEY=`cat $OUTDIR/$PACKAGE_NAME.key | sed -E ':a; N; s/\n/\\\\n/; ta'`
