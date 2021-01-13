@@ -64,14 +64,16 @@ export const initSettingsMenu = (): IMenu => {
         break;
       }
       case 5: { // check for updates
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const version = require('../../package.json').version;
         await setPromptInput(
-          'Check for updates?',
+          `Check for updates (version: ${version})?`,
           async (): Promise<void> => {
             const { error } = await checkForUpdates();
             if (error) {
               await showMessage(error);
             } else {
-              await showMessage('Started AP, FCEnail, password: 1234567890');
+              await showMessage('Update requested.');
             }
             setSharedState({
               prompt: undefined,
