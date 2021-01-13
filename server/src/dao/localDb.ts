@@ -9,14 +9,27 @@ const defaultValue = {
   quickSet: [465, 485, 495, 505, 510, 515, 530],
   profiles: [],
   ssids: [],
-  scripts: [{
-    key: Guid.create().toString(),
-    title: 'Up-Temp 40',
-    rootStep: {
+  scripts: [
+    {
       key: Guid.create().toString(),
-      type: StepTypeEnum.SequentialStep,
-      loop: 1,
-      steps: [
+      title: 'Up-Temp 25',
+      rootStep: {
+        key: Guid.create().toString(),
+        type: StepTypeEnum.SequentialStep,
+        loop: 1,
+        steps: [
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          text: 'Getting ready ...',
+          icon: 'hourglass',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: 25,
+        } as IUpdateSetPointStep,
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.FeedbackStep,
@@ -25,10 +38,60 @@ const defaultValue = {
         } as IFeedbackStep,
         {
           key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'cloud',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.TimerStep,
+          duration: 5,
+        } as ITimerStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: -25,
+        } as IUpdateSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        ],
+      },
+    },
+    {
+      key: Guid.create().toString(),
+      title: 'Up-Temp 40',
+      rootStep: {
+        key: Guid.create().toString(),
+        type: StepTypeEnum.SequentialStep,
+        loop: 1,
+        steps: [
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          text: 'Getting ready ...',
+          icon: 'hourglass',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
           type: StepTypeEnum.UpdateSetPointStep,
           updateType: 'increment',
           value: 40,
         } as IUpdateSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'drop',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.WaitForSetPointStep,
@@ -56,19 +119,122 @@ const defaultValue = {
           type: StepTypeEnum.WaitForSetPointStep,
           offset: 2,
         } as IWaitForSetPointStep,
+        ],
+      },
+    },
+    {
+      key: Guid.create().toString(),
+      title: 'Up-Temp 15x3',
+      rootStep: {
+        key: Guid.create().toString(),
+        type: StepTypeEnum.SequentialStep,
+        loop: 1,
+        steps: [
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          text: 'Getting ready ...',
+          icon: 'hourglass',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: 15,
+        } as IUpdateSetPointStep,
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.FeedbackStep,
           icon: 'drop',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'cloud',
+          sound: 'organ.wav',
         } as IFeedbackStep,
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.TimerStep,
-          duration: 3,
+          duration: 5,
         } as ITimerStep,
-      ],
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: 15,
+        } as IUpdateSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'drop',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'cloud',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.TimerStep,
+          duration: 5,
+        } as ITimerStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: 15,
+        } as IUpdateSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'drop',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.FeedbackStep,
+          icon: 'cloud',
+          sound: 'organ.wav',
+        } as IFeedbackStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.TimerStep,
+          duration: 5,
+        } as ITimerStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.UpdateSetPointStep,
+          updateType: 'increment',
+          value: -45,
+        } as IUpdateSetPointStep,
+        {
+          key: Guid.create().toString(),
+          type: StepTypeEnum.WaitForSetPointStep,
+          offset: 2,
+        } as IWaitForSetPointStep,
+        ],
+      },
     },
-  }],
+  ],
 };
 
 const adapter = new FileAsync<ILocalDb>('./db.json', { defaultValue });
