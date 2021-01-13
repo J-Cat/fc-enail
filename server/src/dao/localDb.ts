@@ -124,7 +124,7 @@ const defaultValue = {
     },
     {
       key: Guid.create().toString(),
-      title: 'Up-Temp 15x3',
+      title: 'Up-Temp 15 x 2',
       rootStep: {
         key: Guid.create().toString(),
         type: StepTypeEnum.SequentialStep,
@@ -136,34 +136,6 @@ const defaultValue = {
           text: 'Getting ready ...',
           icon: 'hourglass',
         } as IFeedbackStep,
-        {
-          key: Guid.create().toString(),
-          type: StepTypeEnum.UpdateSetPointStep,
-          updateType: 'increment',
-          value: 15,
-        } as IUpdateSetPointStep,
-        {
-          key: Guid.create().toString(),
-          type: StepTypeEnum.FeedbackStep,
-          icon: 'drop',
-          sound: 'organ.wav',
-        } as IFeedbackStep,
-        {
-          key: Guid.create().toString(),
-          type: StepTypeEnum.WaitForSetPointStep,
-          offset: 2,
-        } as IWaitForSetPointStep,
-        {
-          key: Guid.create().toString(),
-          type: StepTypeEnum.FeedbackStep,
-          icon: 'cloud',
-          sound: 'organ.wav',
-        } as IFeedbackStep,
-        {
-          key: Guid.create().toString(),
-          type: StepTypeEnum.TimerStep,
-          duration: 5,
-        } as ITimerStep,
         {
           key: Guid.create().toString(),
           type: StepTypeEnum.UpdateSetPointStep,

@@ -17,17 +17,13 @@ PUBLISH=${PUBLISH:="N"}
 case $PUBLISH in
   F | f)
     yarn pack
-    ;;
+  ;;
   P | p)
-    CURRENT_VERSION=$(node -e "console.log(require('./package.json').version)")
-    yarn publish --tag beta --silent
-    npm dist-tag add fcenail@$CURRENT_VERSION next
-    ;;
+    VERSION=$(node -e "console.log(require('./package.json').version)")
+    yarn publish --tag beta --new-version $VERSION
+    npm dist-tag add fcenail@$VERSION next
+  ;;
 esac
-if [[ "${PUBLISH,,}" =~ ^(n|yes)$ ]]; then
-
-#yarn pack
-#yarn publish --tag beta
 
 rm ./README.md
 cd ..
