@@ -38,14 +38,7 @@ export const scan = async (): Promise<{error?: string, stdout?: string, stderr?:
   return new Promise(resolve => {
     try {
       exec(
-        ` \
-          sudo nmcli c mod Hotspot autoconnect no; \
-          ACTIVE_IF=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
-          sudo nmcli c down $ACTIVE_IF > /dev/null 2>&1; \
-          sudo nmcli --terse d wifi list | sed -E 's/^[^:]*:?([^:]+).*$/\\1/g' | grep -v -e '^ *$' | sort | uniq; \
-          sudo nmcli c mod Hotspot autoconnect yes; \
-          sudo nmcli c up $ACTIVE_IF > /dev/null 2>&1; \
-        `, 
+        `sudo iwlist wlan0 scan | grep ESSID: | sed -E 's/^.*ESSID:"([^"]*)".*/\1/gi' | grep -v -e '^ *$' | sort | uniq`, 
         { encoding: 'utf8' }, async (error, stdout, stderr) => {
           if (error) {
             resolve({
@@ -99,6 +92,7 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
           sudo nmcli c modify Hotspot \
             802-11-wireless.ssid "${ssid}" \
             802-11-wireless-security.psk "${passcode}"; \
+          sudo nmcli c down Hotspot; \
           sudo nmcli c up Hotspot; \
           if [ $? -ne 0 ]; then \
             if [ ! -z "$IFNAME" ]; then \

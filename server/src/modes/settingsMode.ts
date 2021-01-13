@@ -51,6 +51,8 @@ export const initSettingsMenu = (): IMenu => {
             const { error } = await updateNetwork('ap', 'FCEnail', '1234567890');
             if (error) {
               await showMessage(error);
+            } else {
+              await showMessage('Started AP, FCEnail, password: 1234567890');
             }
             setSharedState({
               prompt: undefined,
