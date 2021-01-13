@@ -25,7 +25,7 @@ export const initSettingsMenu = (): IMenu => {
   return {
     current: 0, min: 0, max: 5,
     icon: Icons.gear,
-    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info'],
+    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates'],
     onClick: async (index: number): Promise<void> => {
       const menus = [...(state.menu || [])];
       if (menus.length === 0) {
@@ -70,6 +70,8 @@ export const initSettingsMenu = (): IMenu => {
             const { error } = await checkForUpdates();
             if (error) {
               await showMessage(error);
+            } else {
+              await showMessage('Started AP, FCEnail, password: 1234567890');
             }
             setSharedState({
               prompt: undefined,
