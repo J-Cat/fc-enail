@@ -38,7 +38,7 @@ export const scan = async (): Promise<{error?: string, stdout?: string, stderr?:
   return new Promise(resolve => {
     try {
       exec(
-        `sudo iwlist wlan0 scan | grep ESSID: | sed -E 's/^.*ESSID:"([^"]*)".*/\1/gi' | grep -v -e '^ *$' | sort | uniq`, 
+        `sudo iwlist wlan0 scan | grep ESSID: | sed -E 's/^.*ESSID:"([^"]*)".*/\\1/gi' | grep -v -e '^ *$' | sort | uniq`, 
         { encoding: 'utf8' }, async (error, stdout, stderr) => {
           if (error) {
             resolve({
