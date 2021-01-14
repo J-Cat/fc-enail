@@ -1,7 +1,8 @@
+import dotenv from 'dotenv';
 import localtunnel from 'localtunnel';
 // import mail from '@sendgrid/mail';
 import { registerConfigChange } from './config';
-import { getUrl, setUrl } from './dao/localDb';
+import { initLocalDb, getUrl, setUrl } from './dao/localDb';
 
 let Config = registerConfigChange('localtunnel', newConfig => {
   Config = newConfig;
@@ -10,6 +11,10 @@ let Config = registerConfigChange('localtunnel', newConfig => {
 let tunnel: localtunnel.Tunnel | undefined;
 
 export const initTunnel = async (): Promise<void> => {
+  dotenv.config();
+
+  await initLocalDb();
+
   try {
     if (!Config.localtunnel.subdomain) {
       return;

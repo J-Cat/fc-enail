@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import { readFile, stat, writeFile } from 'fs';
 import { registerConfigChange, loadConfig } from '../config';
 import { IConfig } from '../models/IConfig';
+import { setUrl } from './localDb';
 
 let Config = registerConfigChange('config-dao', newConfig => {
   Config = newConfig;
@@ -73,6 +74,23 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
 
     await setVolume(config.volume);
   
+    if (config.localtunnel !== Config.localtunnel.subdomain) {
+      let actions = ['start', 'enable'];
+      if (config.localtunnel) {
+        await setUrl(config.localtunnel);
+      } else {
+        actions = ['stop', 'disable'];
+        await setUrl('');
+      }
+      for (const action of actions) {
+        await new Promise<void>(resolve => {
+          exec(`systemctl ${action} fcenail-localtunnel.service`, () => {
+            resolve();
+          });
+        });            
+      }
+    }
+    
     loadConfig(newEnv);
     return {};
   } catch (e) {
