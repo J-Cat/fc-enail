@@ -215,7 +215,14 @@ let db: LowdbAsync<ILocalDb>;
 export const initLocalDb = async (): Promise<void> => {
   db = await Lowdb(adapter);
   if (!db.get('profiles')) {
-    await db.set('profiles', []).write();
+    await db.set('profiles', [{
+      key: Guid.create().toString(),
+      title: 'Default',
+      p: 21.6,
+      i: 33,
+      d: 6,
+      offset: 0,
+    } as IProfile]).write();
   }
   if (!(db.get('scripts').value())) {
     await db.set('scripts', defaultValue.scripts).write();

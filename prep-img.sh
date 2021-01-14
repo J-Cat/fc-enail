@@ -39,6 +39,16 @@ rm -rvf $mountdir/var/cache/apt/archives/* $mountdir/var/lib/dhcpcd5/* $mountdir
   $mountdir/root/.fcenail/.env $mountdir/root/.fcenail/db.json \
   $mountdir/home/pi/.bash_history $mountdir/root/.bash_history $mountdir/home/pi/.node_repl_history
 touch $mountdir/etc/machine-id
+cat $mountdir/etc/NetworkManager/system-connections/wifi-wlan0.nmconnection \
+  | grep -v "mac-address=" \
+  | sed -E 's/^ssid=.*$/ssid=Undefined/gi' \
+  | sed -E 's/^psk=.*$/psk=1234567890/gi' \
+> $mountdir/etc/NetworkManager/system-connections/wifi-wlan0.nmconnection
+cat $mountdir/etc/NetworkManager/system-connections/Hotspot.nmconnection \
+  | grep -v "mac-address=" \
+  | sed -E 's/^ssid=.*$/ssid=fcenail/gi' \
+  | sed -E 's/^psk=.*$/psk=1234567890/gi' \
+> $mountdir/etc/NetworkManager/system-connections/Hotspot.nmconnection
 mv $mountdir/etc/rc.local $mountdir/etc/rc.local.bak
 echo "#!/bin/sh
 
