@@ -17,6 +17,14 @@ if [ ! -f /lib/systemd/system/fcenail.service ]; then
   systemctl daemon-reload
 fi
 
+cp -b $NODE_MODULES/fcenail/fcenail-localtunnel.sh /usr/local/bin/fcenail-localtunnel
+
+if [ ! -f /lib/systemd/system/fcenail-localtunnel.service ]; then
+  cp $NODE_MODULES/fcenail/fcenail-localtunnel.service /lib/systemd/system
+  systemctl enable fcenail-localtunnel.service
+  systemctl daemon-reload
+fi
+
 cp -b $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
 
 if [ ! -f /lib/systemd/system/fcenail-update.service ]; then

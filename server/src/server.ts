@@ -9,7 +9,7 @@ import { registerStateChange, setSharedState } from './dao/sharedState';
 import { emitE5cc, socketApi } from './socketApi';
 import { closeButton, initButton, setLed } from './hardware/button';
 import { Lock } from './utility/Lock';
-import { initTunnel } from './tunnel';
+// import { initTunnel } from './tunnel';
 import { HomeMode } from './modes/homeMode';
 import { initSettingsMenu, SettingsMode } from './modes/settingsMode';
 import { PresetsMode } from './modes/presetsMode';
@@ -181,7 +181,7 @@ const onSharedStateChange = async (
   const server = Api();
   socketApi(server);
 
-  const tunnel = await initTunnel();
+  // const tunnel = await initTunnel();
 
   await initButton(onButtonClick, onLongButtonClick, onReallyLongButtonClick, onReallyReallyLongButonClick);
 
@@ -194,7 +194,7 @@ const onSharedStateChange = async (
   const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
     if (options.cleanup) {
       console.log('Cleaning up before exit.');
-      tunnel?.close();
+      // tunnel?.close();
     }
     if (exitCode || exitCode === 0) {
       console.log(exitCode);

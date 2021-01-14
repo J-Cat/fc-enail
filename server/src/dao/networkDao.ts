@@ -66,13 +66,13 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
       if (mode === 'infrastructure') {
         cmd = ` \
           set +e; \
+          sudo nmcli c modify wifi-wlan0 \
+            802-11-wireless.ssid "${ssid}" \
+            802-11-wireless-security.psk "${passcode}"; \
           IFNAME=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
           if [ ! -z "$IFNAME" ]; \
             then sudo nmcli c down $IFNAME; \
           fi; \
-          sudo nmcli c modify wifi-wlan0 \
-            802-11-wireless.ssid "${ssid}" \
-            802-11-wireless-security.psk "${passcode}"; \
           sudo nmcli c up wifi-wlan0; \
           if [ $? -ne 0 ]; then \
             sudo nmcli c up Hotspot; \
@@ -85,14 +85,16 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
       } else {
         cmd = `
           set +e; \
+          sudo nmcli c modify Hotspot \
+            802-11-wireless.ssid "${ssid}" \
+            802-11-wireless-security.psk "${passcode}"; \
           IFNAME=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
           if [ ! -z "$IFNAME" ]; then \
             sudo nmcli c down $IFNAME; \
           fi; \
-          sudo nmcli c modify Hotspot \
-            802-11-wireless.ssid "${ssid}" \
-            802-11-wireless-security.psk "${passcode}"; \
-          sudo nmcli c down Hotspot; \
+          if [ "$IFNAME" != "Hotspot" ]; then \
+            sudo nmcli c down Hotspot; \
+          fi; \
           sudo nmcli c up Hotspot; \
           if [ $? -ne 0 ]; then \
             if [ ! -z "$IFNAME" ]; then \

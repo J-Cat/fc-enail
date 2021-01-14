@@ -24,7 +24,7 @@ export const restartService = async (): Promise<void> => {
     await new Promise(resolve => setTimeout(resolve, 250));
     setLed(false);
 
-    if (count > 5) {
+    if (count >= 4) {
       exec('sudo systemctl restart fcenail');
       return;
     }
@@ -50,7 +50,7 @@ export const reboot = async (): Promise<void> => {
     await new Promise(resolve => setTimeout(resolve, 125));
     setLed(false);
 
-    if (count > 10) {
+    if (count >= 9) {
       exec('sudo reboot');
       return;
     }

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from 'http-status-codes';
+import { getUrl } from '../dao/localDb';
 import { getSharedState, setSharedState } from '../dao/sharedState';
 import { ISharedState } from '../models/ISharedState';
 
@@ -7,6 +8,7 @@ export const getState = async (req: Request, res: Response): Promise<Response> =
   try {
     const state: ISharedState = {
       ...(await getSharedState()),
+      url: getUrl(),
       passcode: undefined,
     };
 
