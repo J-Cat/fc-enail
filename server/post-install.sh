@@ -11,7 +11,7 @@ NODE_MODULES="$NODE_PATH/lib/node_modules"
 
 if [ ! -f /etc/systemd/fcenail.conf ]; then
   echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
-  echo "FCENAIL_DIST_TAG=latest"
+  echo "FCENAIL_DIST_TAG=latest" >> /etc/systemd/fcenail.conf
 fi
 
 if [ ! -f /lib/systemd/system/fcenail.service ]; then

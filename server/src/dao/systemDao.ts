@@ -4,6 +4,7 @@ import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
 import { getSounds } from '../dao/soundsDao';
 import { registerStateChange, setSharedState } from './sharedState';
+import dayjs from 'dayjs';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
   state = newState;
@@ -143,7 +144,7 @@ export const updateTime = async(utcTime: number): Promise<string|void> => {
   return new Promise(resolve => {
     try {
       exec(
-        `timedatectl set-ntp false; timedatectl set-time "${(new Date(utcTime)).toUTCString()}"; timedatectl set-ntp true;`,
+        `timedatectl set-ntp false; timedatectl set-time "${dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss')}"; timedatectl set-ntp true;`,
         { encoding: 'utf8' }, (error) => {
           if (error) {
             resolve(error.message);
