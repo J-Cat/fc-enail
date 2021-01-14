@@ -93,7 +93,7 @@ export const loadConfig = (newEnv?: string): void => {
       subdomain: process.env.LOCALTUNNEL_SUBDOMAIN || '',
     },
     settings: {
-      startupSound: process.env.STARTUP_SOUND || 'appear.wav',
+      startupSound: process.env.STARTUP_SOUND || 'appear',
     },
   };
 
