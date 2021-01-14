@@ -10,11 +10,14 @@ SAVE_DIR=$PWD
 
 cd ~/.fcenail
 
+. /etc/systemd/fcenail.conf
+FCENAIL_DIST_TAG=${FCENAIL_DIST_TAG:="latest"}
+
 CURRENT_VERSION=$(node -e "console.log(require('/usr/local/lib/nodejs/current/lib/node_modules/fcenail/package.json').version)")
 AVAILABLE_VERSION=$(npm view fcenail dist-tags.next)
 if [ "$CURRENT_VERSION" != "$AVAILABLE_VERSION" ]; then
   echo "Installing new version: $AVAILABLE_VERSION."
-  npm install -g fcenail@next --unsafe
+  npm install -g fcenail@$FCENAIL_DIST_TAG --unsafe
 else
   echo "Current version: $CURRENT_VERSION"
   echo
