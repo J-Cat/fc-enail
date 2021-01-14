@@ -9,8 +9,10 @@ SAVE_DIR=$PWD
 NODE_PATH=$(readlink -f /usr/local/lib/nodejs/current)
 NODE_MODULES="$NODE_PATH/lib/node_modules"
 
-echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
-echo "FCENAIL_DIST_TAG=latest"
+if [ ! -f /etc/systemd/fcenail.conf ]; then
+  echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
+  echo "FCENAIL_DIST_TAG=latest"
+fi
 
 if [ ! -f /lib/systemd/system/fcenail.service ]; then
   cp $NODE_MODULES/fcenail/fcenail.service /lib/systemd/system

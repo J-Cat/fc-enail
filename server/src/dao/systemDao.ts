@@ -91,7 +91,7 @@ export const getTimezones = async(): Promise<string[]> => {
           if (error) {
             resolve([]);
           } else {
-            resolve(stdout.split('\n'));
+            resolve(stdout.split('\n').filter(t => t.trim() !== ''));
           }
         }
       );
