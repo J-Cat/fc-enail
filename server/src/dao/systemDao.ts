@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { exec } from 'child_process';
 import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
@@ -77,6 +78,63 @@ export const checkForUpdates = async(): Promise<{ error?: string, stdout?: strin
       resolve({
         error: e.message,
       });
+    }
+  });
+};
+
+export const getTimezones = async(): Promise<string[]> => {
+  return new Promise(resolve => {
+    try {
+      exec(
+        'timedatectl list-timezones',
+        { encoding: 'utf8' }, (error, stdout) => {
+          if (error) {
+            resolve([]);
+          } else {
+            resolve(stdout.split('\n'));
+          }
+        }
+      );
+    } catch (e) {
+      resolve([]);
+    }
+  });
+};
+
+export const getTimezone = async(): Promise<string> => {
+  return new Promise(resolve => {
+    try {
+      exec(
+        `timedatectl show | grep Timezone= | sed -E 's/^Timezone=(.*)$/\\1/gi'`,
+        { encoding: 'utf8' }, (error, stdout) => {
+          if (error) {
+            resolve('');
+          } else {
+            resolve(stdout);
+          }
+        }
+      );
+    } catch (e) {
+      resolve('');
+    }
+  });
+};
+
+export const setTimezone = async(timezone: string): Promise<string|undefined> => {
+  return new Promise(resolve => {
+    try {
+      exec(
+        `timedatectl set-timezone ${timezone}`,
+        { encoding: 'utf8' }, (error) => {
+          if (error) {
+            resolve(error.message);
+          } else {
+            resolve();
+          }
+        }
+      );
+    } catch (e) {
+      resolve(e.message);
     }
   });
 };

@@ -85,7 +85,7 @@ export const loadConfig = (newEnv?: string): void => {
     button: {
       buttonPin: parseIntDefault(process.env.BUTTON_BUTTON_PIN, 5),
       ledPin: parseIntDefault(process.env.BUTTON_LED_PIN, 6),
-      longClick: parseIntDefault(process.env.BUTTON_LONG_CLICK, 1000),
+      longClick: parseIntDefault(process.env.BUTTON_LONG_CLICK, 400),
       reallyLongClick: parseIntDefault(process.env.BUTTON_REALLY_LONG_CLICK, 3000),
       reallyReallyLongClick: parseIntDefault(process.env.BUTTON_REALLY_REALLY_LONG_CLICK, 8000),
     },

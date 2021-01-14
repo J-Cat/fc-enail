@@ -9,6 +9,7 @@ import { setNumberInput } from '../numberinput';
 import { setTextInput } from '../textinput';
 import { getSounds } from '../../dao/soundsDao';
 import { IMenu } from '../../models/IMenu';
+import { getTimezone, getTimezones, setTimezone } from '../../dao/systemDao';
 
 let state = registerStateChange('mode-settings-general', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -25,7 +26,7 @@ export const initGeneral = async (): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 7,
+        max: 8,
         menuItems: await getGeneralMenuItems(),
         onClick: processGeneralClick,
       },
@@ -34,6 +35,7 @@ export const initGeneral = async (): Promise<void> => {
 
 const getGeneralMenuItems = async (): Promise<string[]> => {
   const volume = await getVolume();
+  const timezone = await getTimezone();
   return [
     `Volume      : ${volume}`,
     `Min         : ${Config.encoder.minValue}`,
@@ -43,8 +45,42 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
     `Screen Off  : ${Config.display.screenOffTimeout}`,
     `LT Subdomain: ${Config.localtunnel.subdomain}`,
     `Start Sound : ${Config.settings.startupSound}`,
+    `Time Zone   : ${timezone}`,
   ];
 };
+
+export const initTimezones = async (): Promise<void> => {
+  const menus = [...(state.menu || [])];
+  const timezones = await getTimezones();
+  setSharedState({
+    loading: false,
+    loadingMessage: '',
+    menu: [
+      ...menus, {
+        current: 0,
+        min: 0,
+        max: ( timezones.length || 1) - 1,
+        menuItems: timezones || [],
+        onClick: async (index: number): Promise<void> => {
+          await setTimezone(timezones[index]);
+          await showMessage(`Timezone set to ${timezones[index]}`);
+          const menus = [...(state.menu || [])];
+          menus.pop();
+          const menu = menus.pop() as IMenu;
+          setSharedState({
+            menu: [
+              ...menus, {
+                ...menu, 
+                menuItems: await getGeneralMenuItems(),
+              },
+            ],
+          });      
+        },
+      },
+    ]
+  });
+};
+
 
 const processGeneralClick = async (index: number): Promise<void> => {
   const volume = await getVolume();
@@ -197,6 +233,10 @@ const processGeneralClick = async (index: number): Promise<void> => {
         }
       ],
     });
+    break;
+  }
+  case 8: {
+    await initTimezones();
     break;
   }
   }
