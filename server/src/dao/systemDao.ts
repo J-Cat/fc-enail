@@ -120,7 +120,7 @@ export const getTimezone = async(): Promise<string> => {
   });
 };
 
-export const setTimezone = async(timezone: string): Promise<string|undefined> => {
+export const setTimezone = async(timezone: string): Promise<string|void> => {
   return new Promise(resolve => {
     try {
       exec(
@@ -139,7 +139,7 @@ export const setTimezone = async(timezone: string): Promise<string|undefined> =>
   });
 };
 
-export const updateTime = async(utcTime: number): Promise<string|undefined> => {
+export const updateTime = async(utcTime: number): Promise<string|void> => {
   return new Promise(resolve => {
     try {
       exec(

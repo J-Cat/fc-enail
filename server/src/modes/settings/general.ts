@@ -50,18 +50,16 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
 };
 
 export const initTimezones = async (): Promise<void> => {
-  const menus = [...(state.menu || [])];
   const timezones = await getTimezones();
   setSharedState({
-    loading: false,
-    loadingMessage: '',
     menu: [
-      ...menus, {
+      ...(state.menu || []),
+      {
         current: 0,
         min: 0,
-        max: ( timezones.length || 1) - 1,
-        menuItems: timezones || [],
-        onClick: async (index: number): Promise<void> => {
+        max: timezones.length - 1,
+        menuItems: timezones,
+        onClick: async index => {
           await setTimezone(timezones[index]);
           await showMessage(`Timezone set to ${timezones[index]}`);
           const menus = [...(state.menu || [])];
@@ -76,11 +74,10 @@ export const initTimezones = async (): Promise<void> => {
             ],
           });      
         },
-      },
-    ]
+      }
+    ],
   });
 };
-
 
 const processGeneralClick = async (index: number): Promise<void> => {
   const volume = await getVolume();
