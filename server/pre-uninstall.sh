@@ -12,10 +12,17 @@ set -E
 systemctl stop fcenail.service
 systemctl disable fcenail.service
 rm /lib/systemd/system/fcenail.service
+systemctl stop fcenail-localtunnel.service
+systemctl disable fcenail-localtunnel.service
+rm /lib/systemd/system/fcenail-localtunnel.service
 # systemctl daemon-reload
 
 if [ -f /usr/local/bin/fcenail ]; then
   rm /usr/local/bin/fcenail
+fi
+
+if [ -f /usr/local/bin/fcenail-localtunnel ]; then
+  rm /usr/local/bin/fcenail-localtunnel
 fi
 
 cd $SAVE_DIR

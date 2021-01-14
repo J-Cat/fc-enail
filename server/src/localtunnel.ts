@@ -72,7 +72,7 @@ const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: 
     console.log(exitCode);
   }
   if (options.exit) {
-    process.exit();
+    process.exit(exitCode);
   }
 };
 

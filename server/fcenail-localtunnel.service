@@ -8,7 +8,7 @@ User=root
 WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-localtunnel
 EnvironmentFile=/etc/systemd/fcenail.conf
-Restart=always
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
