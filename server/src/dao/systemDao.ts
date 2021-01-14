@@ -138,3 +138,22 @@ export const setTimezone = async(timezone: string): Promise<string|undefined> =>
     }
   });
 };
+
+export const updateTime = async(utcTime: number): Promise<string|undefined> => {
+  return new Promise(resolve => {
+    try {
+      exec(
+        `timedatectl set-ntp false; timedatectl set-time "${(new Date(utcTime)).toUTCString()}"; timedatectl set-ntp true;`,
+        { encoding: 'utf8' }, (error) => {
+          if (error) {
+            resolve(error.message);
+          } else {
+            resolve();
+          }
+        }
+      );
+    } catch (e) {
+      resolve(e.message);
+    }
+  });
+};

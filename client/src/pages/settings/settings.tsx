@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { RootState } from '../../store/reducers/rootReducer';
-import { reboot, restartService, sendConfig, sendQuickSet } from '../../store/reducers/enailReducer';
+import { checkForUpdates, reboot, restartService, sendConfig, sendQuickSet, updateTime } from '../../store/reducers/enailReducer';
 import { useTranslation } from 'react-i18next';
 import './settings.less';
 import { IConfig } from '../../store/state/IEnailState';
@@ -139,6 +139,26 @@ const SettingsPage: React.FC = () => {
         }  
         setCurrentStartupSound('appear');
         formRef.current?.setFieldsValue({ startupSound: 'appear' });
+      },
+    });
+  };
+
+  const onCheckForUpdates = async (): Promise<void> => {
+    Modal.confirm({
+      title: t('settings.confirmCheckForUpdatesTitle', 'Check for Updates?'),
+      content: t('settings.confirmCheckForUpdatesContent', 'Check for updates?'),
+      onOk: async () => {
+        await dispatch(checkForUpdates());
+      },
+    });
+  };
+
+  const onUpdateTime = async (): Promise<void> => {
+    Modal.confirm({
+      title: t('settings.confirmUpdateTimeTitle', 'Update E-Nail Clock?'),
+      content: t('settings.confirmUpdateTimeContent', 'Would you like to update the E-Nail time with your current time, {{timeStr}}?', { timeStr: (new Date()).toUTCString()}),
+      onOk: async () => {
+        await dispatch(updateTime());
       },
     });
   };
@@ -303,6 +323,20 @@ const SettingsPage: React.FC = () => {
         <Form.Item className="button-row">
           <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
             {t('settings.buttonSave', 'Save')}
+          </Button>
+          &nbsp;
+          <Button 
+            type="primary" htmlType="button" disabled={requesting || tuning || scriptRunning}
+            onClick={onUpdateTime}
+          >
+            {t('settings.buttonUpdateTime', 'Update E-Nail Time')}
+          </Button>
+          &nbsp;
+          <Button 
+            type="primary" htmlType="button" disabled={requesting || tuning || scriptRunning}
+            onClick={onCheckForUpdates}
+          >
+            {t('settings.buttonCheckForUpdates', 'Check for Updates')}
           </Button>
           &nbsp;
           <Button 

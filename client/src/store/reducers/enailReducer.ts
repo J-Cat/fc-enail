@@ -252,6 +252,65 @@ const restartService = (): AppThunk<{ error?: string }> => async (
   }
 };
 
+const checkForUpdates = (): AppThunk<{ error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/system/checkForUpdates',
+      method: 'POST',
+    });
+
+    dispatch(completeRequest());
+    return {};
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.CHECK_FOR_UPDATES_UNKNOWN_ERROR', 
+      'An unknown error occured issuing a request to check for updates: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+};
+
+const updateTime = (): AppThunk<{ error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    await Axios({
+      baseURL: Constants.API_URL,
+      url: '/system/updateTime',
+      method: 'POST',
+      data: {
+        time: Date.now()
+      },
+    });
+
+    dispatch(completeRequest());
+    return {};
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.UPDATE_TIME_UNKNOWN_ERROR', 
+      'An unknown error occured trying to udpate the E-Nail clock: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+};
+
 const slice = createSlice({
   name: 'ENAIL',
   initialState,
@@ -336,6 +395,8 @@ export {
   sendQuickSet,
   restartService,
   reboot,
+  checkForUpdates,
+  updateTime,
 };
 
 export const {
