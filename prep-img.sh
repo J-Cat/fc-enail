@@ -46,7 +46,7 @@ cat $mountdir/etc/NetworkManager/system-connections/wifi-wlan0.nmconnection \
 > $mountdir/etc/NetworkManager/system-connections/wifi-wlan0.nmconnection
 cat $mountdir/etc/NetworkManager/system-connections/Hotspot.nmconnection \
   | grep -v "mac-address=" \
-  | sed -E 's/^ssid=.*$/ssid=fcenail/gi' \
+  | sed -E 's/^ssid=.*$/ssid=FCEnail/gi' \
   | sed -E 's/^psk=.*$/psk=1234567890/gi' \
 > $mountdir/etc/NetworkManager/system-connections/Hotspot.nmconnection
 mv $mountdir/etc/rc.local $mountdir/etc/rc.local.bak
