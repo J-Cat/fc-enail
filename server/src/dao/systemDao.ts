@@ -144,7 +144,7 @@ export const updateTime = async(utcTime: number): Promise<string|void> => {
   return new Promise(resolve => {
     try {
       exec(
-        `timedatectl set-ntp false; timedatectl set-time "${dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss')}"; timedatectl set-ntp true;`,
+        `timedatectl set-ntp false; timedatectl set-time "${dayjs(utcTime).format('YYYY-MM-DD HH:mm:ss')}"; timedatectl set-ntp true;`,
         { encoding: 'utf8' }, (error) => {
           if (error) {
             resolve(error.message);
