@@ -8,6 +8,7 @@ fi
 SAVE_DIR=$PWD
 NODE_PATH=$(readlink -f /usr/local/lib/nodejs/current)
 NODE_MODULES="$NODE_PATH/lib/node_modules"
+STARTLT=0
 
 if [ ! -f /etc/systemd/fcenail.conf ]; then
   echo "NODE_PATH=$NODE_PATH" > /etc/systemd/fcenail.conf
@@ -24,7 +25,11 @@ cp -b $NODE_MODULES/fcenail/fcenail-localtunnel.sh /usr/local/bin/fcenail-localt
 
 if [ ! -f /lib/systemd/system/fcenail-localtunnel.service ]; then
   cp $NODE_MODULES/fcenail/fcenail-localtunnel.service /lib/systemd/system
-  # systemctl disable fcenail-localtunnel.service
+  . /root/.fcenail/.env
+  if [ -n "$LOCALTUNNEL_SUBDOMAIN" ]; then
+    systemctl enable fcenail-localtunnel.service
+    STARTLT=1
+  fi
   systemctl daemon-reload
 fi
 
@@ -56,6 +61,8 @@ ln -s $NODE_MODULES/fcenail/fcenail.sh /usr/local/bin/fcenail
 
 systemctl start fcenail.service
 systemctl start fcenail-update.service
-
+if [ $STARTLT -eq 1 ]; then
+  systemctl start fcenail-localtunnel.service
+fi
 cd $SAVE_DIR
 set -e
