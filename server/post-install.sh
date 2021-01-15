@@ -24,7 +24,7 @@ cp -b $NODE_MODULES/fcenail/fcenail-localtunnel.sh /usr/local/bin/fcenail-localt
 
 if [ ! -f /lib/systemd/system/fcenail-localtunnel.service ]; then
   cp $NODE_MODULES/fcenail/fcenail-localtunnel.service /lib/systemd/system
-  systemctl enable fcenail-localtunnel.service
+  # systemctl disable fcenail-localtunnel.service
   systemctl daemon-reload
 fi
 

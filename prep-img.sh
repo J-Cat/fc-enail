@@ -36,9 +36,9 @@ mountdir=$(mktemp -d)
 mount "$loopback" "$mountdir"
 rm -rvf $mountdir/var/cache/apt/archives/* $mountdir/var/lib/dhcpcd5/* $mountdir/var/log/* \
   $mountdir/var/tmp/* $mountdir/tmp/* $mountdir/etc/ssh/ssh_host_* $mountdir/etc/machine-id \
-  $mountdir/etc/systemd/system/multi-user.target.wants/fcenail-localtunnel.service
+  $mountdir/etc/systemd/system/multi-user.target.wants/fcenail-localtunnel.service \
   $mountdir/root/.fcenail/.env $mountdir/root/.fcenail/db.json \
-  $mountdir/home/pi/.bash_history $mountdir/root/.bash_history $mountdir/home/pi/.node_repl_history \
+  $mountdir/home/pi/.bash_history $mountdir/root/.bash_history $mountdir/home/pi/.node_repl_history
 touch $mountdir/etc/machine-id
 RESULT=$(cat $mountdir/etc/NetworkManager/system-connections/wifi-wlan0.nmconnection \
   | grep -v "mac-address=" \

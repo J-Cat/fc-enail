@@ -21,7 +21,6 @@ case $PUBLISH in
   P | p)
     VERSION=$(node -e "console.log(require('./package.json').version)")
     yarn publish --tag beta --new-version $VERSION
-    npm dist-tag add fcenail@$VERSION next
   ;;
 esac
 

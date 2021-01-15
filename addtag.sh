@@ -5,4 +5,7 @@ if [ ! -z $1 ]; then
   exit 1
 fi
 
-npm dist-tag add fcenail@$VERSION $1
+TAG="$1"
+VERSION=$(node -e "console.log(require('./package.json').version)")
+
+npm dist-tag add fcenail@$VERSION $TAG
