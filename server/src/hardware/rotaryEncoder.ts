@@ -1,12 +1,12 @@
 import { Gpio } from 'onoff';
 import { registerConfigChange } from '../config';
-import { Lock } from '../utility/Lock';
+// import { Lock } from '../utility/Lock';
 
 let Config = registerConfigChange('rotary-encoder', newConfig => {
   Config = newConfig;
 });
 
-const lock = new Lock();
+// const lock = new Lock();
 
 const rotEncTable = [0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0];
 
@@ -60,7 +60,7 @@ export const initEncoder = (
   gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
   const processTick = async (from: 'a'|'b', value: number) => {  
-    await lock.acquire();
+    // await lock.acquire();
     try {
       const a = from === 'a' ? value : lastA;
       const b = from === 'b' ? value : lastB;
@@ -119,7 +119,7 @@ export const initEncoder = (
       lastA = a;
       lastB = b;
     } finally {
-      lock.release();
+      // lock.release();
     }
   };
 
@@ -152,16 +152,16 @@ export const initEncoder = (
 
   const emitValue = (): Promise<void> => {
     return new Promise((resolve, reject) => {
-      lock.acquire().then(() => {
-        if (currentValue !== lastValue) {
-          valueChanged?.(currentValue);        
-          lastValue = currentValue;
-        }
-      }).catch(e => {
-        reject(e.message);
-      }).finally(() => {
-        lock.release();
-      });
+      // lock.acquire().then(() => {
+      if (currentValue !== lastValue) {
+        valueChanged?.(currentValue);        
+        lastValue = currentValue;
+      }
+      // }).catch(e => {
+      //   reject(e.message);
+      // }).finally(() => {
+      //   lock.release();
+      // });
       setTimeout(async () => {
         resolve();
         await emitValue();
