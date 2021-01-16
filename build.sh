@@ -67,7 +67,7 @@ if [ $PACK -eq 1 ]; then
 fi
 
 if [ $PUBLISH -eq 1 ]; then
-  VERSION=$(node -e "console.log(require('./package.json').version)")
+  VERSION=$(node -e "console.log(require('./server/package.json').version)")
 
   cd server
   cp ../README.md .
