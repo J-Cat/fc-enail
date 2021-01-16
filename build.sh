@@ -44,21 +44,21 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ SERVER -eq 1 ]; then
+if [ $SERVER -eq 1 ]; then
   cd server
   yarn
   yarn build
   cd ..
 fi
 
-if [ CLIENT -eq 1 ]; then
+if [ $CLIENT -eq 1 ]; then
   cd client
   yarn
   yarn build
   cd ..
 fi
 
-if [ PACK -eq 1 ]; then
+if [ $PACK -eq 1 ]; then
   cd server
   cp ../README.md .
   yarn pack
@@ -66,7 +66,7 @@ if [ PACK -eq 1 ]; then
   cd ..
 fi
 
-if [ PUBLISH -eq 1 ]; then
+if [ $PUBLISH -eq 1 ]; then
   VERSION=$(node -e "console.log(require('./package.json').version)")
 
   cd server
