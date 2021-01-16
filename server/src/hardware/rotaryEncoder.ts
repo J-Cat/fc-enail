@@ -151,11 +151,17 @@ export const initEncoder = (
   });
 
   const emitValue = (): Promise<void> => {
-    return new Promise(resolve => {
-      if (currentValue !== lastValue) {
-        valueChanged?.(currentValue);        
-        lastValue = currentValue;
-      }
+    return new Promise((resolve, reject) => {
+      lock.acquire().then(() => {
+        if (currentValue !== lastValue) {
+          valueChanged?.(currentValue);        
+          lastValue = currentValue;
+        }
+      }).catch(e => {
+        reject(e.message);
+      }).finally(() => {
+        lock.release();
+      });
       setTimeout(async () => {
         resolve();
         await emitValue();
