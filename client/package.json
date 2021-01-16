@@ -54,7 +54,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "sh -ac '. ./.env.production; craco build; ./copy2server.sh'",
+    "build": "sh -ac '. ./.env.production; craco build",
     "test": "craco test",
     "translate": "i18next"
   },

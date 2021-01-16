@@ -48,18 +48,23 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ $SERVER -eq 1 ]; then
-  cd server
-  yarn
-  yarn build
-  cd ..
-fi
-
 if [ $CLIENT -eq 1 ]; then
   cd client
   yarn
   yarn build
   cd ..
+fi
+
+if [ $SERVER -eq 1 ]; then
+  cd server
+  yarn
+  yarn build
+  cd ..
+  if [ -d "./server/dist/client" ]; then
+    rm -f -R ./server/dist/client
+  fi
+  mkdir ./server/dist/client
+  cp -R ./client/build/* ./server/dist/client/  
 fi
 
 if [ $PACK -eq 1 ]; then
