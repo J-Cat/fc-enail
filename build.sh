@@ -5,7 +5,8 @@ CLIENT=0
 SERVER=0
 PUBLISH=0
 PACK=0
-TAG=
+NEXT=0
+LATEST=0
 
 while [[ $# -gt 0 ]]
 do
@@ -31,10 +32,13 @@ case $key in
     PACK=1
     shift
     ;;
-    -t|--tag)
+    -n|--next)
     shift # past argument
-    TAG="$1"
-    shift # past value
+    NEXT=1
+    ;;
+    -l|--latest)
+    shift # past argument
+    LATEST=1
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -76,7 +80,12 @@ if [ $PUBLISH -eq 1 ]; then
   cd ..
 fi
 
-if [ -n "$TAG" ]; then
+if [ $NEXT -eq 1 ]; then
   VERSION=$(node -e "console.log(require('./server/package.json').version)")
-  npm dist-tag add fcenail@$VERSION $TAG
+  npm dist-tag add fcenail@$VERSION next
+fi
+
+if [ $LATEST -eq 1 ]; then
+  VERSION=$(node -e "console.log(require('./server/package.json').version)")
+  npm dist-tag add fcenail@$VERSION latest
 fi

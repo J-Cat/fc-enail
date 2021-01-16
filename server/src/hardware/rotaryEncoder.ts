@@ -77,6 +77,8 @@ export const initEncoder = (
       if (rotEncTable[prevNextCode] === 1) {
         store <<= 4;
         store |= prevNextCode;
+        lastA = a;
+        lastB = b;
 
         if ((store&0xff) === 0x2b) {
           if (velocity.length > 3) {
@@ -116,8 +118,6 @@ export const initEncoder = (
         }
       }
 
-      lastA = a;
-      lastB = b;
     } finally {
       // lock.release();
     }
