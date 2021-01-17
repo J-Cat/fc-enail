@@ -2,13 +2,13 @@
 import { Gpio } from 'pigpio';
 // import rpio from 'rpio';
 import { registerConfigChange } from '../config';
-// import { Lock } from '../utility/Lock';
+import { Lock } from '../utility/Lock';
 
 let Config = registerConfigChange('rotary-encoder', newConfig => {
   Config = newConfig;
 });
 
-// const lock = new Lock();
+const lock = new Lock();
 
 const rotEncTable = [0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0];
 
@@ -28,11 +28,11 @@ let lastB = -1;
 let lastUpdate = Date.now();
 let scale = 1;
 
-const listenerA: (level: number, tick: number) => void = async (value: number) => {
-  await processTick('a', value);
+const listenerA: (level: number, tick: number) => void = (value: number) => {
+  processTick('a', value);
 };
-const listenerB: (level: number, tick: number) => void = async (value: number) => {
-  await processTick('b', value);
+const listenerB: (level: number, tick: number) => void = (value: number) => {
+  processTick('b', value);
 };
 
 export const setEncoderValue = (
@@ -61,7 +61,7 @@ export const closeEncoder = (): void => {
 };
 
 const processTick = async (from: 'a'|'b', value: number) => {  
-  // await lock.acquire();
+  await lock.acquire();
   try {
     const a = from === 'a' ? value : lastA;
     const b = from === 'b' ? value : lastB;
@@ -81,10 +81,10 @@ const processTick = async (from: 'a'|'b', value: number) => {
       lastA = a;
       lastB = b;
       const now = Date.now();
-      if (now - lastUpdate > 0.25) {
+      if (now - lastUpdate < 50) {
         scale = Math.min(scale + 1, Config.encoder.maxVelocity);
       } else {
-        scale = Math.max(1, scale - Math.ceil((now - lastUpdate) / 0.25));
+        scale = Math.max(1, scale - Math.ceil((now - lastUpdate) / 50));
       }
 
       if ((store&0xff) === 0x2b) {
@@ -93,6 +93,7 @@ const processTick = async (from: 'a'|'b', value: number) => {
         } else {
           currentValue += scale;
         }
+        lastUpdate = Date.now();
       }
       if ((store&0xff) === 0x17) {
         if ((currentValue - scale < (overrideMin !== undefined ? overrideMin : Config.encoder.minValue)) && _enforceMinMax) {
@@ -100,13 +101,13 @@ const processTick = async (from: 'a'|'b', value: number) => {
         } else {
           currentValue -= scale;
         }
+        lastUpdate = Date.now();
       }
 
-      lastUpdate = Date.now();
     }
 
   } finally {
-    // lock.release();
+    lock.release();
   }
 };
 
@@ -139,7 +140,7 @@ export const initEncoder = (
   gpioB.on('interrupt', listenerB);
 
   gpioSwitch.on('interrupt', async () => {
-    await onClick?.();
+    onClick?.();
   });
 
   // gpioA.watch(async (err, value) => {
@@ -170,17 +171,17 @@ export const initEncoder = (
   // });
 
   const emitValue = (): Promise<void> => {
-    return new Promise(resolve => {
-      // lock.acquire().then(() => {
-      if (currentValue !== lastValue) {
-        valueChanged?.(currentValue);        
-        lastValue = currentValue;
-      }
-      // }).catch(e => {
-      //   reject(e.message);
-      // }).finally(() => {
-      //   lock.release();
-      // });
+    return new Promise((resolve, reject) => {
+      lock.acquire().then(() => {
+        if (currentValue !== lastValue) {
+          valueChanged?.(currentValue);        
+          lastValue = currentValue;
+        }
+      }).catch(e => {
+        reject(e.message);
+      }).finally(() => {
+        lock.release();
+      });
       setTimeout(async () => {
         resolve();
         await emitValue();
