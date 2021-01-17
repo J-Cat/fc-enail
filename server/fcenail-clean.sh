@@ -73,9 +73,12 @@ if [ "$mountdir" = "/" ]; then
 fi
 
 echo -e '\n[+] Cleaning up temporary files.'
-rm -rvf $mountdir/var/cache/apt/archives/* $mountdir/var/lib/dhcpcd5/* $mountdir/var/log/* \
+apt -y clean
+apt -y autoclean
+rm -rvf $mountdir/var/lib/dhcpcd5/* $mountdir/var/log/* \
   $mountdir/var/tmp/* $mountdir/tmp/* \
-  $mountdir/home/pi/.bash_history $mountdir/root/.bash_history $mountdir/home/pi/.node_repl_history
+  $mountdir/home/pi/.bash_history $mountdir/root/.bash_history $mountdir/home/pi/.node_repl_history \
+  $mountdir/home/pi/.wget-hsts $mountdir/root/.wget-hsts
 
 if [ $ENAIL -eq 1 ]; then
   echo -e '\n[+] Cleaning up E-Nail files.'

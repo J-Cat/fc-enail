@@ -82,11 +82,14 @@ const processTick = async (from: 'a'|'b', value: number) => {
       store |= prevNextCode;
       lastA = a;
       lastB = b;
-      const now = Date.now();
-      if (now - lastUpdate < 50) {
-        scale = Math.min(scale + 1, Config.encoder.maxVelocity);
-      } else {
-        scale = Math.max(1, scale - Math.ceil((now - lastUpdate) / 50));
+
+      if (((store&0xff) === 0x2b) || ((store&0xff) === 0x17)) {
+        const now = Date.now();
+        if (now - lastUpdate < 150) {
+          scale = Math.min(scale + 1, Config.encoder.maxVelocity);
+        } else {
+          scale = Math.max(1, scale - Math.ceil((now - lastUpdate) / 100));
+        }
       }
 
       if ((store&0xff) === 0x2b) {

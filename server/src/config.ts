@@ -60,7 +60,7 @@ export const loadConfig = (newEnv?: string): void => {
       A: parseIntDefault(process.env.ENCODER_A, 23),
       B: parseIntDefault(process.env.ENCODER_B, 24),
       S: parseIntDefault(process.env.ENCODER_S, 22),
-      maxVelocity: parseIntDefault(process.env.ENCODER_MAX_VELOCITY, 10),
+      maxVelocity: parseIntDefault(process.env.ENCODER_MAX_VELOCITY, 25),
       minValue: parseIntDefault(process.env.ENCODER_MIN_VALUE, 0),
       maxValue: parseIntDefault(process.env.ENCODER_MAX_VALUE, 850),
       frequency: parseIntDefault(process.env.ENCODER_FREQUENCY, 100),
