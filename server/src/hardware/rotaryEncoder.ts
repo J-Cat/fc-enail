@@ -16,7 +16,6 @@ let currentValue = 0;
 let store = 0;
 let prevNextCode = 0;
 let lastValue = -1;
-const velocity: number[] = [0];
 let _enforceMinMax = true;
 let overrideMin: number | undefined = undefined;
 let overrideMax: number | undefined = undefined;
@@ -26,6 +25,8 @@ let gpioB: Gpio;
 let gpioSwitch: Gpio;
 let lastA = -1;
 let lastB = -1;
+let lastUpdate = Date.now();
+let scale = 1;
 
 const listenerA: (level: number, tick: number) => void = async (value: number) => {
   await processTick('a', value);
@@ -79,19 +80,14 @@ const processTick = async (from: 'a'|'b', value: number) => {
       store |= prevNextCode;
       lastA = a;
       lastB = b;
+      const now = Date.now();
+      if (now - lastUpdate > 0.25) {
+        scale = Math.min(scale + 1, Config.encoder.maxVelocity);
+      } else {
+        scale = Math.max(1, scale - Math.ceil((now - lastUpdate) / 0.25));
+      }
 
       if ((store&0xff) === 0x2b) {
-        if (velocity.length > 3) {
-          velocity.shift();
-        }
-        velocity.push(Date.now());
-        const scale = Math.min(
-          Math.max(
-            Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
-            1
-          ), 
-          Config.encoder.maxVelocity
-        );
         if ((currentValue + scale > (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue)) && _enforceMinMax) {
           currentValue = (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue);
         } else {
@@ -99,23 +95,14 @@ const processTick = async (from: 'a'|'b', value: number) => {
         }
       }
       if ((store&0xff) === 0x17) {
-        if (velocity.length > 3) {
-          velocity.shift();
-        }
-        velocity.push(Date.now());
-        const scale = Math.min(
-          Math.max(
-            Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
-            1
-          ), 
-          Config.encoder.maxVelocity,
-        );
         if ((currentValue - scale < (overrideMin !== undefined ? overrideMin : Config.encoder.minValue)) && _enforceMinMax) {
           currentValue = (overrideMin !== undefined ? overrideMin : Config.encoder.minValue);
         } else {
           currentValue -= scale;
         }
       }
+
+      lastUpdate = Date.now();
     }
 
   } finally {
