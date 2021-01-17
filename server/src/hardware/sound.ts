@@ -1,23 +1,27 @@
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { getSounds } from '../dao/soundsDao';
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
   return new Promise(resolve => {
-    exec(
+    const cp = spawn(
       ` \
         amixer set Headphone on; \
         aplay "./sounds/${filename}"; \
         amixer set Headphone off; \
-      `, (error, stdout, stderr) => {
-        if (error) {
-          resolve({
-            error: new Error(error.message),
-            stderr,
-          });
-        }
-        resolve({});
-      },
-    );
+      `);
+    let stderr: string | undefined;
+    cp.stderr.on('data', data => {
+      stderr = data;
+    });
+    cp.on('error', error => {
+      resolve({
+        error: new Error(error.message),
+        stderr: stderr,
+      });
+    });
+    cp.on('close', () => {
+      resolve({});
+    });
   });
 };
 
