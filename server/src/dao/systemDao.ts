@@ -136,10 +136,9 @@ export const toggleSupportShell = async (): Promise<string|void> => {
       const lines = data?.toString().split('\n') || [];
       for (const line of lines) {
         if (line.startsWith('ssh session: ')) {
-          console.log('STARTS WITH');
           const sessionUrl = line.replace(/^ssh session: ssh (.*)$/gi, '$1');
-          console.log(`URL: ${sessionUrl}`);
           resolve(sessionUrl);
+          return;
         }  
       }
     });  
