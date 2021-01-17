@@ -1,6 +1,4 @@
-// import { Gpio } from 'onoff';
 import { Gpio } from 'pigpio';
-// import rpio from 'rpio';
 import { registerConfigChange } from '../config';
 import { Lock } from '../utility/Lock';
 
@@ -34,6 +32,10 @@ const listenerA: (level: number, tick: number) => void = (value: number) => {
 const listenerB: (level: number, tick: number) => void = (value: number) => {
   processTick('b', value);
 };
+const listenerSwitch: (level: number, tick: number) => void = () => {
+  click?.();
+};
+let click: (() => Promise<void>) | undefined;
 
 export const setEncoderValue = (
   value: number, enforceMinMax = true, 
@@ -119,6 +121,7 @@ export const initEncoder = (
   onClick?: () => Promise<void>,
   frequency = Config.encoder.frequency,
 ): void => {
+  click = onClick;
   gpioA = new Gpio(pinA, {
     edge: Gpio.EITHER_EDGE,
     mode: Gpio.INPUT,
@@ -131,44 +134,12 @@ export const initEncoder = (
     edge: Gpio.RISING_EDGE,
     mode: Gpio.INPUT,
   });
-  // gpioA = new Gpio(pinA, 'in', 'both'); 
-  // gpioB = new Gpio(pinB, 'in', 'both');
-  //gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
   gpioA.on('interrupt', listenerA);
 
   gpioB.on('interrupt', listenerB);
 
-  gpioSwitch.on('interrupt', async () => {
-    onClick?.();
-  });
-
-  // gpioA.watch(async (err, value) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-
-  //   await processTick('a', value);
-  // });
-
-  // gpioB.watch(async (err, value) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-
-  //   await processTick('b', value);
-  // });
-
-  // gpioSwitch.watch((err) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-
-  //   onClick?.();
-  // });
+  gpioSwitch.on('interrupt', listenerSwitch);
 
   const emitValue = (): Promise<void> => {
     return new Promise((resolve, reject) => {
