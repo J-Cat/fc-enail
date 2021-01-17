@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec } from '../utility/exec';
 import { readFile, stat, writeFile } from 'fs';
 import { registerConfigChange, loadConfig } from '../config';
 import { IConfig } from '../models/IConfig';
@@ -83,11 +83,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
         await setUrl('');
       }
       for (const action of actions) {
-        await new Promise<void>(resolve => {
-          exec(`systemctl ${action} fcenail-localtunnel.service`, () => {
-            resolve();
-          });
-        });            
+        await exec(`systemctl ${action} fcenail-localtunnel.service`);
       }
     }
     
@@ -99,22 +95,21 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
 };
 
 export const getVolume = async (): Promise<number> => {
-  const volume = await new Promise<number>(resolve => {
-    exec('amixer get Headphone | grep -E \'^ *Mono:\' | sed -E \'s/^ *Mono: Playback -?[0-9]+ \\[([0-9]+)%\\].*$/\\1/gi\'', (error, stdout, stderr) => {
-      if (error) {
-        resolve(100);
-        console.error(stderr);
-        return;
-      }
-      const value = parseInt(stdout);
-      if (isNaN(value)) {
-        resolve(100);
-        return;
-      }
-      resolve(Math.round((value - 65) / 33 * 100));
-    });
-  });
-  return volume;
+  const { error, stderr, stdout } = await exec('amixer get Headphone | grep -E \'^ *Mono:\' | sed -E \'s/^ *Mono: Playback -?[0-9]+ \\[([0-9]+)%\\].*$/\\1/gi\'');
+  if (error) {
+    console.error(stderr);
+    return 100;
+  }
+  if (!stdout) {
+    return 100;
+  }
+    
+  const value = parseInt(stdout);
+  if (isNaN(value)) {
+    return 100;
+  }
+    
+  return Math.round((value - 65) / 33 * 100);
 };
 
 export const setVolume = async (value: number): Promise<void> => {
@@ -124,9 +119,5 @@ export const setVolume = async (value: number): Promise<void> => {
   if (value === 0) {
     onoff = 'off';
   }
-  await new Promise<void>(resolve => {
-    exec(`amixer set Headphone ${onoff} ${volume}%`, () => {
-      resolve();
-    });
-  });
+  await exec(`amixer set Headphone ${onoff} ${volume}%`);
 };

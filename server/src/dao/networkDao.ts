@@ -1,70 +1,63 @@
 /* eslint-disable quotes */
-import { exec } from 'child_process';
+import { exec } from '../utility/exec';
 import { getSsids, setSsids } from './localDb';
 
 export const getNetworkInfo = async (): Promise<{ error?: string, stdout?: string, stderr?: string, network?: { mode: string, ssid: string, address: string, ssids: string[] }}> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        ` \
-          ACTIVE_DEVICE=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
-          nmcli --terse --fields 802-11-wireless.mode,802-11-wireless.ssid,ip4.address c show $ACTIVE_DEVICE \
-            | sed -E 's/^[^:]*:(.*)$/\\1/gi'; \
-        `, 
-        { encoding: 'utf8' }, (error, stdout, stderr) => {
-          if (error) {
-            resolve({
-              error: error.message,
-              stdout,
-              stderr,
-            });
-            return;
-          }
+  const { error, stderr, stdout } = await exec(
+    ` \
+      ACTIVE_DEVICE=$(nmcli --terse c show --active | sed -E 's/^([^:]+).*$/\\1/g'); \
+      nmcli --terse --fields 802-11-wireless.mode,802-11-wireless.ssid,ip4.address c show $ACTIVE_DEVICE \
+        | sed -E 's/^[^:]*:(.*)$/\\1/gi'; \
+    `
+  );
 
-          const [mode, ssid, address] = stdout?.split('\n').filter(s => s.length > 0) || [];
-          if (!mode || !ssid || !address) {
-            throw new Error('Failed to retrieve network information.');
-          }
-          const ssids = getSsids();
-          resolve({ network: { mode, ssid, address, ssids } });
-        });
-    } catch (e) {
-      resolve({ error: e.message });
-    }
-  });
+  if (error) {
+    return {
+      error: error.message,
+      stdout,
+      stderr,
+    };
+  }
+
+  if (!stdout) {
+    return {};
+  }
+
+  const [mode, ssid, address] = stdout?.split('\n').filter(s => s.length > 0) || [];
+  if (!mode || !ssid || !address) {
+    throw new Error('Failed to retrieve network information.');
+  }
+  const ssids = getSsids();
+
+  return { network: { mode, ssid, address, ssids } };
 };
 
 export const scan = async (): Promise<{error?: string, stdout?: string, stderr?: string, ssids?: string[]}> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        `sudo iwlist wlan0 scan | grep ESSID: | sed -E 's/^.*ESSID:"([^"]*)".*/\\1/gi' | grep -v -e '^ *$' | sort | uniq`, 
-        { encoding: 'utf8' }, async (error, stdout, stderr) => {
-          if (error) {
-            resolve({
-              error: error.message,
-              stdout,
-              stderr,
-            });
-            return;
-          }
+  const { error, stderr, stdout } = await exec(
+    `sudo iwlist wlan0 scan | grep ESSID: | sed -E 's/^.*ESSID:"([^"]*)".*/\\1/gi' | grep -v -e '^ *$' | sort | uniq`
+  ); 
 
-          const ssids = stdout?.split('\n').filter(s => s.length > 0) || [];
-          await setSsids(ssids);
-          resolve({ ssids });
-        });
-    } catch (e) {
-      resolve({ error: e.message });
-    }
-  });
+  if (error) {
+    return {
+      error: error.message,
+      stdout,
+      stderr,
+    };
+  }
+
+  if (!stdout) {
+    return { ssids: [] };
+  }
+
+  const ssids = stdout?.split('\n').filter(s => s.length > 0) || [];
+  await setSsids(ssids);
+  return { ssids };
 };
 
 export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, passcode: string): Promise<{ error?: string, stdout?: string, stderr?: string }> => {
-  return new Promise(resolve => {
-    try {
-      let cmd = '';
-      if (mode === 'infrastructure') {
-        cmd = ` \
+  let cmd = '';
+  if (mode === 'infrastructure') {
+    cmd = ` \
           set +e; \
           sudo nmcli c modify wifi-wlan0 \
             802-11-wireless.ssid "${ssid}" \
@@ -82,8 +75,8 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
           fi; \
           set -e; \
         `;
-      } else {
-        cmd = `
+  } else {
+    cmd = `
           set +e; \
           sudo nmcli c modify Hotspot \
             802-11-wireless.ssid "${ssid}" \
@@ -106,19 +99,12 @@ export const updateNetwork = async (mode: 'ap'|'infrastructure', ssid: string, p
           fi; \
           set -e; \
         `;
-      }
-      exec(
-        cmd,
-        { encoding: 'utf8' }, (error, stdout, stderr) => {
-          resolve({
-            error: error?.message,
-            stdout,
-            stderr,
-          });
-        }
-      );
-    } catch (e) {
-      resolve({ error: e.message });
-    }
-  });
+  }
+  const { error, stderr, stdout } = await exec(cmd);
+
+  return {
+    error: error?.message,
+    stdout,
+    stderr,
+  };
 };

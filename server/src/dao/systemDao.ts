@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { exec } from 'child_process';
+import { exec } from '../utility/exec';
 import { setLed } from '../hardware/button';
 import { playSound } from '../hardware/sound';
 import { getSounds } from '../dao/soundsDao';
@@ -63,98 +63,59 @@ export const reboot = async (): Promise<void> => {
 };
 
 export const checkForUpdates = async(): Promise<{ error?: string, stdout?: string, stderr?: string }> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        'sudo systemctl start fcenail-update.service',
-        { encoding: 'utf8' }, (error, stdout, stderr) => {
-          resolve({
-            error: error?.message,
-            stdout,
-            stderr,
-          });
-        }
-      );
-    } catch (e) {
-      resolve({
-        error: e.message,
-      });
-    }
-  });
+  try {
+    await exec('sudo systemctl start fcenail-update.service');
+    return {};
+  } catch (e) {
+    return {
+      error: e.message,
+    };
+  }
 };
 
 export const getTimezones = async(): Promise<string[]> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        'timedatectl list-timezones',
-        { encoding: 'utf8' }, (error, stdout) => {
-          if (error) {
-            resolve([]);
-          } else {
-            resolve(stdout.split('\n').filter(t => t.trim() !== ''));
-          }
-        }
-      );
-    } catch (e) {
-      resolve([]);
+  try {
+    const { error, stdout } = await exec('timedatectl list-timezones');
+    if (error || !stdout) {
+      return [];
+    } else {
+      return stdout.split('\n').filter(t => t.trim() !== '');
     }
-  });
+  } catch (e) {
+    return [];
+  }
 };
 
 export const getTimezone = async(): Promise<string> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        `timedatectl show | grep Timezone= | sed -E 's/^Timezone=(.*)$/\\1/gi'`,
-        { encoding: 'utf8' }, (error, stdout) => {
-          if (error) {
-            resolve('');
-          } else {
-            resolve(stdout);
-          }
-        }
-      );
-    } catch (e) {
-      resolve('');
+  try {
+    const { error, stdout } = await exec(`timedatectl show | grep Timezone= | sed -E 's/^Timezone=(.*)$/\\1/gi'`);
+    if (error || !stdout) {
+      return '';
+    } else {
+      return stdout;
     }
-  });
+  } catch (e) {
+    return '';
+  }
 };
 
-export const setTimezone = async(timezone: string): Promise<string|void> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        `timedatectl set-timezone ${timezone}`,
-        { encoding: 'utf8' }, (error) => {
-          if (error) {
-            resolve(error.message);
-          } else {
-            resolve();
-          }
-        }
-      );
-    } catch (e) {
-      resolve(e.message);
-    }
-  });
+export const setTimezone = async (timezone: string): Promise<string|void> => {
+  try {
+    await exec(`timedatectl set-timezone ${timezone}`);
+  } catch (e) {
+    return e.message;
+  }
 };
 
-export const updateTime = async(utcTime: number): Promise<string|void> => {
-  return new Promise(resolve => {
-    try {
-      exec(
-        `timedatectl set-ntp false; timedatectl set-time "${dayjs(utcTime).format('YYYY-MM-DD HH:mm:ss')}"; timedatectl set-ntp true;`,
-        { encoding: 'utf8' }, (error) => {
-          if (error) {
-            resolve(error.message);
-          } else {
-            resolve();
-          }
-        }
-      );
-    } catch (e) {
-      resolve(e.message);
+export const updateTime = async (utcTime: number): Promise<string|void> => {
+  try {
+    const { error } = await exec(
+      `timedatectl set-ntp false; timedatectl set-time "${dayjs(utcTime).format('YYYY-MM-DD HH:mm:ss')}"; timedatectl set-ntp true;`
+    );
+    if (error) {
+      return error.message;
     }
-  });
+  } catch (e) {
+    return e.message;
+  }
 };
