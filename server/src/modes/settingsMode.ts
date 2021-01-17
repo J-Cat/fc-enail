@@ -10,7 +10,7 @@ import { initWifi } from './settings/wifi';
 import { setPromptInput } from './promptinput';
 import { updateNetwork } from '../dao/networkDao';
 import { showMessage } from '../hardware/display';
-import { checkForUpdates, toggleSupportShell } from '../dao/systemDao';
+import { checkForUpdates, isSupportShellEnabled, toggleSupportShell } from '../dao/systemDao';
 import { Font } from 'ssd1306-i2c-js';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
@@ -26,7 +26,7 @@ export const initSettingsMenu = (): IMenu => {
   return {
     current: 0, min: 0, max: 6,
     icon: Icons.gear,
-    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates', 'Enable/Disable Support'],
+    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates', 'Support Shell'],
     onClick: async (index: number): Promise<void> => {
       const menus = [...(state.menu || [])];
       if (menus.length === 0) {
@@ -87,8 +87,9 @@ export const initSettingsMenu = (): IMenu => {
       }
       case 6: { // enable support
         // eslint-disable-next-line @typescript-eslint/no-var-requires
+        
         await setPromptInput(
-          'Enable/Disable Support',
+          `${isSupportShellEnabled() ? 'Disable' : 'Enable' } Remote Support Shell?`,
           async (): Promise<void> => {
             const supportUrl = await toggleSupportShell();
             if (supportUrl) {
