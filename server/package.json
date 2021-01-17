@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.2-beta.8",
+  "version": "1.0.2-beta.9",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -23,6 +23,7 @@
     "@sendgrid/mail": "^7.4.0",
     "@types/localtunnel": "^2.0.0",
     "@types/lowdb": "^1.0.9",
+    "@types/rpio": "^0.0.3",
     "body-parser": "^1.19.0",
     "coffee-script": "^1.12.7",
     "cors": "^2.8.5",
@@ -47,6 +48,7 @@
     "onoff": "https://github.com/J-Cat/onoff.git",
     "openssl": "^1.1.0",
     "rpi-oled": "^0.9.1",
+    "rpio": "^2.4.0",
     "socket.io": "^3.0.0",
     "socketio-jwt": "^4.6.2",
     "ssd1306-i2c-js": "https://github.com/J-Cat/ssd1306-i2c-js"

@@ -267,6 +267,13 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
+"@types/rpio@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@types/rpio/-/rpio-0.0.3.tgz#66a728959a2743f458ace66450b1831c02f4dd55"
+  integrity sha512-zHXqQeNHp/RcERC5dHzjHjmiM71B41HGqYX518XTf2ttRu4v/BXiP60WhuVbAHsGicG6IfL/z4joVl0zHh+Qeg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/serve-static@*":
   version "1.13.8"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.8.tgz#851129d434433c7082148574ffec263d58309c46"
@@ -544,7 +551,7 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.1.0.tgz#30fa40c9e7fe07dbc895678cd287024dea241dd9"
   integrity sha512-1Yj8h9Q+QDF5FzhMs/c9+6UntbD5MkRfRwac8DoEm9ZfUBZ7tZ55YcGVAzEe4bXsdQHEk+s9S5wsOKVdZrw0tQ==
 
-bindings@1.5.0, bindings@^1.3.0, bindings@^1.5.0:
+bindings@1.5.0, bindings@^1.3.0, bindings@^1.5.0, bindings@~1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -2433,6 +2440,14 @@ rpi-oled@^0.9.1:
     png-to-lcd "^1.0.2"
     pngparse "^2.0.1"
     system-health-monitor "^1.1.0"
+
+rpio@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/rpio/-/rpio-2.4.0.tgz#4153b5d10e40578ca8093c39708c7b6057fba6d0"
+  integrity sha512-alS4jLf1qFHMpXe0Jk+uEiHaSb4jkg/tV8QUrYvA2NrqacB11FXgUBbW/Rf2sycGO0DD6vuKT/5GikfbpVgnpA==
+  dependencies:
+    bindings "~1.5.0"
+    nan "^2.14.1"
 
 run-parallel@^1.1.9:
   version "1.1.10"

@@ -1,4 +1,5 @@
 import { Gpio } from 'onoff';
+import rpio from 'rpio';
 import { registerConfigChange } from '../config';
 // import { Lock } from '../utility/Lock';
 
@@ -30,19 +31,21 @@ export const setEncoderValue = (
 };
 
 export const closeEncoder = (): void => {
-  if (gpioA) {
-    gpioA.unwatchAll();
-  }
-  if (gpioB) {
-    gpioB.unwatchAll();
-  }
+  rpio.close(Config.encoder.A);
+  rpio.close(Config.encoder.B);
+  // if (gpioA) {
+  //   gpioA.unwatchAll();
+  // }
+  // if (gpioB) {
+  //   gpioB.unwatchAll();
+  // }
   if (gpioSwitch) {
     gpioSwitch.unwatchAll();
   }
 };
 
-let gpioA: Gpio;
-let gpioB: Gpio;
+//let gpioA: Gpio;
+//let gpioB: Gpio;
 let gpioSwitch: Gpio;
 let lastA = -1;
 let lastB = -1;
@@ -55,8 +58,10 @@ export const initEncoder = (
   onClick?: () => Promise<void>,
   frequency = Config.encoder.frequency,
 ): void => {
-  gpioA = new Gpio(pinA, 'in', 'both'); 
-  gpioB = new Gpio(pinB, 'in', 'both');
+  // gpioA = new Gpio(pinA, 'in', 'both'); 
+  // gpioB = new Gpio(pinB, 'in', 'both');
+  rpio.open(pinA, rpio.INPUT, rpio.PULL_UP);
+  rpio.open(pinB, rpio.INPUT, rpio.PULL_UP);
   gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
   const processTick = async (from: 'a'|'b', value: number) => {  
@@ -123,23 +128,35 @@ export const initEncoder = (
     }
   };
 
-  gpioA.watch(async (err, value) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-
+  rpio.poll(pinA, async pin => {
+    rpio.msleep(5);
+    const value = rpio.read(pin);
     await processTick('a', value);
-  });
-
-  gpioB.watch(async (err, value) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-
+  }, rpio.POLL_BOTH);
+  rpio.poll(pinB, async pin => {
+    rpio.msleep(5);
+    const value = rpio.read(pin);
     await processTick('b', value);
-  });
+  }, rpio.POLL_BOTH);
+
+
+  // gpioA.watch(async (err, value) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return;
+  //   }
+
+  //   await processTick('a', value);
+  // });
+
+  // gpioB.watch(async (err, value) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return;
+  //   }
+
+  //   await processTick('b', value);
+  // });
 
   gpioSwitch.watch((err) => {
     if (err) {
