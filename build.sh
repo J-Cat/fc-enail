@@ -48,6 +48,12 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+if [ $HELP -eq 1 ]; then
+  echo -e "Usage:\n"
+  echo -e "\t./build.sh [-h|--help] [-c|--client] [-s|--server] [-p|--publish] [--pack] [-n|--next] [-l|--latest]\n\n"
+  exit 0
+fi
+
 if [ $CLIENT -eq 1 ]; then
   cd client
   yarn
