@@ -5,6 +5,8 @@ import { playSound } from '../hardware/sound';
 import { getSounds } from '../dao/soundsDao';
 import { registerStateChange, setSharedState } from './sharedState';
 import dayjs from 'dayjs';
+import { ChildProcess, exec as cpexec } from 'child_process';
+import { SIGINT, SIGQUIT } from 'constants';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
   state = newState;
@@ -118,4 +120,29 @@ export const updateTime = async (utcTime: number): Promise<string|void> => {
   } catch (e) {
     return e.message;
   }
+};
+
+let supportShell: ChildProcess | undefined;
+export const toggleSupportShell = async (): Promise<string|void> => {
+  if (supportShell) {
+    supportShell.kill(SIGINT);
+    supportShell = undefined;
+    return;
+  }
+  
+  supportShell = cpexec('tmate -F');
+  
+  return new Promise<string>(resolve => {
+    supportShell?.stdout?.on('data', (data?: string) => {
+      if (data?.startsWith('ssh session: ')) {
+        const sessionUrl = data.replace(/^ssh session: ssh (.*)$/gi, '$1');
+        resolve(sessionUrl);
+      }
+    });  
+  });
+
+};
+
+export const isSupportShellEnabled = (): boolean => {
+  return supportShell !== undefined;
 };

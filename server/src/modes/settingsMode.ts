@@ -10,7 +10,8 @@ import { initWifi } from './settings/wifi';
 import { setPromptInput } from './promptinput';
 import { updateNetwork } from '../dao/networkDao';
 import { showMessage } from '../hardware/display';
-import { checkForUpdates } from '../dao/systemDao';
+import { checkForUpdates, toggleSupportShell } from '../dao/systemDao';
+import { Font } from 'ssd1306-i2c-js';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -23,9 +24,9 @@ export const SettingsMode: IModeInstance = {
 
 export const initSettingsMenu = (): IMenu => {
   return {
-    current: 0, min: 0, max: 5,
+    current: 0, min: 0, max: 6,
     icon: Icons.gear,
-    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates'],
+    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates', 'Enable/Disable Support'],
     onClick: async (index: number): Promise<void> => {
       const menus = [...(state.menu || [])];
       if (menus.length === 0) {
@@ -76,6 +77,24 @@ export const initSettingsMenu = (): IMenu => {
               await showMessage(error);
             } else {
               await showMessage('Update requested.');
+            }
+            setSharedState({
+              prompt: undefined,
+            });
+          },
+        );        
+        break;
+      }
+      case 6: { // enable support
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        await setPromptInput(
+          'Enable/Disable Support',
+          async (): Promise<void> => {
+            const supportUrl = await toggleSupportShell();
+            if (supportUrl) {
+              await showMessage(supportUrl, Font.UbuntuMono_10ptFontInfo, 30000);
+            } else {
+              await showMessage('Disabled support');
             }
             setSharedState({
               prompt: undefined,
