@@ -5,8 +5,7 @@ import { playSound } from '../hardware/sound';
 import { getSounds } from '../dao/soundsDao';
 import { registerStateChange, setSharedState } from './sharedState';
 import dayjs from 'dayjs';
-import { ChildProcess, exec as cpexec } from 'child_process';
-import { SIGINT, SIGQUIT } from 'constants';
+import { ChildProcess, exec as cpexec, spawn } from 'child_process';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
   state = newState;
@@ -125,18 +124,23 @@ export const updateTime = async (utcTime: number): Promise<string|void> => {
 let supportShell: ChildProcess | undefined;
 export const toggleSupportShell = async (): Promise<string|void> => {
   if (supportShell) {
-    supportShell.kill(SIGINT);
+    process.kill(-supportShell.pid);
     supportShell = undefined;
     return;
   }
   
-  supportShell = cpexec('tmate -F');
+  supportShell = spawn('tmate', ['-F'], { shell: true, detached: true });
   
   return new Promise<string>(resolve => {
     supportShell?.stdout?.on('data', (data?: string) => {
-      if (data?.startsWith('ssh session: ')) {
-        const sessionUrl = data.replace(/^ssh session: ssh (.*)$/gi, '$1');
-        resolve(sessionUrl);
+      const lines = data?.toString().split('\n') || [];
+      for (const line of lines) {
+        if (line.startsWith('ssh session: ')) {
+          console.log('STARTS WITH');
+          const sessionUrl = line.replace(/^ssh session: ssh (.*)$/gi, '$1');
+          console.log(`URL: ${sessionUrl}`);
+          resolve(sessionUrl);
+        }  
       }
     });  
   });
