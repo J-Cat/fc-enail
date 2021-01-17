@@ -2067,7 +2067,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
 
 "onoff@https://github.com/J-Cat/onoff.git":
   version "6.0.1"
-  resolved "https://github.com/J-Cat/onoff.git#fb0256065fe6aae64071fdf41c8ea9e8780a44ed"
+  resolved "https://github.com/J-Cat/onoff.git#6cabb2b9a331f253e2d2b7bf8c7f9442a252e6e9"
   dependencies:
     epoll "^4.0.0"
     lodash.debounce "^4.0.8"
