@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -45,7 +45,7 @@
     "morgan": "^1.10.0",
     "nocache": "^2.1.0",
     "oled-font-5x7": "^1.0.3",
-    "onoff": "https://github.com/J-Cat/onoff.git",
+    "onoff": "^6.0.1",
     "openssl": "^1.1.0",
     "pigpio": "^3.3.0",
     "rpi-oled": "^0.9.1",
