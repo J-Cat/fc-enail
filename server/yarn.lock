@@ -551,7 +551,7 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.1.0.tgz#30fa40c9e7fe07dbc895678cd287024dea241dd9"
   integrity sha512-1Yj8h9Q+QDF5FzhMs/c9+6UntbD5MkRfRwac8DoEm9ZfUBZ7tZ55YcGVAzEe4bXsdQHEk+s9S5wsOKVdZrw0tQ==
 
-bindings@1.5.0, bindings@^1.3.0, bindings@^1.5.0, bindings@~1.5.0:
+bindings@1.5.0, bindings@^1.3.0, bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -1963,7 +1963,7 @@ ms@2.1.2, ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-nan@^2.14.1, nan@~2.14.0:
+nan@^2.14.1, nan@^2.14.2, nan@~2.14.0:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
@@ -2203,6 +2203,14 @@ pify@^3.0.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
   integrity sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
 
+pigpio@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/pigpio/-/pigpio-3.3.0.tgz#f08c2fc0042c5867593950b7c7e37cbbe51a281a"
+  integrity sha512-EeMlcgk7UuSoCz99e0DdgJyfsB54zm5N4Ppa5gu+p6TwxGrWL7fVjfTITOxueyL8HfJi20dSnJteNuJTag8PCQ==
+  dependencies:
+    bindings "^1.5.0"
+    nan "^2.14.2"
+
 pinkie-promise@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/pinkie-promise/-/pinkie-promise-2.0.1.tgz#2135d6dfa7a358c069ac9b178776288228450ffa"
@@ -2440,14 +2448,6 @@ rpi-oled@^0.9.1:
     png-to-lcd "^1.0.2"
     pngparse "^2.0.1"
     system-health-monitor "^1.1.0"
-
-rpio@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/rpio/-/rpio-2.4.0.tgz#4153b5d10e40578ca8093c39708c7b6057fba6d0"
-  integrity sha512-alS4jLf1qFHMpXe0Jk+uEiHaSb4jkg/tV8QUrYvA2NrqacB11FXgUBbW/Rf2sycGO0DD6vuKT/5GikfbpVgnpA==
-  dependencies:
-    bindings "~1.5.0"
-    nan "^2.14.1"
 
 run-parallel@^1.1.9:
   version "1.1.10"

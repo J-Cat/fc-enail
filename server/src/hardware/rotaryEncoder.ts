@@ -1,5 +1,6 @@
-import { Gpio } from 'onoff';
-import rpio from 'rpio';
+// import { Gpio } from 'onoff';
+import { Gpio } from 'pigpio';
+// import rpio from 'rpio';
 import { registerConfigChange } from '../config';
 // import { Lock } from '../utility/Lock';
 
@@ -20,6 +21,19 @@ let _enforceMinMax = true;
 let overrideMin: number | undefined = undefined;
 let overrideMax: number | undefined = undefined;
 
+let gpioA: Gpio;
+let gpioB: Gpio;
+let gpioSwitch: Gpio;
+let lastA = -1;
+let lastB = -1;
+
+const listenerA: (level: number, tick: number) => void = async (value: number) => {
+  await processTick('a', value);
+};
+const listenerB: (level: number, tick: number) => void = async (value: number) => {
+  await processTick('b', value);
+};
+
 export const setEncoderValue = (
   value: number, enforceMinMax = true, 
   min: number | undefined = undefined, max: number | undefined = undefined
@@ -31,24 +45,83 @@ export const setEncoderValue = (
 };
 
 export const closeEncoder = (): void => {
-  rpio.close(Config.encoder.A);
-  rpio.close(Config.encoder.B);
-  // if (gpioA) {
-  //   gpioA.unwatchAll();
-  // }
-  // if (gpioB) {
-  //   gpioB.unwatchAll();
-  // }
+  if (gpioA) {
+    gpioA.off('interrupt', listenerA);
+    // gpioA.unwatchAll();
+  }
+  if (gpioB) {
+    gpioB.off('interrupt', listenerB);
+    // gpioB.unwatchAll();
+  }
   if (gpioSwitch) {
-    gpioSwitch.unwatchAll();
+    gpioSwitch.disableInterrupt();
+    // gpioSwitch.unwatchAll();
   }
 };
 
-//let gpioA: Gpio;
-//let gpioB: Gpio;
-let gpioSwitch: Gpio;
-let lastA = -1;
-let lastB = -1;
+const processTick = async (from: 'a'|'b', value: number) => {  
+  // await lock.acquire();
+  try {
+    const a = from === 'a' ? value : lastA;
+    const b = from === 'b' ? value : lastB;
+
+    prevNextCode <<= 2;
+    if (b === 1) {
+      prevNextCode |= 0x02;
+    }
+    if (a === 1) {
+      prevNextCode |= 0x01;
+    }
+    prevNextCode &= 0x0f;
+
+    if (rotEncTable[prevNextCode] === 1) {
+      store <<= 4;
+      store |= prevNextCode;
+      lastA = a;
+      lastB = b;
+
+      if ((store&0xff) === 0x2b) {
+        if (velocity.length > 3) {
+          velocity.shift();
+        }
+        velocity.push(Date.now());
+        const scale = Math.min(
+          Math.max(
+            Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
+            1
+          ), 
+          Config.encoder.maxVelocity
+        );
+        if ((currentValue + scale > (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue)) && _enforceMinMax) {
+          currentValue = (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue);
+        } else {
+          currentValue += scale;
+        }
+      }
+      if ((store&0xff) === 0x17) {
+        if (velocity.length > 3) {
+          velocity.shift();
+        }
+        velocity.push(Date.now());
+        const scale = Math.min(
+          Math.max(
+            Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
+            1
+          ), 
+          Config.encoder.maxVelocity,
+        );
+        if ((currentValue - scale < (overrideMin !== undefined ? overrideMin : Config.encoder.minValue)) && _enforceMinMax) {
+          currentValue = (overrideMin !== undefined ? overrideMin : Config.encoder.minValue);
+        } else {
+          currentValue -= scale;
+        }
+      }
+    }
+
+  } finally {
+    // lock.release();
+  }
+};
 
 export const initEncoder = (
   pinA: number = Config.encoder.A, 
@@ -58,87 +131,29 @@ export const initEncoder = (
   onClick?: () => Promise<void>,
   frequency = Config.encoder.frequency,
 ): void => {
+  gpioA = new Gpio(pinA, {
+    edge: Gpio.EITHER_EDGE,
+    mode: Gpio.INPUT,
+  });
+  gpioB = new Gpio(pinB, {
+    edge: Gpio.EITHER_EDGE,
+    mode: Gpio.INPUT,
+  });
+  gpioSwitch = new Gpio(pinSwitch, { 
+    edge: Gpio.RISING_EDGE,
+    mode: Gpio.INPUT,
+  });
   // gpioA = new Gpio(pinA, 'in', 'both'); 
   // gpioB = new Gpio(pinB, 'in', 'both');
-  rpio.open(pinA, rpio.INPUT, rpio.PULL_UP);
-  rpio.open(pinB, rpio.INPUT, rpio.PULL_UP);
-  gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
+  //gpioSwitch = new Gpio(pinSwitch, 'in', 'rising');
 
-  const processTick = async (from: 'a'|'b', value: number) => {  
-    // await lock.acquire();
-    try {
-      const a = from === 'a' ? value : lastA;
-      const b = from === 'b' ? value : lastB;
+  gpioA.on('interrupt', listenerA);
 
-      prevNextCode <<= 2;
-      if (b === 1) {
-        prevNextCode |= 0x02;
-      }
-      if (a === 1) {
-        prevNextCode |= 0x01;
-      }
-      prevNextCode &= 0x0f;
+  gpioB.on('interrupt', listenerB);
 
-      if (rotEncTable[prevNextCode] === 1) {
-        store <<= 4;
-        store |= prevNextCode;
-        lastA = a;
-        lastB = b;
-
-        if ((store&0xff) === 0x2b) {
-          if (velocity.length > 3) {
-            velocity.shift();
-          }
-          velocity.push(Date.now());
-          const scale = Math.min(
-            Math.max(
-              Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
-              1
-            ), 
-            Config.encoder.maxVelocity
-          );
-          if ((currentValue + scale > (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue)) && _enforceMinMax) {
-            currentValue = (overrideMax !== undefined ? overrideMax : Config.encoder.maxValue);
-          } else {
-            currentValue += scale;
-          }
-        }
-        if ((store&0xff) === 0x17) {
-          if (velocity.length > 3) {
-            velocity.shift();
-          }
-          velocity.push(Date.now());
-          const scale = Math.min(
-            Math.max(
-              Math.round(1 / ((Date.now() - velocity?.[0]) / 2000)),
-              1
-            ), 
-            Config.encoder.maxVelocity,
-          );
-          if ((currentValue - scale < (overrideMin !== undefined ? overrideMin : Config.encoder.minValue)) && _enforceMinMax) {
-            currentValue = (overrideMin !== undefined ? overrideMin : Config.encoder.minValue);
-          } else {
-            currentValue -= scale;
-          }
-        }
-      }
-
-    } finally {
-      // lock.release();
-    }
-  };
-
-  rpio.poll(pinA, async pin => {
-    rpio.msleep(5);
-    const value = rpio.read(pin);
-    await processTick('a', value);
-  }, rpio.POLL_BOTH);
-  rpio.poll(pinB, async pin => {
-    rpio.msleep(5);
-    const value = rpio.read(pin);
-    await processTick('b', value);
-  }, rpio.POLL_BOTH);
-
+  gpioSwitch.on('interrupt', async () => {
+    await onClick?.();
+  });
 
   // gpioA.watch(async (err, value) => {
   //   if (err) {
@@ -158,17 +173,17 @@ export const initEncoder = (
   //   await processTick('b', value);
   // });
 
-  gpioSwitch.watch((err) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
+  // gpioSwitch.watch((err) => {
+  //   if (err) {
+  //     console.error(err);
+  //     return;
+  //   }
 
-    onClick?.();
-  });
+  //   onClick?.();
+  // });
 
   const emitValue = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       // lock.acquire().then(() => {
       if (currentValue !== lastValue) {
         valueChanged?.(currentValue);        
@@ -188,3 +203,4 @@ export const initEncoder = (
 
   emitValue();
 };
+
