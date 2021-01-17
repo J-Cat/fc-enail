@@ -491,6 +491,8 @@ export const getWrappedLines = (text: string, font: Font): [maxWidth: number, li
   
       const line = remainingText.substr(0, Math.min(endingChar - 1, remainingText.length));
       remainingText = remainingText.substr(Math.min(endingChar, remainingText.length));  
+      console.log(`LINE = ${line}`);
+      console.log(`REMA = ${remainingText}`);
       drawLines.push(line);
     }
     const maxLineWidth = drawLines.reduce((previous, value) => {
