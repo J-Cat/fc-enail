@@ -2,7 +2,7 @@ import { Color, display, Font, Layer } from 'ssd1306-i2c-js';
 import { registerConfigChange } from '../config';
 import dayjs from 'dayjs';
 import { getHourglass, Icons, IIcon } from '../models/icons';
-import { registerStateChange } from '../dao/sharedState';
+import { registerStateChange, setSharedState } from '../dao/sharedState';
 import { getNetworkInfo } from '../dao/networkDao';
 import { getQuickSet } from '../dao/localDb';
 import { renderPrompt } from '../modes/promptinput';
@@ -458,12 +458,18 @@ export const drawMessage = async (text: string, font: Font = Font.UbuntuMono_10p
 export const showMessage = async (text: string, font: Font = Font.UbuntuMono_10ptFontInfo, timeout = 5000): Promise<void> => {
   try {
     isMessage = true;
+    setSharedState({
+      showMessage: true,
+    });
     display.clearScreen();
     await drawMessage(text, font);
     display.refresh();
     await new Promise(resolve => setTimeout(resolve, timeout));
   } finally {
     isMessage = false;
+    setSharedState({
+      showMessage: false,
+    });
     display.refresh();
   }
 };

@@ -27,6 +27,12 @@ export const BaseMode: Partial<IModeInstance> = {
       await toggleTuning();
       return;
     }
+    if (state.showMessage) {
+      await setSharedState({
+        showMessage: false,
+      });
+      return;
+    }
     if (await usePromptClick()) {
       return;
     }

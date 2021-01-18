@@ -42,7 +42,7 @@ export const initProfilesMenu = (): IMenu => {
         return;
       }
       await setPromptInput(
-        `Load ${profile?.title} (P:${profile?.p},I:${profile?.i},D:${profile?.d})?`,
+        `Load ${profile?.title} (P/I/D: ${profile?.p}/${profile?.i}/${profile?.d}, Offset: ${profile?.offset})?`,
         async (): Promise<void> => {
           const { error } = await setCurrentProfile(profile.key);
           if (error) {
@@ -60,8 +60,8 @@ export const initProfilesMenu = (): IMenu => {
           ...menus, {
             current: 0,
             min: 0,
-            max: 4,
-            menuItems: ['Edit', 'Auto-Tune', 'Add', 'Delete', 'Cancel'],
+            max: 3,
+            menuItems: ['Edit', 'Auto-Tune', 'Add', 'Delete'],
             onClick: async (subIndex): Promise<void> => {
               switch (subIndex) {
               case 0: {

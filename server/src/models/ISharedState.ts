@@ -37,6 +37,7 @@ export interface ISharedState extends IE5ccState {
     current: boolean;
     onOk: () => Promise<void>;
   },
+  showMessage?: boolean;
   scriptRunning?: boolean;
   scriptFeedback?: IScriptFeedback;
 }
