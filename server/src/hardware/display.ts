@@ -242,7 +242,7 @@ const renderSettings = async (): Promise<void> => {
 };
 
 const render = async () => {
-  if (isMessage) {
+  if (state.showMessage) {
     return;
   }
 
@@ -483,20 +483,28 @@ export const getWrappedLines = (text: string, font: Font): [maxWidth: number, li
   if (lines > 1) {
     while (remainingText.length > 0) {
       if (remainingText.length < charsPerLine) {
-        drawLines.push(remainingText);
+        drawLines.push(...(remainingText.split('\n')));
         break;
       }
 
       let endingChar = charsPerLine;
-      while ((endingChar !== 0) && (remainingText.charAt(endingChar-1) !== ' ')) {
+      while ((endingChar !== 0) && (remainingText.charAt(endingChar) !== ' ') && (remainingText.charAt(endingChar) !== '\n')) {
         endingChar--;
       }
       if (endingChar === 0) {
         endingChar = charsPerLine;
       }
+
+      const crPos = remainingText.indexOf('\n');
+      if (crPos > 0 && crPos < endingChar) {
+        endingChar = crPos;
+      }
   
       const line = remainingText.substr(0, Math.min(endingChar, remainingText.length));
       remainingText = remainingText.substr(Math.min(endingChar, remainingText.length));  
+      if (remainingText.length > 0 && (remainingText.startsWith('\n') || remainingText.startsWith(' '))) {
+        remainingText = remainingText.substring(1);
+      }
       drawLines.push(line);
     }
     const maxLineWidth = drawLines.reduce((previous, value) => {

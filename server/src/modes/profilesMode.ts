@@ -42,7 +42,7 @@ export const initProfilesMenu = (): IMenu => {
         return;
       }
       await setPromptInput(
-        `Load ${profile?.title} (P/I/D: ${profile?.p}/${profile?.i}/${profile?.d}, Offset: ${profile?.offset})?`,
+        `Load ${profile?.title} (PID: ${profile?.p}/${profile?.i}/${profile?.d}, Offset: ${profile?.offset})?`,
         async (): Promise<void> => {
           const { error } = await setCurrentProfile(profile.key);
           if (error) {

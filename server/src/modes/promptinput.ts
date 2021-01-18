@@ -56,9 +56,17 @@ export const renderPrompt = (display: Ioledjs): void => {
   if (!state.prompt?.text) {
     return;
   }
-
-  const [fontWidth, fontHeight] = fontSize(Font.UbuntuMono_10ptFontInfo);
-  const [maxWidth, lines] = getWrappedLines(state.prompt?.text, Font.UbuntuMono_10ptFontInfo);
+  
+  let font = Font.UbuntuMono_10ptFontInfo;
+  let [fontWidth, fontHeight] = fontSize(font);
+  let [maxWidth, lines] = getWrappedLines(state.prompt?.text, font);
+  if (lines.length > 4) {
+    font = Font.UbuntuMono_8ptFontInfo;
+    [fontWidth, fontHeight] = fontSize(font);
+    [maxWidth, lines] = getWrappedLines(state.prompt?.text, font);  
+  }
+  
+  display.setFont(font);
   
   const x = Math.floor((128 - (maxWidth * fontWidth))/2);
   let y = Math.floor((64 - (fontHeight * (lines.length + 2)))/2);
