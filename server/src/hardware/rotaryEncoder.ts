@@ -63,6 +63,7 @@ export const closeEncoder = (): void => {
 };
 
 const processTick = async (from: 'a'|'b', value: number) => {  
+  console.log('tick');
   await lock.acquire();
   try {
     const a = from === 'a' ? value : lastA;
@@ -145,6 +146,8 @@ export const initEncoder = (
   gpioSwitch.on('interrupt', listenerSwitch);
 
   const emitValue = (): Promise<void> => {
+    console.log('Emit!!');
+    console.log(`Current = ${currentValue}, Last = ${lastValue}`);
     return new Promise((resolve, reject) => {
       lock.acquire().then(() => {
         if (currentValue !== lastValue) {

@@ -15,7 +15,7 @@ let state = registerStateChange('mode-scripts', async (oldState, newState): Prom
   state = newState;
   if ((oldState?.mode !== newState.mode) && (newState.mode === 'scripts')) {
     scripts = getScripts();
-    setEncoderValue(0);
+    setEncoderValue(0, false);
   }
 
   if ((oldState?.scriptRunning !== newState.scriptRunning) && !newState.scriptRunning) {

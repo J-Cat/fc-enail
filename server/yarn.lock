@@ -2072,9 +2072,10 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-"onoff@https://github.com/J-Cat/onoff.git":
+onoff@^6.0.1:
   version "6.0.1"
-  resolved "https://github.com/J-Cat/onoff.git#8043a64e2bc7a6304f162872f9ec6eaa301ffaf2"
+  resolved "https://registry.yarnpkg.com/onoff/-/onoff-6.0.1.tgz#68ecaece4a4b4663fd59d72544dfec556d460ddd"
+  integrity sha512-lqnVyUiWLbb4T6sWTaOeCJn682EPyxaTyfJ5bP5LiTa0KMDlVPQR0ngVgzV3SkRkd0JnNxPvwTNj7QVvZTZsAw==
   dependencies:
     epoll "^4.0.0"
     lodash.debounce "^4.0.8"

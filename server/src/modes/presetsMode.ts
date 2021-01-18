@@ -9,8 +9,8 @@ let presets: number[] = [];
 
 let state = registerStateChange('mode-presets', async (oldState, newState): Promise<void> => {
   state = newState;
-  if ((oldState?.mode !== newState.mode) && (newState.mode === 'presets') && (newState.sp)) {
-    setEncoderValue(newState.sp);
+  if ((oldState?.mode !== newState.mode) && (newState.mode === 'presets')) {
+    setEncoderValue(0, false);
     presets = getQuickSet();
     const currentPresetValue = presets.reduce((previous, value) => {
       const sp = state.sp || 0;
