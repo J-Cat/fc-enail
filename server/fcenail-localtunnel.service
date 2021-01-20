@@ -1,8 +1,8 @@
 [Unit]
 Description=FC E-Nail Local Tunnel Service
 After=network.target
-StartLimitIntervalSec=90
-StartLimitBurst=5
+StartLimitIntervalSec=1560
+StartLimitBurst=25
 
 [Service]
 Type=simple
@@ -11,7 +11,7 @@ WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-localtunnel
 EnvironmentFile=/etc/systemd/fcenail.conf
 Restart=on-failure
-RestartSec=15
+RestartSec=60
 
 [Install]
 WantedBy=multi-user.target
