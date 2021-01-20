@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { getHourglass, Icons, IIcon } from '../models/icons';
 import { registerStateChange, setSharedState } from '../dao/sharedState';
 import { getNetworkInfo } from '../dao/networkDao';
-import { getQuickSet } from '../dao/localDb';
+import { getQuickSet, getUrl } from '../dao/localDb';
 import { renderPrompt } from '../modes/promptinput';
 import { renderTextInput } from '../modes/textinput';
 import { renderNumberInput } from '../modes/numberinput';
@@ -232,7 +232,7 @@ const renderSettings = async (): Promise<void> => {
     display.drawString(0, 2, `Mode: ${networkInfo.network?.mode}`, 1, Color.White, Layer.Layer0);
     display.drawString(0, 10, `SSID: ${networkInfo.network?.ssid}`, 1, Color.White, Layer.Layer0);
     display.drawString(0, 20, `IP:   ${networkInfo.network?.address}`, 1, Color.White, Layer.Layer0);
-    drawStringWrapped(0, 30, `URL:  ${state.url}`, Font.UbuntuMono_8ptFontInfo, 6);
+    drawStringWrapped(0, 30, `URL:  ${getUrl()}`, Font.UbuntuMono_8ptFontInfo, 6);
     display.refresh();
     return;
   }

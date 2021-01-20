@@ -29,6 +29,8 @@ export const exec = async (cmd: string): Promise<{ error?: Error; stderr?: strin
   await new Promise<void>(resolve => {
     cp.stdout?.on('close', () => {
       resolve();
+      cp.disconnect();
+      cp.kill();
     });  
   });
 

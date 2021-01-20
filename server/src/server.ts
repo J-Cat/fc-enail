@@ -19,6 +19,7 @@ import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
 import { reboot, restartService } from './dao/systemDao';
 import { ISharedState } from './models/ISharedState';
 import { display } from 'ssd1306-i2c-js';
+import { initialize, terminate } from 'pigpio';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
@@ -157,6 +158,8 @@ const onSharedStateChange = async (
 
 // initialization
 (async () => {
+  initialize();
+
   dotenv.config();
 
   await initLocalDb();
@@ -196,6 +199,7 @@ const onSharedStateChange = async (
     if (options.cleanup) {
       console.log('Cleaning up before exit.');
       display.clearScreen();
+      terminate();
       // tunnel?.close();
     }
     if (exitCode || exitCode === 0) {
