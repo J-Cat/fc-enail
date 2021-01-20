@@ -124,7 +124,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     // return error to user
     app.use((err: Error, req: express.Request, res: express.Response) => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(err.stack);
+        console.error(err.stack);
       }
       res.status(err.status || HttpStatusCode.INTERNAL_SERVER_ERROR)
         .json({
@@ -148,7 +148,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
   const handleExceptions = () => {
     (process as NodeJS.EventEmitter).on('uncaughtException', (err: { code: string; message: string }) => {
       if (err.code === 'ECONNRESET') {
-        console.log(err.message);
+        console.error(err.message);
       } else {
         throw err;
       }

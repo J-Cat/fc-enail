@@ -63,7 +63,6 @@ export const closeEncoder = (): void => {
 };
 
 const processTick = async (from: 'a'|'b', value: number) => {  
-  console.log('tick');
   await lock.acquire();
   try {
     const a = from === 'a' ? value : lastA;

@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
   };
 
   const languageOnChange = (value: string) => {
-    console.log(JSON.stringify(i18n.languages));
+    //console.log(JSON.stringify(i18n.languages));
     i18n.changeLanguage(value).then(() => {
       dispatch(setLanguage(value));
     });

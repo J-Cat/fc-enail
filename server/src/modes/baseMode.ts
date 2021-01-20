@@ -86,7 +86,6 @@ export const BaseMode: Partial<IModeInstance> = {
     await useMenuEncoderClick();
   },
   onEncoderChange: async (value: number): Promise<void> => {
-    console.log(`Encoder = ${value}`);
     if (state.tuning) {
       return;
     }

@@ -41,7 +41,7 @@ export const authMiddleware: Middleware<{}, RootState> = (api: MiddlewareAPI<App
         });
       },
       error => {
-        console.log(`Axios interceptor error: ${error}`);
+        console.error(`Axios interceptor error: ${error}`);
       },
     );
 

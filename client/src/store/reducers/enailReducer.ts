@@ -43,6 +43,35 @@ const getState = (): AppThunk<{ result: boolean, state?: ISharedState, error?: s
   }
 };
 
+const getUrl = (): AppThunk<{ url?: string, error?: string }> => async (
+  dispatch: AppDispatch,
+): Promise<{ url?: string, error?: string }> => {
+  dispatch(startRequest());
+
+  try {
+    const response = await Axios({
+      baseURL: Constants.API_URL,
+      url: '/state/url',
+      method: 'GET',
+    });
+
+    const state: { url: string } = response.data;
+    dispatch(completeGetUrl(state.url));
+    return { url: state.url };
+  } catch (e) {
+    const error = i18n.t(
+      'ENAIL.GET_URL_UNKNOWN_ERROR', 
+      'An unknown error occured trying to retrieve the e-nail public url: {{error}}', 
+      { error: e.message },
+    );
+    
+    dispatch(setError(error));
+    return {
+      error,
+    };
+  }
+};
+
 const sendState = (newState: ISharedState): AppThunk<{ 
   result: boolean, lastState?: ISharedState, state?: ISharedState, error?: string 
 }> => async (
@@ -367,6 +396,16 @@ const slice = createSlice({
         quickset: action.payload,
       };
     },
+    completeGetUrl: (state: IEnailState, action: PayloadAction<string>): IEnailState => {
+      return {
+        ...state,
+        requesting: false,
+        state: {
+          ...state.state,
+          url: action.payload,
+        },
+      };
+    },
     setState: (state: IEnailState, action: PayloadAction<ISharedState>): IEnailState => {
       return {
         ...state,
@@ -396,6 +435,7 @@ export {
   restartService,
   reboot,
   checkForUpdates,
+  getUrl,
   updateTime,
 };
 
@@ -407,6 +447,7 @@ export const {
   completeGetConfig,
   completeSendConfig,
   completeGetQuickSet,
+  completeGetUrl,
   setState,
   setError,
 } = slice.actions;

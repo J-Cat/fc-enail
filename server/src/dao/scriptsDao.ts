@@ -69,6 +69,6 @@ export const runScript = async (key: string): Promise<void> => {
     return;
   }
   const { script } = getScript(key);
-  console.log(`Running ${script.title}`);
+  // console.log(`Running ${script.title}`);
   runScriptEngine(script);
 };

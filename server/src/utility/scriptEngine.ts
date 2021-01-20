@@ -56,7 +56,7 @@ export const runScript = async (script: IScript): Promise<void> => {
 
 export const runStep = async (step: IStep): Promise<void> => {
   if (!state.scriptRunning) {
-    console.log('Script cancelled');
+    // console.log('Script cancelled');
     showMessage('Script cancelled');
     return;
   }

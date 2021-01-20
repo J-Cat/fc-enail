@@ -33,3 +33,14 @@ export const setState = async (req: Request, res: Response): Promise<Response> =
       .json({ message: err.message, error: { message: err.message, stack: err.stack } });
   }
 };
+
+export const url = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    return res.status(HttpStatusCode.OK).json({ url: getUrl() });
+  } catch (e) {
+    const err: Error = e as Error;
+
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message, error: { message: err.message, stack: err.stack } });
+  }
+};

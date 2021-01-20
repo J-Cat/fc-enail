@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form, Input, Button, InputNumber, Spin, Modal, Select, Upload } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { RootState } from '../../store/reducers/rootReducer';
-import { checkForUpdates, reboot, restartService, sendConfig, sendQuickSet, updateTime } from '../../store/reducers/enailReducer';
+import { checkForUpdates, getUrl, reboot, restartService, sendConfig, sendQuickSet, updateTime } from '../../store/reducers/enailReducer';
 import { useTranslation } from 'react-i18next';
 import './settings.less';
 import { IConfig } from '../../store/state/IEnailState';
@@ -39,6 +39,11 @@ const SettingsPage: React.FC = () => {
   const [t] = useTranslation();
   const [currentStartupSound, setCurrentStartupSound] = useState<string|undefined>(config?.startupSound);
   const formRef = useRef<FormInstance>();
+
+  useEffect(() => {
+    dispatch(getUrl());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const submitSettings = async (formData: IFormData) => {
     if (

@@ -268,7 +268,7 @@ const ScriptsPage: FC = () => {
           trigger={['click']}
           overlay={<Menu>
             <Menu.Item key="menu-update-sp" onClick={() => {
-              console.log(JSON.stringify(currentScript, null, ' '));
+              //console.log(JSON.stringify(currentScript, null, ' '));
               if (!currentScript) {
                 return;
               }

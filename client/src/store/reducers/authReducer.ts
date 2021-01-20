@@ -19,7 +19,7 @@ const getInitialState = (): IAuthState => {
       };
     }
   } catch (e) {
-    console.log(`Unknown error getting initial auth state: ${e.message}`);
+    console.error(`Unknown error getting initial auth state: ${e.message}`);
   }
 
   return {
