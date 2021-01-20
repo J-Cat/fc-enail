@@ -16,12 +16,16 @@ let Config = registerConfigChange('display', newConfig => {
   Config = newConfig;
 });
 
+let networkInfo: { network?: { mode: string; ssid: string; address: string; ssids: string[]; } } | undefined;
 let presets: number[] = [];
 
 let state = registerStateChange('oled', async (oldState, newState): Promise<void> => {
   setDisplayState(newState);
   if (oldState?.mode !== newState.mode && newState.mode === 'presets') {
     presets = getQuickSet();
+  }
+  if (newState?.menu?.[newState?.menu?.length-1]?.action === 'network') {
+    networkInfo = await getNetworkInfo();
   }
 });
 
@@ -227,11 +231,10 @@ const renderSettings = async (): Promise<void> => {
   }
 
   if (menu.action === 'network') {
-    const networkInfo = await getNetworkInfo();
     display.setFont(Font.UbuntuMono_8ptFontInfo);    
-    display.drawString(0, 2, `Mode: ${networkInfo.network?.mode}`, 1, Color.White, Layer.Layer0);
-    display.drawString(0, 10, `SSID: ${networkInfo.network?.ssid}`, 1, Color.White, Layer.Layer0);
-    display.drawString(0, 20, `IP:   ${networkInfo.network?.address}`, 1, Color.White, Layer.Layer0);
+    display.drawString(0, 2, `Mode: ${networkInfo?.network?.mode || ''}`, 1, Color.White, Layer.Layer0);
+    display.drawString(0, 10, `SSID: ${networkInfo?.network?.ssid || ''}`, 1, Color.White, Layer.Layer0);
+    display.drawString(0, 20, `IP:   ${networkInfo?.network?.address || ''}`, 1, Color.White, Layer.Layer0);
     drawStringWrapped(0, 30, `URL:  ${getUrl()}`, Font.UbuntuMono_8ptFontInfo, 6);
     display.refresh();
     return;
