@@ -39,6 +39,8 @@ declare global {
       BUTTON_LONG_CLICK?: string;
       BUTTON_REALLY_LONG_CLICK?: string;
       BUTTON_REALLY_REALLY_LONG_CLICK?: string;
+
+      AUDIO_MUTE_PIN?: string;
     }
   }
 }

@@ -37,6 +37,9 @@ export interface IServerConfig {
   settings: {
     startupSound: string;
   };
+  audio: {
+    mutePin: number;
+  };
 }
 
 const onChanges: {
@@ -94,6 +97,9 @@ export const loadConfig = (newEnv?: string): void => {
     },
     settings: {
       startupSound: process.env.STARTUP_SOUND || 'appear',
+    },
+    audio: {
+      mutePin: parseIntDefault(process.env.AUDIO_MUTE_PIN, 16),
     },
   };
 
