@@ -4,12 +4,16 @@ import { Gpio } from 'pigpio';
 import { parseIntDefault } from '../utility/parseIntDefault';
 import { registerConfigChange } from '../config';
 
-const gpio = new Gpio(parseIntDefault(process.env.AUDIO_MUTE_PIN, 16), { mode: Gpio.OUTPUT });
-gpio.digitalWrite(0);
 
-let Config = registerConfigChange('button', newConfig => {
+let Config = registerConfigChange('hardware-sound', newConfig => {
   Config = newConfig;
 });
+
+let gpio: Gpio;
+export const initSound = (): void => {
+  gpio = new Gpio(parseIntDefault(process.env.AUDIO_MUTE_PIN, 16), { mode: Gpio.OUTPUT });
+  gpio.digitalWrite(0);
+};
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
   if (Config.audio.volume === 0) {

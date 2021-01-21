@@ -5,7 +5,7 @@ import { playSound } from '../hardware/sound';
 import { getSounds } from '../dao/soundsDao';
 import { registerStateChange, setSharedState } from './sharedState';
 import dayjs from 'dayjs';
-import { ChildProcess, exec as cpexec, spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 
 let state = registerStateChange('system-dao', async (lastState, newState): Promise<void> => {
   state = newState;
