@@ -1,6 +1,7 @@
 import { SerialPortOptions } from 'modbus-serial/ModbusRTU';
 import dotenv from 'dotenv';
 import { parseIntDefault } from './utility/parseIntDefault';
+import { getVolume } from './dao/configDao';
 
 export interface IServerConfig {
   encoder: {
@@ -39,6 +40,7 @@ export interface IServerConfig {
   };
   audio: {
     mutePin: number;
+    volume: number;
   };
 }
 
@@ -48,7 +50,7 @@ const onChanges: {
 
 let config: IServerConfig;
 
-export const loadConfig = (newEnv?: string): void => {
+export const loadConfig = async (newEnv?: string): Promise<void> => {
   dotenv.config();
 
   if (newEnv) {
@@ -100,6 +102,7 @@ export const loadConfig = (newEnv?: string): void => {
     },
     audio: {
       mutePin: parseIntDefault(process.env.AUDIO_MUTE_PIN, 16),
+      volume: await getVolume(),
     },
   };
 

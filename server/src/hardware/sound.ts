@@ -2,11 +2,20 @@ import { exec } from '../utility/exec';
 import { getSounds } from '../dao/soundsDao';
 import { Gpio } from 'pigpio';
 import { parseIntDefault } from '../utility/parseIntDefault';
+import { registerConfigChange } from '../config';
 
 const gpio = new Gpio(parseIntDefault(process.env.AUDIO_MUTE_PIN, 16), { mode: Gpio.OUTPUT });
 gpio.digitalWrite(0);
 
+let Config = registerConfigChange('button', newConfig => {
+  Config = newConfig;
+});
+
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
+  if (Config.audio.volume === 0) {
+    return {};
+  }
+
   gpio.digitalWrite(1);
   try {
     const result = await exec(
@@ -24,6 +33,9 @@ export const playSound = async (filename: string): Promise<{error?: Error, stder
 
 export const playBeep = async (repeat: number): Promise<void> => {
   try {
+    if (Config.audio.volume === 0) {
+      return;
+    }
 
     await exec('amixer set Headphone on');
 
