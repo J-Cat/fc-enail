@@ -20,6 +20,7 @@ import { reboot, restartService } from './dao/systemDao';
 import { ISharedState } from './models/ISharedState';
 import { display } from 'ssd1306-i2c-js';
 import { initialize, terminate } from 'pigpio';
+import { initSound } from './hardware/sound';
 
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
@@ -192,6 +193,8 @@ const onSharedStateChange = async (
   initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick);
 
   initE5cc(onE5ccChange);
+  
+  await initSound();
 
   process.stdin.resume();//so the program will not close instantly
 

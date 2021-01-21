@@ -3,6 +3,7 @@ import { readFile, stat, writeFile } from 'fs';
 import { registerConfigChange, loadConfig } from '../config';
 import { IConfig } from '../models/IConfig';
 import { setUrl } from './localDb';
+import { updateVolumeState } from '../hardware/sound';
 
 let Config = registerConfigChange('config-dao', newConfig => {
   Config = newConfig;
@@ -119,5 +120,6 @@ export const setVolume = async (value: number): Promise<void> => {
   if (value === 0) {
     onoff = 'off';
   }
+  updateVolumeState(volume);
   await exec(`amixer set Headphone ${onoff} ${volume}%`);
 };
