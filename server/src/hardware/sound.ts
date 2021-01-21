@@ -3,21 +3,22 @@ import { getSounds } from '../dao/soundsDao';
 import { Gpio } from 'pigpio';
 import { parseIntDefault } from '../utility/parseIntDefault';
 
-const gpio = new Gpio(parseIntDefault(process.env.AUDIO_MUTE_PIN, 16));
+const gpio = new Gpio(parseIntDefault(process.env.AUDIO_MUTE_PIN, 16), { mode: Gpio.OUTPUT });
 gpio.digitalWrite(0);
 
 export const playSound = async (filename: string): Promise<{error?: Error, stderr?: string}> => {
   gpio.digitalWrite(1);
   try {
-    return exec(
+    const result = await exec(
       ` \
         amixer set Headphone on; \
         aplay "./sounds/${filename}"; \
         amixer set Headphone off; \
       `
     );
+    return result;
   } finally {
-    gpio.digitalWrite(0);
+    gpio.digitalWrite(0);      
   }
 };
 
