@@ -10,7 +10,8 @@ import { initWifi } from './settings/wifi';
 import { setPromptInput } from './promptinput';
 import { updateNetwork } from '../dao/networkDao';
 import { showMessage } from '../hardware/display';
-import { checkForUpdates, isSupportShellEnabled, toggleSupportShell } from '../dao/systemDao';
+import { checkForUpdates } from '../dao/systemDao';
+import { isSupportShellEnabled, toggleSupportShell } from '../remoteSupport';
 import { Font } from 'ssd1306-i2c-js';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {

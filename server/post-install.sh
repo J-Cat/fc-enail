@@ -34,6 +34,14 @@ if [ ! -f /lib/systemd/system/fcenail-localtunnel.service ]; then
   systemctl daemon-reload
 fi
 
+cp -b $NODE_MODULES/fcenail/fcenail-remotesupport.sh /usr/local/bin/fcenail-remotesupport
+
+if [ ! -f /lib/systemd/system/fcenail-remotesupport.service ]; then
+  cp $NODE_MODULES/fcenail/fcenail-remotesupport.service /lib/systemd/system
+  systemctl enable fcenail-remotesupport.service
+  systemctl daemon-reload
+fi
+
 cp -b $NODE_MODULES/fcenail/fcenail-updater.sh /usr/local/bin/fcenail-updater
 
 if [ ! -f /lib/systemd/system/fcenail-update.service ]; then

@@ -1,4 +1,5 @@
 import { Gpio } from 'pigpio';
+import { Gpio as GpioOnOff, ValueCallback } from 'onoff';
 import { registerConfigChange } from '../config';
 import { Lock } from '../utility/Lock';
 
@@ -20,7 +21,7 @@ let overrideMax: number | undefined = undefined;
 
 let gpioA: Gpio;
 let gpioB: Gpio;
-let gpioSwitch: Gpio;
+let gpioSwitch: GpioOnOff;
 let lastA = -1;
 let lastB = -1;
 let lastUpdate = Date.now();
@@ -32,8 +33,13 @@ const listenerA: (level: number, tick: number) => void = (value: number) => {
 const listenerB: (level: number, tick: number) => void = (value: number) => {
   processTick('b', value);
 };
-const listenerSwitch: (level: number, tick: number) => void = () => {
-  click?.();
+const listenerSwitch: ValueCallback = (err, value) => {
+  if (err) {
+    return;
+  }
+  if (value === 0) {
+    click?.();
+  }
 };
 let click: (() => Promise<void>) | undefined;
 
@@ -57,7 +63,7 @@ export const closeEncoder = (): void => {
     // gpioB.unwatchAll();
   }
   if (gpioSwitch) {
-    gpioSwitch.disableInterrupt();
+    gpioSwitch.unwatchAll();
     // gpioSwitch.unwatchAll();
   }
 };
@@ -133,16 +139,13 @@ export const initEncoder = (
     edge: Gpio.EITHER_EDGE,
     mode: Gpio.INPUT,
   });
-  gpioSwitch = new Gpio(pinSwitch, { 
-    edge: Gpio.RISING_EDGE,
-    mode: Gpio.INPUT,
-  });
+  gpioSwitch = new GpioOnOff(pinSwitch, 'in', 'both');
 
   gpioA.on('interrupt', listenerA);
 
   gpioB.on('interrupt', listenerB);
 
-  gpioSwitch.on('interrupt', listenerSwitch);
+  gpioSwitch.watch(listenerSwitch);
 
   const emitValue = (): Promise<void> => {
     return new Promise((resolve, reject) => {

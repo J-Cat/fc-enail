@@ -120,32 +120,3 @@ export const updateTime = async (utcTime: number): Promise<string|void> => {
     return e.message;
   }
 };
-
-let supportShell: ChildProcess | undefined;
-export const toggleSupportShell = async (): Promise<string|void> => {
-  if (supportShell) {
-    process.kill(-supportShell.pid);
-    supportShell = undefined;
-    return;
-  }
-  
-  supportShell = spawn('tmate', ['-F'], { shell: true, detached: true });
-  
-  return new Promise<string>(resolve => {
-    supportShell?.stdout?.on('data', (data?: string) => {
-      const lines = data?.toString().split('\n') || [];
-      for (const line of lines) {
-        if (line.startsWith('ssh session: ')) {
-          const sessionUrl = line.replace(/^ssh session: ssh (.*)$/gi, '$1');
-          resolve(sessionUrl);
-          return;
-        }  
-      }
-    });  
-  });
-
-};
-
-export const isSupportShellEnabled = (): boolean => {
-  return supportShell !== undefined;
-};

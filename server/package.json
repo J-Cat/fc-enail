@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.7",
+  "version": "1.0.8-beta.1",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -9,7 +9,8 @@
   "bin": {
     "fcenail": "./fcenail.sh",
     "fcenail-updater": "./fcenail-updater.sh",
-    "fcenail-localtunnel": "./fcenail-localtunnel.sh"
+    "fcenail-localtunnel": "./fcenail-localtunnel.sh",
+    "fcenail-remotesupport": "./fcenail-remotesupport.sh"
   },
   "scripts": {
     "postinstall": "./post-install.sh",
