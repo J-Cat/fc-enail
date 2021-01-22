@@ -21,6 +21,9 @@ import { ISharedState } from './models/ISharedState';
 import { initialize, terminate } from 'pigpio';
 import { initSound } from './hardware/sound';
 
+// initialize pigpio before anything else
+initialize();
+
 let Config = registerConfigChange('server', newConfig => {
   Config = newConfig;
 });
@@ -51,7 +54,7 @@ const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: 
     cleanup();
   }
   if (exitCode || exitCode === 0) {
-    console.log(exitCode);
+    console.log(`Exit code: ${exitCode}`);
   }
   if (options.exit) {
     process.exit();
@@ -62,18 +65,17 @@ const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: 
 process.on('exit', exitHandler.bind(null,{cleanup:true}, 0));
 
 //catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
-
+process.on('SIGINT', exitHandler.bind(null, {exit:true}, 3));
 // CATCHES TERMINATE
-process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
-process.on('SIGKILL', exitHandler.bind(null, {exit:true}, 0));
+process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 4));
+//process.on('SIGKILL', exitHandler.bind(null, {exit:true}, 5));
 
 // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
 process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));
 
 //catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}, 2));
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}, 1));
 
 const processAction = (): boolean => {
   if (currentState.rebooting) {
@@ -186,8 +188,6 @@ const onSharedStateChange = async (
 
 // initialization
 (async () => {
-  initialize();
-
   dotenv.config();
 
   await initLocalDb();
