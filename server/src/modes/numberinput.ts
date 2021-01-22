@@ -63,7 +63,7 @@ export const setNumberInput = (label: string, min: number, max: number, initialV
       step: 1,
       onClick: async (value: number) => {
         await callback(value);
-      }
+      },
     },
   });
 };

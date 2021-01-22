@@ -23,6 +23,12 @@ let state = registerStateChange('mode-profiles', async (oldState, newState): Pro
     profiles = getProfiles();
     setEncoderValue(0, false);
   }
+  if (
+    (!newState.textinput && oldState?.textinput)
+    || (!newState.numberinput && oldState?.numberinput)
+  ) {
+    setEncoderValue(0, false);
+  }
 });
 
 export const ProfilesMode: IModeInstance = {
