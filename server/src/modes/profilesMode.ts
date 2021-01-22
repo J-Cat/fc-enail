@@ -200,9 +200,9 @@ const saveProfileLocal = async (profile: IProfile, continueEdit = false): Promis
         action: undefined,
       }),
     });
-
+  } else {
+    await refreshProfileMenu(current);
   }
-  await refreshProfileMenu(current);
 
   return updatedProfile;
 };

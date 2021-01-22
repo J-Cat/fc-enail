@@ -68,6 +68,7 @@ if [ -f /usr/local/bin/fcenail ]; then
 fi
 ln -s $NODE_MODULES/fcenail/fcenail.sh /usr/local/bin/fcenail
 
+systemctl stop fcenail-remotesupport.service
 systemctl start fcenail.service
 systemctl start fcenail-update.service
 if [ $STARTLT -eq 1 ]; then
