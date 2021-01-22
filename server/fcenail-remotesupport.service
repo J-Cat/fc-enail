@@ -1,8 +1,6 @@
 [Unit]
 Description=FC E-Nail Emergency Remote Service
 After=network.target
-StartLimitIntervalSec=1560
-StartLimitBurst=25
 
 [Service]
 Type=simple
@@ -11,7 +9,6 @@ WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-remotesupport
 EnvironmentFile=/etc/systemd/fcenail.conf
 Restart=on-failure
-RestartSec=60
 
 [Install]
 WantedBy=multi-user.target

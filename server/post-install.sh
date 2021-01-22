@@ -38,7 +38,7 @@ cp -b $NODE_MODULES/fcenail/fcenail-remotesupport.sh /usr/local/bin/fcenail-remo
 
 if [ ! -f /lib/systemd/system/fcenail-remotesupport.service ]; then
   cp $NODE_MODULES/fcenail/fcenail-remotesupport.service /lib/systemd/system
-  systemctl enable fcenail-remotesupport.service
+  systemctl disable fcenail-remotesupport.service
   systemctl daemon-reload
 fi
 

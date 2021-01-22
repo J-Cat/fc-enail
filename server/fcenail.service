@@ -2,6 +2,9 @@
 Description=FC E-Nail - A smart e-nail controller!
 Documentation=https://github.com/J-Cat/fc-enail
 After=network.target
+StartLimitIntervalSec=100
+StartLimitBurst=10
+OnFailure=fcenail-remotesupport.service
 
 [Service]
 Type=simple
@@ -10,6 +13,7 @@ WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail
 EnvironmentFile=/etc/systemd/fcenail.conf
 Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
