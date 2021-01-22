@@ -82,6 +82,9 @@ process.on('exit', exitHandler.bind(null,{cleanup:true}, 0));
 //catches ctrl+c event
 process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
 
+// CATCHES TERMINATE
+process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
+
 // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
 process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));

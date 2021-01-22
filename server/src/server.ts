@@ -130,7 +130,7 @@ const onEncoderLongClick = async () => {
   }
 
   //console.log(JSON.stringify(currentState, null, ' '));
-  await currentState.modes?.[currentState.mode || '']?.onEncoderLongClick();
+  await currentState.modes?.[currentState.mode || '']?.onEncoderLongClick?.();
 };
 
 const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState) => {
@@ -227,7 +227,10 @@ const onSharedStateChange = async (
   
   //catches ctrl+c event
   process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
-  
+
+  // CATCHES TERMINATE
+  process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
+
   // catches "kill pid" (for example: nodemon restart)
   process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
   process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));
