@@ -41,7 +41,7 @@ const listenerSwitch: ValueCallback = (err, value) => {
   if (err) {
     return;
   }
-  if (value === 1) {
+  if (value === 0) {
     down = Date.now();
     return;
   }
