@@ -5,5 +5,5 @@ if [[ $(whoami) != "root" ]]; then
   exit
 fi
 
-/usr/local/bin/oled r
-/usr/local/bin/oled s
+#/usr/local/bin/oled r
+#/usr/local/bin/oled s

@@ -128,6 +128,7 @@ export const setDisplayState = async (newState: ISharedState): Promise<void> => 
 
 export const closeDisplay = (): void => {
   display.clearScreen();
+  display.refresh();
   display.turnOff();
   display.dispose();
 };
