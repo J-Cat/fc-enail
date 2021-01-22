@@ -133,31 +133,31 @@ const editProfile = async (profile: IProfile): Promise<void> => {
           switch (editIndex) {
           case 0: {
             setTextInput('Profile Name', profile.title, async (text: string): Promise<void> => {
-              await saveProfileLocal({...profile, title: text}, true);
+              await saveProfileLocal({...profile, title: text}, true, 0);
             });
             break;
           }
           case 1: {
             setNumberInput('Proportional Band', 0, 2000, profile.p, async (value: number): Promise<void> => {
-              await saveProfileLocal({...profile, p: value}, true);
+              await saveProfileLocal({...profile, p: value}, true, 1);
             });
             break;
           }
           case 2: {
             setNumberInput('Integral Time', 0, 2000, profile.i, async (value: number): Promise<void> => {
-              await saveProfileLocal({...profile, i: value}, true);
+              await saveProfileLocal({...profile, i: value}, true, 2);
             });
             break;
           }
           case 3: {
             setNumberInput('Derivative Time', 0, 2000, profile.d, async (value: number): Promise<void> => {
-              await saveProfileLocal({...profile, d: value}, true);
+              await saveProfileLocal({...profile, d: value}, true, 3);
             });
             break;
           }
           case 4: {
             setNumberInput('Offset', -500, 500, profile.offset, async (value: number): Promise<void> => {
-              await saveProfileLocal({...profile, offset: value}, true);
+              await saveProfileLocal({...profile, offset: value}, true, 4);
             });
             break;
           }
@@ -170,7 +170,7 @@ const editProfile = async (profile: IProfile): Promise<void> => {
   });
 };
 
-const saveProfileLocal = async (profile: IProfile, continueEdit = false): Promise<IProfile|undefined> => {
+const saveProfileLocal = async (profile: IProfile, continueEdit = false, pos = 0): Promise<IProfile|undefined> => {
   let current = 0;
   let updatedProfile: IProfile|undefined;
   if (profile) {
@@ -190,6 +190,9 @@ const saveProfileLocal = async (profile: IProfile, continueEdit = false): Promis
   if (continueEdit) {
     setSharedState({
       menu: getMenuUpdate({
+        current: pos,
+        min: 0,
+        max: 4,
         menuItems: [
           `Title:  ${profile.title}`,
           `P:      ${profile.p}`,
