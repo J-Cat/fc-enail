@@ -15,6 +15,8 @@ rm /lib/systemd/system/fcenail.service
 systemctl stop fcenail-localtunnel.service
 systemctl disable fcenail-localtunnel.service
 rm /lib/systemd/system/fcenail-localtunnel.service
+systemctl enable fcanail-remotesupport.service
+systemctl start fcenail-remotesupport.service
 # systemctl daemon-reload
 
 if [ -f /usr/local/bin/fcenail ]; then
