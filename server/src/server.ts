@@ -124,6 +124,15 @@ const onEncoderClick = async () => {
   await currentState.modes?.[currentState.mode || '']?.onEncoderClick();
 };
 
+const onEncoderLongClick = async () => {
+  if (!processAction()) {
+    return;
+  }
+
+  //console.log(JSON.stringify(currentState, null, ' '));
+  await currentState.modes?.[currentState.mode || '']?.onEncoderLongClick();
+};
+
 const onE5ccChange = async (lastState: IE5ccState | undefined, state: IE5ccState) => {
   if (!initialized) {
     initialized = true;
@@ -190,7 +199,7 @@ const onSharedStateChange = async (
 
   await initButton(onButtonClick, onLongButtonClick, onReallyLongButtonClick, onReallyReallyLongButonClick);
 
-  initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick);
+  initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick, onEncoderLongClick);
 
   initE5cc(onE5ccChange);
   

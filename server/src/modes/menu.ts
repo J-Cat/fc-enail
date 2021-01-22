@@ -1,6 +1,6 @@
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { getCurrentProfile, getCurrentScript, getProfiles, getScripts } from '../dao/localDb';
-import { registerStateChange, setNextMode, setSharedState } from '../dao/sharedState';
+import { registerStateChange, setNextMode, setPreviousMode, setSharedState } from '../dao/sharedState';
 import { IMenu } from '../models/IMenu';
 
 let state = registerStateChange('menu', async (oldState, newState): Promise<void> => {
@@ -73,6 +73,37 @@ export const useMenuEncoderClick = async (): Promise<boolean> => {
     }
 
     setNextMode('self');
+    return true;
+  }
+
+  const menu = menus.pop() as IMenu;
+  if (menu.isMoving) {
+    await menu.onMove?.();
+    return true;
+  }
+
+  if (menu?.action) {
+    setSharedState({ menu: [...menus, { ...menu, action: undefined }]});
+    return true;
+  }
+  if (menu) {
+    setSharedState({ menu: [...menus]});
+    return true;
+  }
+
+  return false;
+};
+
+export const useMenuEncoderLongClick = async (): Promise<boolean> => {
+  const menus = [...(state.menu || [])];
+
+  if (menus.length <= 1) {
+    if (menus?.[0].action) {
+      setSharedState({ menu: [{...menus[0], action: undefined }]});
+      return true;
+    }
+
+    setPreviousMode('self');
     return true;
   }
 

@@ -2,7 +2,7 @@ import { toggleTuning } from '../dao/profilesDao';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
 import { getCurrentScript, getQuickSet, getScript } from '../dao/localDb';
-import { registerStateChange, setNextMode, setSharedState } from '../dao/sharedState';
+import { registerStateChange, setNextMode, setPreviousMode, setSharedState } from '../dao/sharedState';
 import { runScript } from '../utility/scriptEngine';
 
 let presets: number[] = [];
@@ -66,6 +66,22 @@ export const PresetsMode: IModeInstance = {
     }
 
     setNextMode('self');
+    setEncoderValue(0, false);
+  },
+  onEncoderLongClick: async (): Promise<void> => {
+    if (state.scriptRunning) {
+      await setSharedState({
+        scriptRunning: false,
+        scriptFeedback: undefined,
+      });
+      return;
+    }
+    if (state.tuning) {
+      await toggleTuning();
+      return;
+    }
+
+    setPreviousMode('self');
     setEncoderValue(0, false);
   },
   onEncoderChange: async (value: number): Promise<void> => {

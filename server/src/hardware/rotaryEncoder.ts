@@ -26,6 +26,10 @@ let lastA = -1;
 let lastB = -1;
 let lastUpdate = Date.now();
 let scale = 1;
+let down = 0;
+
+let click: (() => Promise<void>) | undefined;
+let longClick: (() => Promise<void>) | undefined;
 
 const listenerA: (level: number, tick: number) => void = (value: number) => {
   processTick('a', value);
@@ -37,11 +41,22 @@ const listenerSwitch: ValueCallback = (err, value) => {
   if (err) {
     return;
   }
-  if (value === 0) {
+  if (value === 1) {
+    down = Date.now();
+    return;
+  }
+
+  try {
+    const elapsed = down === 0 ? 0 : Date.now() - down;
+    if (elapsed >= Config.button.longClick) {
+      longClick?.();
+      return;
+    }
     click?.();
+  } finally {
+    down = 0;
   }
 };
-let click: (() => Promise<void>) | undefined;
 
 export const setEncoderValue = (
   value: number, enforceMinMax = true, 
@@ -128,9 +143,11 @@ export const initEncoder = (
   pinSwitch: number = Config.encoder.S, 
   valueChanged?: (value: number) => Promise<void>,
   onClick?: () => Promise<void>,
+  onLongClick?: () => Promise<void>,
   frequency = Config.encoder.frequency,
 ): void => {
   click = onClick;
+  longClick = onLongClick;
   gpioA = new Gpio(pinA, {
     edge: Gpio.EITHER_EDGE,
     mode: Gpio.INPUT,

@@ -35,6 +35,17 @@ export const useTextInputEncoderClick = async (): Promise<boolean> => {
   return false;
 };
 
+export const useTextInputEncoderLongClick = async (): Promise<boolean> => {
+  if (state.textinput) {
+    setSharedState({
+      textinput: undefined,
+      menu: getMenuUpdate({ action: undefined }),
+    });
+    return true;
+  }
+  return false;
+};
+
 export const useTextInputEncoderChange = async (increment: number): Promise<boolean> => {
   if (state.textinput) {
     const line = Constants.textInput[state.textinput?.inputMode || 'lowercase'];

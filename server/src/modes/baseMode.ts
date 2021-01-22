@@ -2,10 +2,10 @@ import { toggleTuning } from '../dao/profilesDao';
 import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { IModeInstance } from '../models/IModeInstance';
 import { registerStateChange, setSharedState } from '../dao/sharedState';
-import { useMenuClick, useMenuLongClick, useMenuEncoderClick, useMenuEncoderChange } from './menu';
+import { useMenuClick, useMenuLongClick, useMenuEncoderClick, useMenuEncoderChange, useMenuEncoderLongClick } from './menu';
 import { processNumberInput, useNumberInputClick, useNumberInputEncoderChange, useNumberInputEncoderClick } from './numberinput';
 import { usePromptClick, usePromptEncoderChange, usePromptEncoderClick } from './promptinput';
-import { processTextInput, useTextInputClick, useTextInputEncoderChange, useTextInputEncoderClick } from './textinput';
+import { processTextInput, useTextInputClick, useTextInputEncoderChange, useTextInputEncoderClick, useTextInputEncoderLongClick } from './textinput';
 
 let state = registerStateChange('mode-base', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -84,6 +84,35 @@ export const BaseMode: Partial<IModeInstance> = {
       return;
     }
     await useMenuEncoderClick();
+  },
+  onEncoderLongClick: async (): Promise<void> => {
+    if (state.scriptRunning) {
+      await setSharedState({
+        scriptRunning: false,
+        scriptFeedback: undefined,
+      });
+      return;
+    }
+    if (state.tuning) {
+      await toggleTuning();
+      return;
+    }
+    if (state.showMessage) {
+      await setSharedState({
+        showMessage: false,
+      });
+      return;
+    }
+    if (await usePromptEncoderClick()) {
+      return;
+    }
+    if (await useTextInputEncoderLongClick()) {
+      return;
+    }
+    if (await useNumberInputEncoderClick()) {
+      return;
+    }
+    await useMenuEncoderLongClick();
   },
   onEncoderChange: async (value: number): Promise<void> => {
     if (state.tuning) {

@@ -24,6 +24,18 @@ export const setNextMode = (source: 'e5cc'|'api'|'self'): void => {
   setSharedState({ mode: keys[newIndex] }, source);
 };
 
+export const setPreviousMode = (source: 'e5cc'|'api'|'self'): void => {
+  const keys = Object.keys(state.modes || []);
+  const index = keys.findIndex(key => key === state.mode);
+  let newIndex = 0;
+  if (index > 0) {
+    newIndex = index - 1;
+  } else {
+    newIndex = keys.length - 1;
+  }
+  setSharedState({ mode: keys[newIndex] }, source);
+};
+
 export const registerStateChange = (
   key: string,
   onChange: (lastState: ISharedState | undefined, state: ISharedState, source: 'e5cc'|'api'|'self') => Promise<void>,
