@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.10-beta.2",
+  "version": "1.0.10-beta.3",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
