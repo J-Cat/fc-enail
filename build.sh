@@ -71,6 +71,11 @@ if [ $SERVER -eq 1 ]; then
   fi
   mkdir ./server/dist/client
   cp -R ./client/build/* ./server/dist/client/  
+  if [ -d "./server/dist/oled" ]; then
+    rm -f -R ./server/dist/oled
+  fi
+  mkdir ./server/dist/oled
+  cp -R ./oled/* ./server/dist/oled/
 fi
 
 if [ $PACK -eq 1 ]; then

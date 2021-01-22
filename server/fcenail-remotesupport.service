@@ -9,6 +9,7 @@ WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-remotesupport
 EnvironmentFile=/etc/systemd/fcenail.conf
 Restart=on-failure
+ExecStop=/usr/local/bin/fcenail-cleardisplay
 
 [Install]
 WantedBy=multi-user.target

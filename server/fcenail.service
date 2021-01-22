@@ -14,6 +14,7 @@ ExecStart=/usr/local/bin/fcenail
 EnvironmentFile=/etc/systemd/fcenail.conf
 Restart=always
 RestartSec=5
+ExecStop=/usr/local/bin/fcenail-cleardisplay
 
 [Install]
 WantedBy=multi-user.target

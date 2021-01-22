@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.9",
+  "version": "1.0.10-beta.1",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -10,7 +10,8 @@
     "fcenail": "./fcenail.sh",
     "fcenail-updater": "./fcenail-updater.sh",
     "fcenail-localtunnel": "./fcenail-localtunnel.sh",
-    "fcenail-remotesupport": "./fcenail-remotesupport.sh"
+    "fcenail-remotesupport": "./fcenail-remotesupport.sh",
+    "fcenail-cleardisplay": "./fcenail-cleardisplay.sh"
   },
   "scripts": {
     "postinstall": "./post-install.sh",
