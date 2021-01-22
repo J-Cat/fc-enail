@@ -18,7 +18,6 @@ import { initLocalDb } from './dao/localDb';
 import { initScriptsMenu, ScriptsMode } from './modes/scriptsMode';
 import { reboot, restartService } from './dao/systemDao';
 import { ISharedState } from './models/ISharedState';
-import { display } from 'ssd1306-i2c-js';
 import { initialize, terminate } from 'pigpio';
 import { initSound } from './hardware/sound';
 
@@ -35,27 +34,46 @@ const lock = new Lock();
 let initialized = false;
 let currentState: ISharedState = {};
 
-// capture interrupts and cleanup on exit
-process.on('SIGINT', () => {
-  process.exit(0);
-});
-
-process.on('exit', () => {
-  console.log('Cleaning up.');
-  cleanup();
-});
-
-process.on('uncaughtException', (error) => {
-  console.error(`Uncaught exception: ${error.message}`);
-  cleanup();
-});
+process.stdin.resume();//so the program will not close instantly
 
 const cleanup = () => {
   closeE5cc();
   closeEncoder();
   closeDisplay();
   closeButton();
+  terminate();
 };
+
+const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
+  console.log('Exiting FC E-Nail ...');
+  if (options.cleanup) {
+    console.log('Cleaning up before exit.');
+    cleanup();
+  }
+  if (exitCode || exitCode === 0) {
+    console.log(exitCode);
+  }
+  if (options.exit) {
+    process.exit();
+  }
+};
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}, 0));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
+
+// CATCHES TERMINATE
+process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
+process.on('SIGKILL', exitHandler.bind(null, {exit:true}, 0));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}, 2));
 
 const processAction = (): boolean => {
   if (currentState.rebooting) {
@@ -204,37 +222,4 @@ const onSharedStateChange = async (
   initE5cc(onE5ccChange);
   
   await initSound();
-
-  process.stdin.resume();//so the program will not close instantly
-
-  const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
-    if (options.cleanup) {
-      console.log('Cleaning up before exit.');
-      closeDisplay();
-      terminate();
-      // tunnel?.close();
-    }
-    if (exitCode || exitCode === 0) {
-      console.log(exitCode);
-    }
-    if (options.exit) {
-      process.exit();
-    }
-  };
-  
-  //do something when app is closing
-  process.on('exit', exitHandler.bind(null,{cleanup:true}, 0));
-  
-  //catches ctrl+c event
-  process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
-
-  // CATCHES TERMINATE
-  process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
-
-  // catches "kill pid" (for example: nodemon restart)
-  process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
-  process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));
-  
-  //catches uncaught exceptions
-  process.on('uncaughtException', exitHandler.bind(null, {exit:true}, 2));
 })();

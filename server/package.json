@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.10-beta.3",
+  "version": "1.0.10-beta.4",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.0",
-    "@types/commander": "^2.12.2",
     "@types/localtunnel": "^2.0.0",
     "@types/lowdb": "^1.0.9",
     "@types/rpio": "^0.0.3",

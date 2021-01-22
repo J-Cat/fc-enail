@@ -82,6 +82,7 @@ if (options.write) {
     options.write,
     getFontFromSize(parseIntDefault(options.font, 10)),
   );
+  display.refresh();
 }
 
 display.dispose();
