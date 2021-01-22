@@ -201,7 +201,7 @@ const onSharedStateChange = async (
   const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
     if (options.cleanup) {
       console.log('Cleaning up before exit.');
-      display.clearScreen();
+      closeDisplay();
       terminate();
       // tunnel?.close();
     }
