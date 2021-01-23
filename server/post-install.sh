@@ -65,12 +65,14 @@ fi
 ln -s $NODE_MODULES/fcenail/fcenail.sh /usr/local/bin/fcenail
 
 # oled binary and fonts
+cp -b $NODE_MODULES/fcenail/fcenail-cleardisplay.sh /usr/local/bin/fcenail-cleardisplay
 if [ ! -f /usr/local/bin/oled ]; then
   cp $NODE_MODULES/fcenail/oled/oled /usr/local/bin/
 fi
 if [ ! -d /usr/local/lib/fontx ]; then
   cp -r $NODE_MODULES/fcenail/oled/fontx /usr/local/lib/
 fi
+
 
 # remote support
 cp -b $NODE_MODULES/fcenail/fcenail-remotesupport.sh /usr/local/bin/fcenail-remotesupport
