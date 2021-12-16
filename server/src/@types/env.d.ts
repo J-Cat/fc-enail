@@ -20,6 +20,7 @@ declare global {
       ENCODER_MIN_VALUE?: string;
       ENCODER_MAX_VALUE?: string;
       ENCODER_FREQUENCY?: string;
+      ENCODER_BUTTON_DEBOUNCE?: string;
 
       DISPALY_INTERVAL?: string;
       DISPLAY_SCREEN_OFF?: string;
@@ -39,6 +40,7 @@ declare global {
       BUTTON_LONG_CLICK?: string;
       BUTTON_REALLY_LONG_CLICK?: string;
       BUTTON_REALLY_REALLY_LONG_CLICK?: string;
+      BUTTON_DEBOUNCE?: string;
 
       AUDIO_MUTE_PIN?: string;
     }

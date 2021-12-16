@@ -156,7 +156,7 @@ export const initEncoder = (
     edge: Gpio.EITHER_EDGE,
     mode: Gpio.INPUT,
   });
-  gpioSwitch = new GpioOnOff(pinSwitch, 'in', 'both');
+  gpioSwitch = new GpioOnOff(pinSwitch, 'in', 'both', Config.encoder.buttonDebounce > 0 ? { debounceTimeout: Config.encoder.buttonDebounce } : {});
 
   gpioA.on('interrupt', listenerA);
 

@@ -11,6 +11,7 @@ export interface IServerConfig {
     minValue: number;
     maxValue: number;
     frequency: number;
+    buttonDebounce: number;
   };
   display: {
     interval: number;
@@ -30,6 +31,7 @@ export interface IServerConfig {
     longClick: number;
     reallyLongClick: number;
     reallyReallyLongClick: number;
+    debounce: number;
   };
   localtunnel: {
     subdomain: string;
@@ -67,6 +69,7 @@ export const loadConfig = (newEnv?: string): void => {
       minValue: parseIntDefault(process.env.ENCODER_MIN_VALUE, 0),
       maxValue: parseIntDefault(process.env.ENCODER_MAX_VALUE, 850),
       frequency: parseIntDefault(process.env.ENCODER_FREQUENCY, 100),
+      buttonDebounce: parseIntDefault(process.env.ENCODER_BUTTON_DEBOUNCE, 20),
     },
     display: {
       interval: parseIntDefault(process.env.DISPALY_INTERVAL, 100),
@@ -91,6 +94,7 @@ export const loadConfig = (newEnv?: string): void => {
       longClick: parseIntDefault(process.env.BUTTON_LONG_CLICK, 400),
       reallyLongClick: parseIntDefault(process.env.BUTTON_REALLY_LONG_CLICK, 3000),
       reallyReallyLongClick: parseIntDefault(process.env.BUTTON_REALLY_REALLY_LONG_CLICK, 8000),
+      debounce: parseIntDefault(process.env.BUTTON_DEBOUNCE, 20),
     },
     localtunnel: {
       subdomain: process.env.LOCALTUNNEL_SUBDOMAIN || '',

@@ -14,7 +14,7 @@ registerStateChange('button', async (oldState, newState) => {
 
 export type ClickFunc = () => Promise<void>;
 
-const button = new Gpio(Config.button.buttonPin, 'in', 'both');
+const button = new Gpio(Config.button.buttonPin, 'in', 'both', Config.button.debounce > 0 ? { debounceTimeout: Config.button.debounce } : {});
 const led = new Gpio(Config.button.ledPin, 'out');
 let down = 0;
 let ledState = false;
