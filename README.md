@@ -7,7 +7,7 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 * Easy temperature adjustments with rotary dial
 * Easy on/off of heater both on device and remotely
 * Quick temps from mobile screen to go to a temperature with 1-click
-* Save/Load profiles (PID settings) for different devices (can use auto-tune to generate)
+* Save/Load profiles (PID settings and coil temperature offset) for different devices (can use auto-tune to generate)
 * Run scripts for fancy up-temp procedures and the like
 * Full mobile access including:
   * Remotely start, adjust temperatures, and monitor
