@@ -17,7 +17,7 @@ export const useSocketIO = (): void => {
     if (!authenticated) {
       return;
     }
-    const socket = io(Constants.SOCKET_URL, { auth: { token }});
+    const socket = io(Constants.SOCKET_URL, { auth: { token } });
     socket.on('E5CC', (data: IE5ccState) => {
       dispatch(setState(data));    });
 

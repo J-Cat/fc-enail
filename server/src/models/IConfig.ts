@@ -7,4 +7,6 @@ export interface IConfig {
   volume: number;
   localtunnel?: string;
   startupSound?: string;
+  buttonDebounce?: number;
+  encoderButtonDebounce?: number;
 }

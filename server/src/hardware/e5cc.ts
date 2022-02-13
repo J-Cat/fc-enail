@@ -110,8 +110,12 @@ export const initE5cc = async (
         const status = statusReading?.data?.[1];
         const nocoil = (statusReading?.data?.[0] & Constants.e5cc.flags.nocoil) === Constants.e5cc.flags.nocoil;
         const running = (status & Constants.e5cc.flags.stopped) !== Constants.e5cc.flags.stopped;
+        let presentValue = nocoil ? 0 : (await modbus.readHoldingRegisters(Constants.e5cc.variables.presentValue, 1))?.data?.[0] || 0;
+        if (presentValue > 32767) {
+          presentValue = presentValue - 65536;
+        }
         state = {
-          pv: nocoil ? 0 : (await modbus.readHoldingRegisters(Constants.e5cc.variables.presentValue, 1))?.data?.[0] || 0,
+          pv: presentValue,
           sp: (await modbus.readHoldingRegisters(Constants.e5cc.variables.setPoint, 1))?.data?.[0] || 0,
           running,
           tuning: (status & Constants.e5cc.flags.tuning) === Constants.e5cc.flags.tuning,

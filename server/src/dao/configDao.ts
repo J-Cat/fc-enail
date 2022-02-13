@@ -10,7 +10,7 @@ let Config = registerConfigChange('config-dao', newConfig => {
 });
 
 export const getConfig = async (): Promise<IConfig> => {
-  const config = {
+  const config: IConfig = {
     autoShutoff: Config.e5cc.autoShutoff,
     screenSaverTimeout: Config.display.screenSaverTimeout,
     screenOffTimeout: Config.display.screenOffTimeout,
@@ -19,6 +19,8 @@ export const getConfig = async (): Promise<IConfig> => {
     localtunnel: Config.localtunnel.subdomain,
     volume: await getVolume(),
     startupSound: Config.settings.startupSound,
+    buttonDebounce: Config.button.debounce,
+    encoderButtonDebounce: Config.encoder.buttonDebounce
   };
 
   return config;
@@ -47,7 +49,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
               [
                 'E5CC_AUTOSHUTOFF', 'DISPLAY_SCREEN_SAVER', 'DISPLAY_SCREEN_OFF', 
                 'ENCODER_MIN_VALUE', 'ENCODER_MAX_VALUE', 'LOCALTUNNEL_SUBDOMAIN',
-                'STARTUP_SOUND',
+                'STARTUP_SOUND', 'BUTTON_DEBOUNCE', 'ENCODER_BUTTON_DEBOUNCE',
               ].includes(key.trim())
             ) {
               continue;
@@ -64,7 +66,9 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
       + `ENCODER_MIN_VALUE=${config.min}\n`
       + `ENCODER_MAX_VALUE=${config.max}\n`
       + `LOCALTUNNEL_SUBDOMAIN=${config.localtunnel || ''}\n`
-      + `STARTUP_SOUND=${config.startupSound || 'appear'}\n`;
+      + `STARTUP_SOUND=${config.startupSound || 'appear'}\n`
+      + `BUTTON_DEBOUNCE=${(config.buttonDebounce || 50).toString()}\n`
+      + `ENCODER_BUTTON_DEBOUNCE=${(config.encoderButtonDebounce || 50).toString()}\n`;
     
     await new Promise<void>(resolve => writeFile('./.env', newEnv, { encoding: 'utf8' }, err => {
       if (err) {
@@ -76,7 +80,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
     await setVolume(config.volume);
   
     if (config.localtunnel !== Config.localtunnel.subdomain) {
-      let actions = ['start', 'enable'];
+      let actions = ['enable', 'start'];
       if (config.localtunnel) {
         await setUrl(config.localtunnel);
       } else {

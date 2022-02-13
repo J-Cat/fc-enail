@@ -26,7 +26,7 @@ export const initGeneral = async (): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 8,
+        max: 10,
         menuItems: await getGeneralMenuItems(),
         onClick: processGeneralClick,
       },
@@ -46,6 +46,8 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
     `LT Subdomain: ${Config.localtunnel.subdomain}`,
     `Start Sound : ${Config.settings.startupSound}`,
     `Time Zone   : ${timezone}`,
+    `B1 Debounce : ${Config.button.debounce}`,
+    `B2 Debounce : ${Config.encoder.buttonDebounce}`,
   ];
 };
 
@@ -90,6 +92,8 @@ const processGeneralClick = async (index: number): Promise<void> => {
     localtunnel: Config.localtunnel.subdomain,
     volume,
     startupSound: Config.settings.startupSound,
+    buttonDebounce: Config.button.debounce,
+    encoderButtonDebounce: Config.encoder.buttonDebounce,
   };
   switch (index) {
   case 0: {
@@ -234,6 +238,36 @@ const processGeneralClick = async (index: number): Promise<void> => {
   }
   case 8: {
     await initTimezones();
+    break;
+  }
+  case 9: {
+    setNumberInput('Button Debounce', 0, 500, Config.button.debounce, async (value: number): Promise<void> => {
+      const result = await saveConfig({ ...config, buttonDebounce: value });
+      if (result.error) {
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+      }
+      setSharedState({
+        menu: getMenuUpdate({
+          menuItems: await getGeneralMenuItems(),
+          action: undefined,
+        }),
+      });
+    });
+    break;
+  }
+  case 10: {
+    setNumberInput('Encoder Button Debounce', 0, 500, Config.encoder.buttonDebounce, async (value: number): Promise<void> => {
+      const result = await saveConfig({ ...config, encoderButtonDebounce: value });
+      if (result.error) {
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+      }
+      setSharedState({
+        menu: getMenuUpdate({
+          menuItems: await getGeneralMenuItems(),
+          action: undefined,
+        }),
+      });
+    });
     break;
   }
   }

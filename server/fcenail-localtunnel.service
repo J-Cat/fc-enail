@@ -10,7 +10,7 @@ User=root
 WorkingDirectory=/root/.fcenail
 ExecStart=/usr/local/bin/fcenail-localtunnel
 EnvironmentFile=/etc/systemd/fcenail.conf
-Restart=on-failure
+Restart=always
 RestartSec=60
 
 [Install]

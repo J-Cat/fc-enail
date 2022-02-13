@@ -36,7 +36,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
     app.use(nocache());
     app.use(cors({
       allowedHeaders: [
-        'Content-Type', 'Authorization',
+        'Content-Type', 'Authorization', 'Bypass-Tunnel-Reminder',
       ],
     }));
     app.use(logger('dev'));

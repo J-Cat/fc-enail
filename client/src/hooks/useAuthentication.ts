@@ -24,12 +24,53 @@ export const useAuthentication = (): void => {
     const handle = Axios.interceptors.response.use(
       (response) => {
         return response;
-      }, (error) => {
-        if (
+      }, async (error) => {
+        if ((error.response?.status === HttpStatusCodes.NETWORK_AUTHENTICATION_REQUIRED)) {
+          // deal with loca.lt
+          const bodyHtml = (error.response?.data as string || '');
+          const re = /^[\s\S]*url:\s*"(\/continue\/[^"]+)"[\s\S]*$/igm;
+          if (!re.test(bodyHtml)) {
+            if (error.response?.config.url !== '/auth') {
+              if (!location.pathname.endsWith('login')) {
+                if ((Date.now() - lastLoginError)>2000) {
+                  Modal.error({
+                    centered: true,
+                    title: t('labels.Unauthorized', 'Unauthorized!'),
+                    content: t('error.unauthorized', 'Access denied to FC E-Nail: {{error}}', { error: error.message }),
+                  });  
+                }
+                lastLoginError = Date.now();
+              }
+              dispatch(logoutSoft()).then(() => {
+                history.push(`${Constants.CLIENT_BASE_PATH}login`);
+              });
+              return;  
+            }
+          }
+
+          const continueUrl = bodyHtml.replace(re, '$1');
+          console.log(`continue: ${continueUrl}`);
+
+          const result = await Axios({
+            //baseURL: (error.response as AxiosResponse<any>).,
+            url: continueUrl,
+            method: 'GET',
+          });
+          
+          if (result.status === HttpStatusCodes.OK) {
+            console.log(`continue successful: ${JSON.stringify(error.config)}`);
+            (window as Window).document.location.reload();
+            return Axios(error.config);
+          }
+          else {
+            console.error(`Error: ${JSON.stringify(error)}`);
+            throw error;
+          }
+        } else if (
           [
             HttpStatusCodes.UNAUTHORIZED, 
             HttpStatusCodes.FORBIDDEN, 
-            HttpStatusCodes.NETWORK_AUTHENTICATION_REQUIRED,
+            // HttpStatusCodes.NETWORK_AUTHENTICATION_REQUIRED,
           ].includes(error.response?.status)
         ) {
           if (error.response?.config.url !== '/auth') {

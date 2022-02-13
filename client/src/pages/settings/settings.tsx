@@ -14,6 +14,9 @@ import { IncludedSounds, ISounds } from '../../models/ISounds';
 import { DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const version = require('../../../package.json').version;
+
 interface IFormData {
   autoShutoff?: number;
   screenSaverTimeout?: number;
@@ -321,9 +324,15 @@ const SettingsPage: React.FC = () => {
           <Input disabled={requesting} />
         </Form.Item>
 
-        <div hidden={!url} className="localtunnel-me-link">
-          <a href={url}>{url}</a>
-        </div>
+        <Form.Item>
+          <div hidden={!url} className="localtunnel-me-link">
+            <a href={url}>{url}</a>
+          </div>
+        </Form.Item>
+
+        <Form.Item label={t('settings.versionlabel', 'Version')}>
+          <div>{version}</div>
+        </Form.Item>
 
         <Form.Item className="button-row">
           <Button type="primary" htmlType="submit" disabled={requesting || tuning || scriptRunning}>
