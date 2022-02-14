@@ -264,7 +264,7 @@ const HomePage: FC = () => {
                 <div className="profile-card-content-value">
                   <Select value={currentProfile} onChange={profileOnChange} disabled={tuning || scriptRunning}>
                     <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
-                    {profiles.sort((a, b) => a.title.localeCompare(b.title)).map(p => {
+                    {[...profiles].sort((a, b) => a.title.localeCompare(b.title)).map(p => {
                       return (
                         <Select.Option 
                           key={p.key} value={p.key}
@@ -294,7 +294,7 @@ const HomePage: FC = () => {
                         dispatch(setCurrentScriptReducer(value));
                       }}
                     >
-                      {scripts.sort((a, b) => a.title.localeCompare(b.title)).map(s => (
+                      {[...scripts].sort((a, b) => a.title.localeCompare(b.title)).map(s => (
                         <Select.Option key={s.key} value={s.key}>{s.title}</Select.Option>                      
                       ))}
                     </Select>

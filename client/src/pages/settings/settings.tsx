@@ -135,7 +135,7 @@ const SettingsPage: React.FC = () => {
 
     Modal.confirm({
       title: t('settings.deleteSoundConfirmTitle', 'Delete Sound File?'),
-      content: t('settings.rebootConfirmContent', 'Are you sure you want to delete the sound file, {{sound}}?', { sound: currentStartupSound }),
+      content: t('settings.deleteSoundConfirmContent', 'Are you sure you want to delete the sound file, {{sound}}?', { sound: currentStartupSound }),
       onOk: async () => {
         const result = await dispatch(deleteSound(currentStartupSound));
         if (result.error) {

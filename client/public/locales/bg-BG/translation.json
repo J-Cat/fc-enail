@@ -22,6 +22,8 @@
       "content": "Delete the {{profile}} profile?"
     }
   },
+  "FC E-Nail": "FC E-Nail",
+  "by J-Cat": "by J-Cat",
   "profiles": {
     "label": "Profile",
     "updateConfirm": "Update Profile?",
@@ -136,7 +138,8 @@
   "label": {
     "proportionalBand": "Proportional Band (P)",
     "integralTime": "Integral Time (I)",
-    "derivativeTime": "Derivative Time (D)"
+    "derivativeTime": "Derivative Time (D)",
+    "offset": "Offset"
   },
   "button": {
     "setActive": "Set Active",
@@ -148,6 +151,7 @@
     "waitForSP": "Wait for Set Point",
     "feedback": "Feedback",
     "timer": "Timer",
+    "updatePID": "Update PID Settings",
     "addstep": "Add Step"
   },
   "settings": {
@@ -155,8 +159,19 @@
       "title": "Error",
       "invalidParameters": "Invalid parameters specified",
       "sendconfig": "An error occured saving the configuration.",
-      "sendquicksets": "An error occured saving the presets."
+      "sendquicksets": "An error occured saving the presets.",
+      "upload": "An error occured uploading the sound file.",
+      "deleteSound": "An error occured deleting the sound file."
     },
+    "restartConfirm": "Restart Service?",
+    "restartConfirmContent": "Are you sure you want to restart the FC E-Nail service?",
+    "rebootConfirm": "Reboot Device?",
+    "rebootConfirmContent": "Are you sure you want to delete the sound file, {{sound}}?",
+    "deleteSoundConfirmTitle": "Delete Sound File?",
+    "confirmCheckForUpdatesTitle": "Check for Updates?",
+    "confirmCheckForUpdatesContent": "Check for updates?",
+    "confirmUpdateTimeTitle": "Update E-Nail Clock?",
+    "confirmUpdateTimeContent": "Would you like to update the E-Nail time with your current time, {{timeStr}}?",
     "volume": "Volume",
     "min": "Minimum",
     "max": "Maximum",
@@ -165,8 +180,16 @@
     "autoshutoff": "Auto Shutoff (in minutes)",
     "screenSaverTimeout": "Screen Saver Timeout (in minutes)",
     "screenOffTimeout": "Screen Off Timeout (in minutes)",
+    "startupSound": "Startup Sound",
+    "deletesound": "Delete Sound",
+    "upload": "Upload Sound",
     "localtunnel": "LocalTunnel.me Subdomain",
-    "buttonSave": "Save"
+    "versionlabel": "Version",
+    "buttonSave": "Save",
+    "buttonUpdateTime": "Update E-Nail Time",
+    "buttonCheckForUpdates": "Check for Updates",
+    "buttonRestart": "Restart Service",
+    "buttonReboot": "Reboot"
   },
   "success": {
     "savedConfig": {
@@ -219,10 +242,15 @@
   },
   "ENAIL": {
     "GET_STATE_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the e-nail state: {{error}}",
+    "GET_URL_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the e-nail public url: {{error}}",
     "SEND_STATE_UNKNOWN_ERROR": "An unknown error occured trying to send an update to the e-nail: {{error}}",
     "ERROR_SAVE_CONFIG": "An unknown error occured saving the configuration: {{error}}",
     "GET_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the quick-set values: {{error}}",
-    "SEND_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to update the quick-set values: {{error}}"
+    "SEND_QUICKSET_UNKNOWN_ERROR": "An unknown error occured trying to update the quick-set values: {{error}}",
+    "REBOOT_UNKNOWN_ERROR": "An unknown error occured trying to reboot the FC E-Nail: {{error}}",
+    "RESTART_UNKNOWN_ERROR": "An unknown error occured trying to restart the FC E-Nail service: {{error}}",
+    "CHECK_FOR_UPDATES_UNKNOWN_ERROR": "An unknown error occured issuing a request to check for updates: {{error}}",
+    "UPDATE_TIME_UNKNOWN_ERROR": "An unknown error occured trying to udpate the E-Nail clock: {{error}}"
   },
   "NETWORK": {
     "getNetworkConfigFailed": "Retrieving network information failed.",
@@ -243,5 +271,12 @@
     "RUN_SCRIPT_ERROR": "An unknown error occured trying to run the script: {{error}}",
     "SET_CURRENT_SCRIPT_ERROR": "An unknown error occured trying to set the current script: {{error}}",
     "DELETE_SCRIPT_ERROR": "An unknown error occured deleting the script: {{error}}"
+  },
+  "SDOUNDS": {
+    "GET_SOUNDS_UNKNOWN_ERROR": "An unknown error occured trying to retrieve the sounds: {{error}}"
+  },
+  "SOUNDS": {
+    "UPLOAD_SOUND_UNKNOWN_ERROR": "An unknown error occured trying to upload the sound: {{error}}",
+    "DELETE_SOUND_ERROR": "An unknown error occured deleting the sound: {{error}}"
   }
 }

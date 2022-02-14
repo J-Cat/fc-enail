@@ -191,7 +191,7 @@ const ProfilesPage: React.FC = () => {
       <Form.Item label={t('profiles.profile', 'Profile')} rules={[{ required: true }]}>
         <Select value={currentProfile} onChange={selectedOnChange}>
           <Select.Option key="new-profile" value="new-profile">-New-</Select.Option>
-          {profiles.sort((a, b) => a.title.localeCompare(b.title)).map(p => {
+          {[...profiles].sort((a, b) => a.title.localeCompare(b.title)).map(p => {
             return (
               <Select.Option 
                 key={p.key} value={p.key}

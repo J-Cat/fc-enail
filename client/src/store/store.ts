@@ -4,7 +4,6 @@ import { rootReducer, RootState } from './reducers/rootReducer';
 import { authMiddleware } from './middleware/authMiddleware';
 import { completeLogin } from './reducers/authReducer';
 import { Constants } from '../models/constants';
-import axios from 'axios';
 
 export const store = configureStore({
   reducer: rootReducer,

@@ -1,6 +1,6 @@
 {
   "name": "fcenail-client",
-  "version": "1.0.12-beta.19",
+  "version": "1.0.12-beta.22",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
@@ -34,7 +34,7 @@
     "react-i18next": "^11.7.3",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.0",
     "redux": "^4.0.5",
     "socket.io-client": "^3.0.1",
     "typescript": "4.0.5",

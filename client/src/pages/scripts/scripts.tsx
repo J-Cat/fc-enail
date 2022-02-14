@@ -149,7 +149,7 @@ const ScriptsPage: FC = () => {
       <Form.Item label={t('scripts.script', 'Script')} rules={[{ required: true }]}>
         <Select value={currentScript?.key} onChange={selectedOnChange}>
           <Select.Option key={Guid.EMPTY} value={Guid.EMPTY}>-New-</Select.Option>
-          {scripts.sort((a, b) => a.title.localeCompare(b.title)).map(p => {
+          {[...scripts].sort((a, b) => a.title.localeCompare(b.title)).map(p => {
             return (
               <Select.Option 
                 key={p.key} value={p.key}
@@ -166,7 +166,7 @@ const ScriptsPage: FC = () => {
             return;
           }
           const saveKey = openKey;
-          const newSteps = [...currentScript?.rootStep.steps];
+          const newSteps = [...(currentScript?.rootStep.steps || [])];
           newSteps.splice(result.destination.index, 0, newSteps.splice(result.source.index, 1)[0]);
           setCurrentScript({
             ...currentScript,

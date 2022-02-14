@@ -6,7 +6,6 @@ import Axios from 'axios';
 import i18n from '../../i18n';
 import { ISoundsState } from '../state/ISoundsState';
 import { ISounds } from '../../models/ISounds';
-import { parse } from 'path';
 
 const initialState: ISoundsState = {
   loaded: false,
