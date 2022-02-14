@@ -2,9 +2,10 @@ import { Button, Collapse, Form, Input, InputNumber, Select } from 'antd';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Icons, IIcon } from '../models/icons';
-import { IStep, StepTypeEnum, ISequentialStep, IFeedbackStep, ITimerStep, IUpdateSetPointStep, IWaitForSetPointStep } from '../models/IScript';
+import { IStep, StepTypeEnum, ISequentialStep, IFeedbackStep, ITimerStep, IUpdateSetPointStep, IWaitForSetPointStep, IUpdatePIDStep } from '../models/IScript';
 import { ISounds } from '../models/ISounds';
 import { RootState } from '../store/reducers/rootReducer';
+import { IProfile } from '../store/state/IProfileState';
 
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
@@ -28,6 +29,8 @@ export const parseIntDefault = (value: string, defaultValue: number): number => 
 
 export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose, onDelete }: IStepProps) => {
   const Sounds = useSelector<RootState, ISounds>(state => state.sounds.sounds);
+  const profile = useSelector<RootState, IProfile|undefined>(state => state.profiles.profiles.find(p => p.key === state.profiles.currentProfile));
+
   const getString = () => {
     switch (step.type) {
     case StepTypeEnum.SequentialStep: {
@@ -55,6 +58,9 @@ export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose
     }
     case StepTypeEnum.WaitForSetPointStep: {
       return 'Wait for Set Point';
+    }
+    case StepTypeEnum.UpdatePIDStep: {
+      return 'Update PID';
     }
     }
   };
@@ -178,6 +184,38 @@ export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose
     </React.Fragment>;    
   };
 
+  const renderUpdatePIDStep = (typedStep: IUpdatePIDStep): JSX.Element => {
+    return <React.Fragment>
+      <FormItem label="Current PID Settings">
+        <div>{profile?.p}/{profile?.i}/{profile?.d}</div>
+      </FormItem>
+      <FormItem label="P Offset">
+        <InputNumber defaultValue={typedStep.pOffset} onBlur={(value) => {
+          onChange?.({
+            ...step, 
+            pOffset: parseIntDefault(value.target.value, typedStep.pOffset),
+          } as IUpdatePIDStep);
+        }} />
+      </FormItem>
+      <FormItem label="I Offset">
+        <InputNumber defaultValue={typedStep.iOffset} onBlur={(value) => {
+          onChange?.({
+            ...step, 
+            iOffset: parseIntDefault(value.target.value, typedStep.iOffset),
+          } as IUpdatePIDStep);
+        }} />
+      </FormItem>
+      <FormItem label="D Offset">
+        <InputNumber defaultValue={typedStep.dOffset} onBlur={(value) => {
+          onChange?.({
+            ...step, 
+            dOffset: parseIntDefault(value.target.value, typedStep.dOffset),
+          } as IUpdatePIDStep);
+        }} />
+      </FormItem>
+    </React.Fragment>;    
+  };
+
   const StepWrapper = (contents: JSX.Element): JSX.Element => {
     return <div>
       {contents}
@@ -209,6 +247,9 @@ export const Step: React.FC<IStepProps> = ({ step, isOpen, onChange, onOpenClose
     }
     case StepTypeEnum.UpdateSetPointStep: {
       return StepWrapper(renderUpdateSetPointStep(step as IUpdateSetPointStep));
+    }
+    case StepTypeEnum.UpdatePIDStep: {
+      return StepWrapper(renderUpdatePIDStep(step as IUpdatePIDStep));
     }
     }
     return <React.Fragment />;

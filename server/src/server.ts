@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { closeDisplay } from './hardware/display';
-import { closeE5cc, initE5cc } from './hardware/e5cc';
+import { closeE5cc, getPidSettings, initE5cc } from './hardware/e5cc';
 import { IE5ccState } from './models/IE5ccState';
 import { closeEncoder, initEncoder, setEncoderValue } from './hardware/rotaryEncoder';
 import { registerConfigChange } from './config';
@@ -219,7 +219,11 @@ const onSharedStateChange = async (
 
   initEncoder(Config.encoder.A, Config.encoder.B, Config.encoder.S, onEncoderChange, onEncoderClick, onEncoderLongClick);
 
-  initE5cc(onE5ccChange);
+  await initE5cc(onE5ccChange);
+
+  setSharedState({
+    pid: await getPidSettings(),
+  });
   
   await initSound();
 })();

@@ -40,4 +40,5 @@ export interface ISharedState extends IE5ccState {
   showMessage?: boolean;
   scriptRunning?: boolean;
   scriptFeedback?: IScriptFeedback;
+  pid?: { p: number; i: number; d: number; offset: number; }
 }

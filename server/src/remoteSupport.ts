@@ -10,7 +10,8 @@ let Config = registerConfigChange('remote-support', newConfig => {
 let encoderStart = 0;
 let gpioEncoder: Gpio | undefined;
 
-let supportShell: ChildProcess | undefined;
+let supportShell: ChildProcess | undefined = undefined;
+
 export const toggleSupportShell = async (): Promise<string|void> => {
   if (supportShell) {
     process.kill(-supportShell.pid);

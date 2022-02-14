@@ -4,7 +4,7 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { IFeedbackStep, IScript, ITimerStep, IUpdateSetPointStep, IWaitForSetPointStep, StepTypeEnum } from '../../models/IScript';
+import { IFeedbackStep, IScript, ITimerStep, IUpdatePIDStep, IUpdateSetPointStep, IWaitForSetPointStep, StepTypeEnum } from '../../models/IScript';
 import { RootState } from '../../store/reducers/rootReducer';
 import { deleteScript, saveScript } from '../../store/reducers/scriptReducer';
 import { AppDispatch } from '../../store/store';
@@ -306,6 +306,8 @@ const ScriptsPage: FC = () => {
                   {
                     key: Guid.create().toString(),
                     type: StepTypeEnum.WaitForSetPointStep,
+                    offset: 2,
+                    timeout: 120,
                   } as IWaitForSetPointStep,
                   ],
                 },
@@ -355,6 +357,32 @@ const ScriptsPage: FC = () => {
               });
             }}>
               {t('button.timer', 'Timer')}
+            </Menu.Item>
+            <Menu.Item key="menu-update-pid" onClick={() => {
+              //console.log(JSON.stringify(currentScript, null, ' '));
+              if (!currentScript) {
+                return;
+              }
+
+              const newScript = {
+                ...currentScript,
+                rootStep: {
+                  ...currentScript.rootStep,
+                  steps: [
+                    ...currentScript.rootStep.steps,
+                  {
+                    key: Guid.create().toString(),
+                    type: StepTypeEnum.UpdatePIDStep,
+                    pOffset: 0,
+                    iOffset: 0,
+                    dOffset: 0,
+                  } as IUpdatePIDStep,
+                  ],
+                },
+              };
+              setCurrentScript(newScript);
+            }}>
+              {t('button.updatePID', 'Update PID Settings')}
             </Menu.Item>
           </Menu>
           }

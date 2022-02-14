@@ -8,6 +8,7 @@ import { Lock } from '../utility/Lock';
 import { registerStateChange } from '../dao/sharedState';
 import { showMessage } from './display';
 import { playSound } from './sound';
+import { stringify } from 'querystring';
 
 let Config = registerConfigChange('e5cc', newConfig => {
   Config = newConfig;
@@ -42,6 +43,18 @@ registerStateChange('e5cc', async (oldState, newState, source) => {
   }
   if (newState.sp && oldState?.sp !== newState.sp) {
     await updateE5ccSetPoint(newState.sp);
+  }
+
+  if (
+    (newState.pid && oldState?.pid) 
+    && (
+      oldState?.pid.p !== newState.pid.p 
+      || oldState.pid.i !== newState.pid.i 
+      || oldState.pid.d !== newState.pid.d
+      || oldState.pid.offset !== newState.pid.offset
+    ))
+  {
+    await setPidSettings(newState.pid.p, newState.pid.i, newState.pid.d, newState.pid.offset);
   }
   
   if (newState.mode === 'presets') {

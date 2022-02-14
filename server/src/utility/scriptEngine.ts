@@ -2,7 +2,7 @@ import { Font, Ioledjs } from 'ssd1306-i2c-js';
 import { drawMessage, showMessage } from '../hardware/display';
 import { playSound } from '../hardware/sound';
 import { getTimeString } from './getTimeString';
-import { IScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep, IWaitForSetPointStep } from '../models/IScript';
+import { IScript, IStep, StepTypeEnum, ISequentialStep, IUpdateSetPointStep, ITimerStep, IFeedbackStep, IWaitForSetPointStep, IUpdatePIDStep } from '../models/IScript';
 import { setCurrentScript } from '../dao/scriptsDao';
 import { registerStateChange, setSharedState } from '../dao/sharedState';
 
@@ -14,7 +14,11 @@ let state = registerStateChange('script-engine', async (oldState, newState): Pro
 
 export const runScript = async (script: IScript): Promise<void> => {
   //
-  const startingSetPoint = state.sp;
+  const startingSetPoint = state.sp;  
+  
+  const pidStep = hasPidStep(script.rootStep);
+  const startingPidSettings = state.pid;
+  
   const menus = [...state.menu || []];
   menus.pop();
   await setCurrentScript(script.key);
@@ -37,6 +41,11 @@ export const runScript = async (script: IScript): Promise<void> => {
     } as { start: number; text?: string; icon?: string }
   });
   await runStep(script.rootStep);
+  if (pidStep) {
+    await setSharedState({
+      pid: startingPidSettings,
+    });
+  }
   if (startingSetPoint) {
     await setSharedState({
       sp: startingSetPoint,
@@ -117,6 +126,10 @@ export const runStep = async (step: IStep): Promise<void> => {
     await runFeedbackStep(step);
     break;
   }
+  case StepTypeEnum.UpdatePIDStep: {
+    await runUpdatePIDStep(step as IUpdatePIDStep);
+    break;
+  }
   }
 };
 
@@ -173,10 +186,50 @@ export const runFeedbackStep = async (step: IFeedbackStep): Promise<void> => {
   }
 };
 
+export const runUpdatePIDStep = async (step: IUpdatePIDStep): Promise<void> => {
+  if (!state.pid) {
+    return;
+  }
+  const newPid = {
+    p: state.pid.p + step.pOffset,
+    i: state.pid.i + step.iOffset,
+    d: state.pid.d + step.dOffset,
+    offset: state.pid.offset,
+  };
+  await setSharedState({
+    pid: newPid,
+    scriptFeedback: {
+      ...state.scriptFeedback,
+      text: `PID: ${newPid.p}/${newPid.i}/${newPid.d}`,
+    } as { start: number, text: string; icon?: string },
+  });
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  await setSharedState({
+    scriptFeedback: {
+      ...state.scriptFeedback,
+      text: undefined,
+    } as { start: number; text?: string; icon?: string }
+  });
+};
+
 export const renderRunningScript = async (display: Ioledjs): Promise<void> => {
   display.clearScreen();
   const text = state.scriptFeedback?.text
     || (state.scriptFeedback?.start ? `Elapsed: ${getTimeString(Date.now() - state.scriptFeedback?.start)}` : '');
   await drawMessage(text, Font.UbuntuMono_10ptFontInfo, state.scriptFeedback?.icon);
   display.refresh();
+};
+
+const hasPidStep = (step: IStep): boolean => {
+  if (step.type === StepTypeEnum.UpdatePIDStep) {
+    return true;
+  }
+  if (step.type === StepTypeEnum.SequentialStep) {
+    for (const subStep of (step as ISequentialStep).steps) {
+      if (hasPidStep(subStep)) {
+        return true;
+      }
+    }
+  }
+  return false;
 };

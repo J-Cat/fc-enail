@@ -10,6 +10,7 @@ export enum StepTypeEnum {
   FeedbackStep,
   TimerStep,
   WaitForSetPointStep,
+  UpdatePIDStep,
 }
 export interface IStep {
   key: string;
@@ -41,7 +42,13 @@ export interface IWaitForSetPointStep extends IStep {
   offset: number;
 }
 
-export type StepType = ISequentialStep | IUpdateSetPointStep | IFeedbackStep | ITimerStep | IWaitForSetPointStep;
+export interface IUpdatePIDStep extends IStep {
+  pOffset: number;
+  iOffset: number;
+  dOffset: number;
+}
+
+export type StepType = ISequentialStep | IUpdateSetPointStep | IFeedbackStep | ITimerStep | IWaitForSetPointStep | IUpdatePIDStep;
 
 export interface Step extends IStep {
   toString: () => string;
