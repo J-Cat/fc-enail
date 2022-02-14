@@ -51,7 +51,7 @@
     "nocache": "^2.1.0",
     "oled-font-5x7": "^1.0.3",
     "onoff": "^6.0.1",
-    "openssl": "^1.1.0",
+    "openssl": "^2.0.0",
     "pigpio": "^3.3.0",
     "rpi-oled": "^0.9.1",
     "socket.io": "^3.0.0",
