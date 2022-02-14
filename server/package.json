@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.12-beta.23",
+  "version": "1.0.12-beta.24",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -73,6 +73,6 @@
     "eslint": "^7.13.0",
     "ts-node": "^9.0.0",
     "ts-node-dev": "^1.0.0",
-    "typescript": "^4.0.5"
+    "typescript": "~4.3.5"
   }
 }
