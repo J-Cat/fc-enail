@@ -2,14 +2,17 @@ import { setEncoderValue } from '../hardware/rotaryEncoder';
 import { getCurrentProfile, getCurrentScript, getProfiles, getScripts } from '../dao/localDb';
 import { registerStateChange, setNextMode, setPreviousMode, setSharedState } from '../dao/sharedState';
 import { IMenu } from '../models/IMenu';
+import { initSettingsMenu } from './settingsMode';
 
 let state = registerStateChange('menu', async (oldState, newState): Promise<void> => {
   state = newState;
   if (oldState?.mode !== newState.mode) {
     switch (newState.mode) {
     case 'settings': {
+      const settingsMenu = await initSettingsMenu();
       setSharedState({
-        menu: newState.menus?.[0],
+        menus: [[settingsMenu], ...(newState.menus?.slice(1) || [])],
+        menu: [settingsMenu],
       });  
       break;
     }

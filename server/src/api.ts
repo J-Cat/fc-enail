@@ -72,7 +72,7 @@ export const Api = (port = 8000, baseRoutePath = ''): Server => {
       // always resolve service worker
       if (req.url.endsWith('/service-worker.js')) {
         const url = path.join(
-          process.env.API_CLIENT_PATH || path.join(__dirname, '../client'), 
+          process.env.API_CLIENT_PATH || path.join(__dirname, 'client'), 
           'service-worker.js'
         );
 

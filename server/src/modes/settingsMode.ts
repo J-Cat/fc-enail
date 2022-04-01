@@ -13,6 +13,8 @@ import { showMessage } from '../hardware/display';
 import { checkForUpdates } from '../dao/systemDao';
 import { isSupportShellEnabled, toggleSupportShell } from '../remoteSupport';
 import { Font } from 'ssd1306-i2c-js';
+import { getTunnelStatus, toggleTunnelActive, toggleTunnelEnabled } from '../localtunnel';
+import { initRemoteAccess } from './settings/remoteAccess';
 
 let state = registerStateChange('mode-settings', async (oldState, newState): Promise<void> => {
   state = newState;
@@ -23,11 +25,14 @@ export const SettingsMode: IModeInstance = {
   key: 'settings',
 } as IModeInstance;
 
-export const initSettingsMenu = (): IMenu => {
+export const initSettingsMenu = async (): Promise<IMenu> => {
   return {
-    current: 0, min: 0, max: 6,
+    current: 0, min: 0, max: 7,
     icon: Icons.gear,
-    menuItems: ['Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 'Network Info', 'Check for Updates', 'Support Shell'],
+    menuItems: [
+      'Presets', 'General', 'Connect WiFi', 'Enable Hotspot', 
+      'Network Info', 'Check for Updates', 'Remote Access', 'Support Shell',
+    ],
     onClick: async (index: number): Promise<void> => {
       const menus = [...(state.menu || [])];
       if (menus.length === 0) {
@@ -86,7 +91,11 @@ export const initSettingsMenu = (): IMenu => {
         );        
         break;
       }
-      case 6: { // enable support
+      case 6: { // remote access
+        await initRemoteAccess();
+        break;
+      }
+      case 7: { // enable support
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         
         await setPromptInput(

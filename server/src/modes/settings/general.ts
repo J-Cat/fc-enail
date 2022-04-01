@@ -26,7 +26,7 @@ export const initGeneral = async (): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 10,
+        max: 9,
         menuItems: await getGeneralMenuItems(),
         onClick: processGeneralClick,
       },
@@ -43,7 +43,6 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
     `Auto Shutoff: ${Config.e5cc.autoShutoff}`,
     `Screen Saver: ${Config.display.screenSaverTimeout}`,
     `Screen Off  : ${Config.display.screenOffTimeout}`,
-    `LT Subdomain: ${Config.localtunnel.subdomain}`,
     `Start Sound : ${Config.settings.startupSound}`,
     `Time Zone   : ${timezone}`,
     `B1 Debounce : ${Config.button.debounce}`,
@@ -187,21 +186,6 @@ const processGeneralClick = async (index: number): Promise<void> => {
     break;
   }
   case 6: {
-    setTextInput('Localtunnel.me', Config.localtunnel.subdomain, async (text: string): Promise<void> => {
-      const result = await saveConfig({ ...config, localtunnel: text });
-      if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
-      }
-      setSharedState({
-        menu: getMenuUpdate({
-          menuItems: await getGeneralMenuItems(),
-          action: undefined,
-        }),
-      });
-    });
-    break;
-  }
-  case 7: {
     const sounds = Object.keys((await getSounds()));
     if (sounds.length <= 0) {
       break;
@@ -236,11 +220,11 @@ const processGeneralClick = async (index: number): Promise<void> => {
     });
     break;
   }
-  case 8: {
+  case 7: {
     await initTimezones();
     break;
   }
-  case 9: {
+  case 8: {
     setNumberInput('Button Debounce', 0, 500, Config.button.debounce, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, buttonDebounce: value });
       if (result.error) {
@@ -255,7 +239,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     });
     break;
   }
-  case 10: {
+  case 9: {
     setNumberInput('Encoder Button Debounce', 0, 500, Config.encoder.buttonDebounce, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, encoderButtonDebounce: value });
       if (result.error) {

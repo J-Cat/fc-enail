@@ -216,7 +216,13 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
    sudo apt-get install git
 
-7. Install fcenail
+7. Install tmate (version 2.4 at time of writing this)
+
+   Install tmate using the download from the releases page.  Expand the download and copy the "tmate" file to the /usr/local/bin folder.
+  
+   [https://github.com/tmate-io/tmate/releases](https://github.com/tmate-io/tmate/releases)
+
+8. Install fcenail
 
    sudo npm install -g fcenail --unsafe
 
@@ -225,6 +231,9 @@ This project is inspired by the FC Community and a desire to have a better E-Nai
 
 * Typescript
 * ReactJS/Redux
+* NodeJS
+* ExpressJS
+* Socket.IO
 * Raspberry Pi
 * Omron E5CC-QX2ASM-802
 
@@ -239,3 +248,4 @@ This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 In
 ## Acknowledgments
 
 * Thanks to Rocco Musolino, Patrik Melander, Maciej Sopyło for the ALSA aplay module being used here-in.
+* Thanks to Nicolas Vienot from tmate.io

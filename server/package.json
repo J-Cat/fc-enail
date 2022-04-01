@@ -1,6 +1,6 @@
 {
   "name": "fcenail",
-  "version": "1.0.12-beta.24",
+  "version": "1.0.12-beta.43",
   "main": "dist/server.js",
   "license": "CC-BY-NC-4.0",
   "readme": "README.md",
@@ -57,6 +57,7 @@
     "socket.io": "^3.0.0",
     "socketio-jwt": "^4.6.2",
     "ssd1306-i2c-js": "https://github.com/J-Cat/ssd1306-i2c-js",
+    "systemd-status": "^1.2.0",
     "underscore": "^1.13.2"
   },
   "devDependencies": {

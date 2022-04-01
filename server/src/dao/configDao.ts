@@ -88,7 +88,7 @@ export const saveConfig = async (config: IConfig): Promise<{ error?: string }> =
         await setUrl('');
       }
       for (const action of actions) {
-        await exec(`systemctl ${action} fcenail-localtunnel.service`);
+        await exec(`sudo systemctl ${action} fcenail-localtunnel.service`);
       }
     }
     

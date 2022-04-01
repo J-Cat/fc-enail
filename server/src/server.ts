@@ -192,7 +192,7 @@ const onSharedStateChange = async (
 
   await initLocalDb();
 
-  const settingsMenu = initSettingsMenu();
+  const settingsMenu = await initSettingsMenu();
   setSharedState({
     menu: [settingsMenu],
     menus: [

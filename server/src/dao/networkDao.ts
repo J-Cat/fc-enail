@@ -29,7 +29,14 @@ export const getNetworkInfo = async (): Promise<{ error?: string, stdout?: strin
   }
   const ssids = getSsids();
 
-  return { network: { mode, ssid, address, ssids } };
+  return { 
+    network: { 
+      mode, 
+      ssid, 
+      address: address.indexOf('/')>0 ? address.substr(0, address.indexOf('/')) : address, 
+      ssids,
+    } 
+  };
 };
 
 export const scan = async (): Promise<{error?: string, stdout?: string, stderr?: string, ssids?: string[]}> => {

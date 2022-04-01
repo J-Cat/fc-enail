@@ -3,14 +3,14 @@ import localtunnel from 'localtunnel';
 // import mail from '@sendgrid/mail';
 import { registerConfigChange } from './config';
 import { initLocalDb, getUrl, setUrl } from './dao/localDb';
+import { exec } from './utility/exec';
+import { ISystemdStatus, systemdStatus } from './utility/systemd-status';
 
 let Config = registerConfigChange('localtunnel', newConfig => {
   Config = newConfig;
 });
 
-let tunnel: localtunnel.Tunnel | undefined;
-
-export const initTunnel = async (): Promise<void> => {
+export const initTunnel = async (): Promise<localtunnel.Tunnel|void> => {
   dotenv.config();
 
   await initLocalDb();
@@ -20,7 +20,7 @@ export const initTunnel = async (): Promise<void> => {
       return;
     }
 
-    tunnel = await new Promise<localtunnel.Tunnel>((resolve, reject) => {
+    const tunnel = await new Promise<localtunnel.Tunnel>((resolve, reject) => {
       try {
         setTimeout(() => { reject('Connection to localtunnel.me timed out.'); }, 10000);
 
@@ -39,6 +39,8 @@ export const initTunnel = async (): Promise<void> => {
     if (getUrl() !== tunnel.url) {
       await setUrl(tunnel.url);
     }
+
+    return tunnel;
 
     // if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY.length
     //   && process.env.EMAIL_FROM && process.env.EMAIL_TO && process.env.SUBJECT) {
@@ -59,35 +61,19 @@ export const initTunnel = async (): Promise<void> => {
   }
 };
 
-initTunnel();
-
-process.stdin.resume();//so the program will not close instantly
-
-const exitHandler = (options: { cleanup?: boolean; exit?: boolean }, exitCode?: number): void => {
-  if (options.cleanup) {
-    console.log('Cleaning up before exit.');
-    tunnel?.close();
-  }
-  if (exitCode || exitCode === 0) {
-    console.log(exitCode);
-  }
-  if (options.exit) {
-    process.exit(exitCode);
-  }
+export const getTunnelStatus = async (): Promise<ISystemdStatus|void> => {
+  const status = await systemdStatus('fcenail-localtunnel');
+  return status;
 };
 
-//do something when app is closing
-process.on('exit', exitHandler.bind(null,{cleanup:true}, 0));
+export const toggleTunnelActive = async (): Promise<ISystemdStatus|void> => {
+  const status = await getTunnelStatus();
+  await exec(`sudo systemctl ${status?.isActive ? 'stop' : 'start'} fcenail-localtunnel.service`);
+  return (await getTunnelStatus());
+};
 
-//catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}, 0));
-
-// CATCHES TERMINATE
-process.on('SIGTERM', exitHandler.bind(null, {exit:true}, 0));
-
-// catches "kill pid" (for example: nodemon restart)
-process.on('SIGUSR1', exitHandler.bind(null, {exit:true}, 1));
-process.on('SIGUSR2', exitHandler.bind(null, {exit:true}, 1));
-
-//catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}, 2));
+export const toggleTunnelEnabled = async (): Promise<ISystemdStatus|void> => {
+  const status = await getTunnelStatus();
+  await exec(`sudo systemctl ${status?.isDisabled ? 'enable' : 'disable'} fcenail-localtunnel.service`);
+  return (await getTunnelStatus());
+};
