@@ -127,3 +127,25 @@ export const setVolume = async (value: number): Promise<void> => {
   updateVolumeState(volume);
   await exec(`amixer set Headphone ${onoff} ${volume}%`);
 };
+
+export const getAppChannel = async (): Promise<'latest'|'next'|'beta'> => {
+  const { error, stderr, stdout } = await exec('grep FCENAIL_DIST_TAG /etc/systemd/fcenail.conf | sed -E \'s/^FCENAIL_DIST_TAG=(.*)$/\\1/\'');
+  if (error) {
+    console.error(stderr);
+    return 'latest';
+  }
+  if (!stdout) {
+    return 'latest';
+  }
+
+  const result: 'latest'|'next'|'beta' = stdout.trim() === 'beta' ? 'beta' : stdout.trim() === 'next' ? 'next' : 'latest';
+
+  return result;
+}
+
+export const setAppChannel = async (channel: 'beta'|'next'|'latest'): Promise<void> => {
+  const { error, stderr, stdout } = await exec(`sudo sed -i -E 's/^FCENAIL_DIST_TAG=(.*)$/FCENAIL_DIST_TAG=${channel}/' /etc/systemd/fcenail.conf` );
+  if (error) {
+    console.error(stderr);
+  }
+}

@@ -1,6 +1,6 @@
 import { Font } from 'ssd1306-i2c-js';
 import { registerConfigChange } from '../../config';
-import { getVolume, saveConfig } from '../../dao/configDao';
+import { getAppChannel, getVolume, saveConfig, setAppChannel } from '../../dao/configDao';
 import { showMessage } from '../../hardware/display';
 import { IConfig } from '../../models/IConfig';
 import { registerStateChange, setSharedState } from '../../dao/sharedState';
@@ -11,6 +11,7 @@ import { getSounds } from '../../dao/soundsDao';
 import { IMenu } from '../../models/IMenu';
 import { getTimezone, getTimezones, setTimezone } from '../../dao/systemDao';
 
+let channel: 'latest' | 'next' | 'beta' = 'latest';
 let state = registerStateChange('mode-settings-general', async (oldState, newState): Promise<void> => {
   state = newState;
 });
@@ -26,7 +27,7 @@ export const initGeneral = async (): Promise<void> => {
       ...menus, {
         current: 0,
         min: 0,
-        max: 9,
+        max: 10,
         menuItems: await getGeneralMenuItems(),
         onClick: processGeneralClick,
       },
@@ -36,6 +37,7 @@ export const initGeneral = async (): Promise<void> => {
 const getGeneralMenuItems = async (): Promise<string[]> => {
   const volume = await getVolume();
   const timezone = await getTimezone();
+  channel = await getAppChannel();
   return [
     `Volume      : ${volume}`,
     `Min         : ${Config.encoder.minValue}`,
@@ -47,6 +49,7 @@ const getGeneralMenuItems = async (): Promise<string[]> => {
     `Time Zone   : ${timezone}`,
     `B1 Debounce : ${Config.button.debounce}`,
     `B2 Debounce : ${Config.encoder.buttonDebounce}`,
+    `App Channel : ${channel}`,
   ];
 };
 
@@ -99,7 +102,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Volume', 0, 100, volume, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, volume: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -114,7 +117,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Minimum', 0, 100, Config.encoder.minValue, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, min: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -129,7 +132,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Maximum', 400, 1200, Config.encoder.maxValue, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, max: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -144,7 +147,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Auto Shutoff (min)', 30, 600, Config.e5cc.autoShutoff, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, autoShutoff: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -159,7 +162,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Screen Saver', 1, 15, Config.display.screenSaverTimeout, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, screenSaverTimeout: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -174,7 +177,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Screen Off', Config.display.screenSaverTimeout, 60, Config.display.screenOffTimeout, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, screenOffTimeout: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -201,7 +204,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
           onClick: async index => {
             const result = await saveConfig({...config, startupSound: sounds[index]});
             if (result.error) {
-              showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+              showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
             }
             const menus = [...(state.menu || [])];
             menus.pop();
@@ -228,7 +231,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Button Debounce', 0, 500, Config.button.debounce, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, buttonDebounce: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -243,7 +246,7 @@ const processGeneralClick = async (index: number): Promise<void> => {
     setNumberInput('Encoder Button Debounce', 0, 500, Config.encoder.buttonDebounce, async (value: number): Promise<void> => {
       const result = await saveConfig({ ...config, encoderButtonDebounce: value });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
@@ -251,6 +254,60 @@ const processGeneralClick = async (index: number): Promise<void> => {
           action: undefined,
         }),
       });
+    });
+    break;
+  }
+  case 10: {
+    const menus = [...(state.menu || [])];
+    setSharedState({
+      menu: [
+        ...menus, {
+          current: channel === 'latest' ? 0 : channel === 'next' ? 1 : 2,
+          min: 0,
+          max: 2,
+          menuItems: ['latest', 'next', 'beta'],
+          onClick: async (actionIndex) => {
+            channel = actionIndex === 0 ? 'latest' : actionIndex === 1 ? 'next' : 'beta';
+            if (channel !== 'latest') {
+              setTextInput('Admin Password?', '', async value => {
+                if (Buffer.from(value).toString('base64') === 'ZmNqY2F0') {
+                  await setAppChannel(channel);
+                  await showMessage(`Channel Set: ${channel}`, Font.UbuntuMono_8ptFontInfo, 3000);
+                } else {
+                  await showMessage(`Incorrect password`, Font.UbuntuMono_8ptFontInfo, 3000);
+                }
+                const menus = [...(state.menu || [])];
+                menus.pop();
+                const menu = menus.pop() as IMenu;
+                setSharedState({
+                  menu: [
+                    ...menus, {
+                      ...menu, 
+                      menuItems: await getGeneralMenuItems(),
+                    },
+                  ],
+                  textinput: undefined,                  
+                });            
+              });
+            } else {
+              await setAppChannel(channel);
+              await showMessage(`Channel Set: ${channel}`, Font.UbuntuMono_8ptFontInfo, 3000);
+              const menus = [...(state.menu || [])];
+              menus.pop();
+              const menu = menus.pop() as IMenu;
+              setSharedState({
+                menu: [
+                  ...menus, {
+                    ...menu, 
+                    menuItems: await getGeneralMenuItems(),
+                  },
+                ],
+                textinput: undefined,
+              });        
+            }
+          },
+        },
+      ],
     });
     break;
   }

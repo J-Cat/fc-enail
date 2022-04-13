@@ -62,20 +62,20 @@ const processRemoteAccessClick = async (index: number): Promise<void> => {
       setTextInput('Localtunnel.me', Config.localtunnel.subdomain, async (text: string): Promise<void> => {
       const result = await saveConfig({ ...config, localtunnel: text });
       if (result.error) {
-        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 5000);
+        showMessage(result.error, Font.UbuntuMono_8ptFontInfo, 3000);
       }
       setSharedState({
         menu: getMenuUpdate({
           menuItems: await getRemoteAccessMenuItems(),
           action: undefined,
         }),
+        textinput: undefined,
       });
     });
     break;
     }
     case 1: { // enable/disable remote access
       const tunnelStatus = await getTunnelStatus();
-      console.log(JSON.stringify(tunnelStatus));
       await setPromptInput(
         `${tunnelStatus?.isDisabled ? 'Enable' : 'Disable' } Remote Access?`,
         async (): Promise<void> => {

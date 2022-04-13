@@ -459,7 +459,7 @@ export const drawMessage = async (text: string, font: Font = Font.UbuntuMono_10p
   }
 };
 
-export const showMessage = async (text: string, font: Font = Font.UbuntuMono_10ptFontInfo, timeout = 5000): Promise<void> => {
+export const showMessage = async (text: string, font: Font = Font.UbuntuMono_10ptFontInfo, timeout = 3000): Promise<void> => {
   try {
     isMessage = true;
     setSharedState({

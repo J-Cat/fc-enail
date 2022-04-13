@@ -182,7 +182,7 @@ const saveProfileLocal = async (profile: IProfile, continueEdit = false, pos = 0
   if (profile) {
     const { error, updated } = await saveProfile(profile);
     if (error) {
-      showMessage(error, Font.UbuntuMono_8ptFontInfo, 5000);
+      showMessage(error, Font.UbuntuMono_8ptFontInfo, 3000);
       return;
     }
     profiles = getProfiles();
