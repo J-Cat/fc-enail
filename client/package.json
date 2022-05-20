@@ -1,6 +1,6 @@
 {
   "name": "fcenail-client",
-  "version": "1.0.12",
+  "version": "1.0.13-beta.3",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.2.2",

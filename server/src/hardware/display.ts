@@ -134,73 +134,91 @@ export const closeDisplay = (): void => {
 };
 
 const renderHome = () => {
+  let [ width, height ] = fontSize(Font.UbuntuMono_14ptFontInfo);
   display.setFont(Font.UbuntuMono_14ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
+  const timeStr = state.running && timer >= 0 ? getTimeString(timer) : dayjs(Date.now()).format('h:mm');
+
+  const maxX = 124 - (18 + (width * timeStr.length));
+  const maxY = 64 - (2 + height);
+
+  updateScreenSaverPos(
+    maxX,
+    maxY,
+  );
+
   if (state.running && timer >= 0) {
-    drawBitmap(0, 0, getHourglass());
-    display.drawString(18, 2, getTimeString(timer), 1, Color.White, Layer.Layer0);
+    drawBitmap(pos.x, pos.y, getHourglass());
+    display.drawString(pos.x+18, pos.y+2, timeStr, 1, Color.White, Layer.Layer0);
   } else {
-    drawBitmap(0, 0, Icons.clock);
-    display.drawString(18, 2, dayjs(Date.now()).format('h:mm'), 1, Color.White, Layer.Layer0);
+    drawBitmap(pos.x, pos.y, Icons.clock);
+    display.drawString(pos.x+18, pos.y+2, timeStr, 1, Color.White, Layer.Layer0);
   }
 
   display.setFont(Font.UbuntuMono_24ptFontInfo);
-  updateScreenSaverPos(
-    state.nocoil ? 50 : 64,
-    state.nocoil ? 46 : 40
-  );
+
+  if (
+    ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
+    && (screenSaverDisabled !== 0)
+  ) {
+    display.refresh();
+    return;
+  }
 
   if (state.nocoil) {
     display.setFont(Font.UbuntuMono_16ptFontInfo);
-    display.drawString(pos.x, pos.y, 'NO COIL', 1, Color.White, Layer.Layer0);
+    display.drawString(50, 46, 'NO COIL', 1, Color.White, Layer.Layer0);
   } else {
-    display.drawString(pos.x, pos.y, `${(state.pv || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
+    display.drawString(64, 40, `${(state.pv || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
   }
 
-  if (
-    ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) > 0) 
-    || (screenSaverDisabled === 0)
-  ) {
-    drawBitmap(0, 48, Icons.home);
-  }
+  drawBitmap(0, 48, Icons.home);
 
   display.refresh();
 };
 
 const renderPresets = () => {
+  const isScreenSaver = ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
+    && (screenSaverDisabled !== 0);
+
+  let [ width, height ] = fontSize(Font.UbuntuMono_14ptFontInfo);
+  
   display.setFont(Font.UbuntuMono_14ptFontInfo);
   const timer = (Config.e5cc.autoShutoff * 60000) - (Date.now() - (state.started || 0));
+  const timeStr = state.running && timer >= 0 ? getTimeString(timer, isScreenSaver) : dayjs(Date.now()).format('h:mm');
+
+  const maxX = 124 - (18 + (width * timeStr.length));
+  const maxY = 64 - (2 + height);
+
+  updateScreenSaverPos(
+    maxX,
+    maxY,
+  );
+
   if (state.running && timer >= 0) {
-    drawBitmap(0, 0, getHourglass());
-    display.drawString(18, 2, getTimeString(timer, false), 1, Color.White, Layer.Layer0);
+    drawBitmap(pos.x, pos.y, getHourglass());
+    display.drawString(pos.x+18, pos.y+2, timeStr, 1, Color.White, Layer.Layer0);
   } else {
-    drawBitmap(0, 0, Icons.clock);
-    display.drawString(18, 2, dayjs(Date.now()).format('h:mm'), 1, Color.White, Layer.Layer0);
+    drawBitmap(pos.x, pos.y, Icons.clock);
+    display.drawString(pos.x+18, pos.y+2, dayjs(Date.now()).format('h:mm'), 1, Color.White, Layer.Layer0);
+  }
+
+  if (isScreenSaver) {
+    display.refresh();
+    return;
   }
 
   display.drawString(90, 2, `${presets[state.currentPreset || 0]}F`, 1, Color.White, Layer.Layer0);
 
   display.setFont(Font.UbuntuMono_24ptFontInfo);
-  updateScreenSaverPos(
-    state.nocoil ? 50 : 64,
-    state.nocoil ? 46 : 40
-  );
-
   if (state.nocoil) {
     display.setFont(Font.UbuntuMono_16ptFontInfo);
-    display.drawString(pos.x, pos.y, 'NO COIL', 1, Color.White, Layer.Layer0);
+    display.drawString(50, 46, 'NO COIL', 1, Color.White, Layer.Layer0);
   } else {
-    display.drawString(pos.x, pos.y, `${(state.pv || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
+    display.drawString(64, 40, `${(state.pv || 0).toString().padStart(3)}F`, 1, Color.White, Layer.Layer0);
   }
 
-  if (
-    ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) > 0) 
-    || (screenSaverDisabled === 0)
-  ) {
-    drawBitmap(0, 48, Icons.star);
-  }
-  // display.drawString()
-  // drawMenu(state.currentPreset || 0, presets.map(p => p.toString()), Icons.drop, 106);
+  drawBitmap(0, 48, Icons.star);
 
   display.refresh();
 };
@@ -329,7 +347,7 @@ const renderTuning = () => {
   display.refresh();
 };
 
-export const updateScreenSaverPos = (startX: number, startY: number): boolean => {
+export const updateScreenSaverPos = (maxX: number, maxY: number): boolean => {
   if (
     (
       ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
@@ -339,7 +357,7 @@ export const updateScreenSaverPos = (startX: number, startY: number): boolean =>
   ) {
     const newXDir = 
       pos.xDir === 1
-        ? pos.x + pos.xDir > startX
+        ? pos.x + pos.xDir > maxX
           ? -1
           : 1
         : pos.x + pos.xDir < 0
@@ -347,10 +365,10 @@ export const updateScreenSaverPos = (startX: number, startY: number): boolean =>
           : -1;
     const newYDir = 
       pos.yDir === 1
-        ? pos.y + pos.yDir > startY
+        ? pos.y + pos.yDir > maxY
           ? -1
           : 1
-        : pos.y + pos.yDir < 28
+        : pos.y + pos.yDir < 0
           ? 1
           : -1;
     pos = {
@@ -364,9 +382,9 @@ export const updateScreenSaverPos = (startX: number, startY: number): boolean =>
     return true;
   } else {
     pos = {
-      xDir: -1, yDir: -1,
-      x: startX, y: startY,
-      lastX: startX, lastY: startY,    
+      xDir: 1, yDir: 1,
+      x: 0, y: 0,
+      lastX: 0, lastY: 0,    
     };
     return false;
   }
