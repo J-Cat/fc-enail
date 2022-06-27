@@ -316,6 +316,16 @@ const render = async () => {
     return;
   }  
 
+  if (
+    !state.running
+    &&
+    ((Config.display.screenSaverTimeout * 60000) - (Date.now() - screenSaverDisabled) <= 0) 
+    && (screenSaverDisabled !== 0)
+  ) {
+    display.refresh();
+    return;
+  }
+
   //state.mode?
   switch (state.mode) {
   case 'profiles': {
