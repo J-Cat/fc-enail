@@ -34,7 +34,7 @@
     "dayjs": "^1.9.5",
     "debug": "^4.2.0",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-fileupload": "^1.2.0",
     "express-validator": "^6.6.1",
     "generate-password": "^1.5.1",
