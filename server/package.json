@@ -43,7 +43,7 @@
     "http-status-codes": "^2.1.4",
     "i2c": "^0.2.5",
     "ini": "^2.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "localtunnel": "^2.0.0",
     "lowdb": "^1.0.0",
     "modbus-serial": "^8.0.1",
